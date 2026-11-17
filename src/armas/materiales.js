@@ -109,7 +109,7 @@ function texComposite(n = 256) {
 
 const DEF = {
   // metales
-  acero: () => new THREE.MeshStandardMaterial({ name: 'arsenal_acero', color: 0x2a2f36, metalness: 0.92, roughness: 0.42, roughnessMap: rugAcero(), envMapIntensity: 1.5 }),
+  acero: () => new THREE.MeshStandardMaterial({ name: 'arsenal_acero', color: 0x55616f, metalness: 0.95, roughness: 0.36, roughnessMap: rugAcero(), envMapIntensity: 1.5 }),
   acero_c: () => new THREE.MeshStandardMaterial({ name: 'arsenal_acero_claro', color: 0xb9bec4, metalness: 1, roughness: 0.34, roughnessMap: rugAcero(), envMapIntensity: 1.5 }),
   hierro: () => new THREE.MeshStandardMaterial({ name: 'arsenal_hierro', color: 0x3a3836, metalness: 0.85, roughness: 0.68, roughnessMap: rugAcero(), envMapIntensity: 1.1 }),
   oxido: () => new THREE.MeshStandardMaterial({ name: 'arsenal_oxido', color: 0x5a3a28, metalness: 0.55, roughness: 0.85, roughnessMap: rugAcero(), envMapIntensity: 0.8 }),

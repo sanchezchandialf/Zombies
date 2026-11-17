@@ -9,6 +9,7 @@
 //   ?era=N&hora=H           atmósfera del arnés
 import * as THREE from 'three';
 import { crearArnes } from './arnes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { crearModeloArma, crearModeloTorreta, crearModeloEmplazamiento, crearIconoArma } from '../src/armas/modelos.js';
 import { ARMAS } from '../src/datos/armas.js';
 import { ERAS, ARQUETIPOS } from '../src/datos/eras.js';
@@ -80,20 +81,63 @@ function soldado(id) {
 }
 
 const vista = q.get('vista');
-const a = await crearArnes({ eraIdx: num('era', 0), hora: num('hora', 0.25), camara: { dist: 10, alto: 2, objetivo: [0, 1, 0] } });
+// Visor ligero (por defecto): entorno de estudio + luz principal con sombras, sin posproceso → capturas rápidas por software.
+// ?arnes=1 usa el arnés del juego (atmósfera real de la era y bloom) para juzgar emisivos y luz de juego.
+async function visorLigero() {
+  document.body.style.cssText = 'margin:0;background:#16181c;overflow:hidden';
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  r.setPixelRatio(1); r.setSize(innerWidth, innerHeight);
+  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+  r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = num('exp', 1.0);
+  document.body.appendChild(r.domElement);
+  const escena = new THREE.Scene();
+  escena.background = new THREE.Color(num('fondo', 0x3a3f47));
+  const pm = new THREE.PMREMGenerator(r);
+  escena.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; escena.environmentIntensity = 0.9;
+  const sol = new THREE.DirectionalLight(0xfff0dc, 3.2); sol.position.set(4, 8, 6); sol.castShadow = true;
+  sol.shadow.mapSize.set(2048, 2048); Object.assign(sol.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 30 }); sol.shadow.bias = -0.0004;
+  escena.add(sol);
+  const rel = new THREE.DirectionalLight(0x9ab8ff, 1.2); rel.position.set(-5, 3, -4); escena.add(rel);
+  const camara = new THREE.PerspectiveCamera(36, innerWidth / innerHeight, 0.05, 200);
+  const fns = []; let activo = false;
+  const dibujar = () => r.render(escena, camara);
+  let t0 = performance.now();
+  const bucle = () => { const t = performance.now(); const dt = Math.min(0.1, (t - t0) / 1000); t0 = t; for (const f of fns) f(dt); dibujar(); if (activo) requestAnimationFrame(bucle); };
+  return {
+    juego: { render: { escena, camara }, opciones: {} }, THREE,
+    alCuadro(f) { fns.push(f); activo = true; },
+    mirar(x, y, z, tx = 0, ty = 1, tz = 0) { camara.position.set(x, y, z); camara.lookAt(tx, ty, tz); },
+    lista() { camara.updateProjectionMatrix(); bucle(); window.__lista = true; },
+  };
+}
+const a = q.has('arnes') ? await crearArnes({ eraIdx: num('era', 0), hora: num('hora', 0.25), camara: { dist: 10, alto: 2, objetivo: [0, 1, 0] } }) : await visorLigero();
 const esc = a.juego.render.escena;
 window.arnes = a;
 let giratorios = [];
 let h = 0;
 
-if (q.has('arma')) {
+if (q.has('arma') && q.get('arma').includes(',')) {
+  // varias armas normalizadas en una rejilla (comparar detalle): ?arma=a,b,c,d&cols=2
+  const ids = q.get('arma').split(','), cols = num('cols', 2), L = 1.5, cw = L * 1.1, ch = num('alto', 0.75);
+  ids.forEach((id, i) => {
+    const m = crearModeloArma(id), caja = new THREE.Box3().setFromObject(m), c = caja.getCenter(new THREE.Vector3()), t = caja.getSize(new THREE.Vector3());
+    const g = new THREE.Group(); m.position.sub(c); g.add(m); g.rotation.y = Math.PI / 2 * (q.has('lado') ? -1 : 1);
+    const e = new THREE.Group(); e.add(g); e.scale.setScalar(Math.min(L / Math.max(t.z, t.x), (ch * 0.85) / t.y));
+    e.position.set((i % cols - (cols - 1) / 2) * cw, -Math.floor(i / cols) * ch, 0); esc.add(e);
+  });
+  const rows = Math.ceil(ids.length / cols), cam = a.juego.render.camara;
+  cam.aspect = innerWidth / innerHeight; cam.fov = 30; cam.updateProjectionMatrix();
+  const tf = Math.tan(cam.fov * Math.PI / 360), Wt = cols * cw, Ht = rows * ch;
+  const dist = Math.max(Ht / 2 / tf, Wt / 2 / (tf * cam.aspect)) * 1.02;
+  a.mirar(0, -(rows - 1) * ch / 2, dist, 0, -(rows - 1) * ch / 2, 0);
+} else if (q.has('arma')) {
   const id = q.get('arma');
   const m = crearModeloArma(id);
   const pivote = new THREE.Group(); pivote.add(m); esc.add(pivote);
   const caja = new THREE.Box3().setFromObject(m), c = caja.getCenter(new THREE.Vector3()), tam = caja.getSize(new THREE.Vector3());
   m.position.sub(c); pivote.position.set(0, 1.2, 0);
   pivote.rotation.y = num('ang', Math.PI / 2);
-  const cam = a.juego.render.camara, L = Math.max(tam.x, tam.z) * 0.62 * num('zoom', 1);
+  const cam = a.juego.render.camara, L = Math.max(tam.x, tam.z) * 0.62 * num('zoom', 0.52);
   const dist = L / Math.tan((cam.fov * Math.PI / 180) / 2 * Math.min(1, cam.aspect)) * 1.0;
   a.mirar(0, 1.2 + dist * 0.18, dist, 0, 1.2, 0);
   if (num('giro', 1)) a.alCuadro((dt) => { pivote.rotation.y += dt * 0.5; });
@@ -152,21 +196,26 @@ if (q.has('arma')) {
   // parrilla
   const fila = q.has('fila') ? num('fila', 0) : null;
   const filas = fila === null ? [0, 1, 2, 3, 4, 5] : [fila];
-  const dx = fila === null ? 1.55 : 2.3, dy = fila === null ? 0.9 : 1.15;
+  const dx = fila === null ? 1.7 : 1.9, dy = fila === null ? 0.95 : 1.3;
   const cols = fila === null ? 8 : 4;
+  const filasN = fila === null ? 6 : 2;
   filas.forEach((e, fi) => {
     ARQUETIPOS.forEach((k, ci) => {
       const id = ERAS[e].armas[k];
       let cx, cy;
       if (fila === null) { cx = (ci - 3.5) * dx; cy = (5 - fi) * dy; }
-      else { cx = ((ci % cols) - 1.5) * dx; cy = (1 - Math.floor(ci / cols)) * dy * 2.4 + 1.2; }
+      else { cx = ((ci % cols) - 1.5) * dx; cy = (1 - Math.floor(ci / cols)) * dy; }
       const { g } = expositor(id, cx, cy);
       esc.add(g);
-      const t = etiqueta(ARMAS[id].nombre, fila === null ? 0.075 : 0.11); t.position.set(cx, cy - (fila === null ? 0.3 : 0.5), 0.6); esc.add(t);
+      const t = etiqueta(ARMAS[id].nombre, fila === null ? 0.13 : 0.15); t.position.set(cx, cy - dy * 0.36, 0.6); esc.add(t);
     });
   });
-  if (fila === null) { a.mirar(0, 2.9, 11.6, 0, 2.55, 0); a.juego.render.camara.fov = 38; }
-  else { a.mirar(0, 1.9, 8.5, 0, 1.6, 0); a.juego.render.camara.fov = 34; }
-  a.juego.render.camara.updateProjectionMatrix();
+  const W = cols * dx + 0.6, H = filasN * dy + 0.4, cyc = fila === null ? 2.5 * dy : 0;
+  const cam = a.juego.render.camara; cam.fov = 36; cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix();
+  const tf = Math.tan(cam.fov * Math.PI / 360);
+  const dist = Math.max(H / 2 / tf, W / 2 / (tf * cam.aspect)) * 1.04;
+  const fondo = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshStandardMaterial({ color: 0x23262c, roughness: 0.95 }));
+  fondo.position.set(0, cyc, -1.4); esc.add(fondo);
+  a.mirar(0, cyc + 0.3, dist, 0, cyc + 0.3, 0);
 }
 a.lista();

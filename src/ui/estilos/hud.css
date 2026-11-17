@@ -241,3 +241,9 @@
 .ez[data-formato="estrecho"] .hud-sup { grid-template-columns: 1fr; justify-items: center; }
 .ez[data-formato="estrecho"] .hud-izq, .ez[data-formato="estrecho"] .hud-der { display: none; }
 .ez[data-formato="estrecho"] .jug { width: 20em; }
+
+/* Era 1: el calendario es una cinta de cartel «Se busca» */
+.ez[data-era="1"] .calendario { background: var(--cinta-fondo); border: 2px solid #2b160a; outline-color: rgba(43,22,10,.5); box-shadow: 0 .2em .5em rgba(0,0,0,.55); transform: rotate(-.6deg); }
+.ez[data-era="1"] .calendario .cal-dia, .ez[data-era="1"] .calendario .cal-anio { color: #2b160a; }
+.ez[data-era="1"] .calendario .cal-era { color: #8a3a14; }
+.ez[data-era="1"] .calendario i { background: #8a3a14; }

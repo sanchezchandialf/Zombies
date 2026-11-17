@@ -129,9 +129,10 @@ function galeria() {
 window.probar = (n, op) => ejecutar(n, op);
 window.parar = (v = true) => juego.pausar(v);
 window.paso = (seg) => { const n = Math.max(1, Math.round(seg * 30)); for (let i = 0; i < n; i++) fx.actualizar(1 / 30); };
+window.fijar = (nombres, t = 0.3, repetir = 1) => { juego.pausar(true); window.limpiar(); fx.actualizar(1 / 60); for (let r = 0; r < repetir; r++) for (const n of String(nombres).split(',')) ejecutar(n.trim()); window.paso(t); };
 window.limpiar = () => { emisores = []; fx.limpiar(); };
 window.fx = fx; window.juego = juego; window.arnes = a;
-window.estado = () => fx.estado();
+window.diag = () => fx.estado();
 window.nombres = () => Object.keys(EFECTOS);
 
 const ef = q.get('efecto');

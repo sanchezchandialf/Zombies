@@ -38,10 +38,31 @@ function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
 let mats = null;
 export function materialesZombi() {
   if (mats) return mats;
-  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.32, suciedad: 0.55 });
-  const metal = parchear(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.38, metalness: 0.85 }), { granulado: 0.55, rim: 0.12, suciedad: 0.4 });
+  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.12, suciedad: 0.55 });
+  const metal = parchear(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.38, metalness: 0.85 }), { granulado: 0.55, rim: 0.06, suciedad: 0.4 });
   const emisivo = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
   mats = { mate, metal, emisivo };
   return mats;
 }
 export function liberarMateriales() { if (mats) { for (const m of Object.values(mats)) m.dispose(); mats = null; } }
+
+/** Material para jefes (mallas normales, no instanciadas): grano por objeto, suciedad cerca del suelo y borde de luz. */
+export function materialJefe({ color = 0x888888, metal = 0, rough = 0.7, emis = null, ei = 0, rim = 0.12, grano = 0.8 } = {}) {
+  const m = new THREE.MeshStandardMaterial({ color, metalness: metal, roughness: rough });
+  if (emis !== null) { m.emissive = new THREE.Color(emis); m.emissiveIntensity = ei; }
+  m.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', `#include <common>\n varying vec3 vLoc; varying float vAlt;`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>\n vLoc = position; vAlt = (modelMatrix * vec4(transformed, 1.0)).y;`);
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>\n varying vec3 vLoc; varying float vAlt;\n${GLSL_RUIDO}`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        float zn = zr(vLoc * 5.0), zn2 = zr(vLoc * 19.0 + 3.7);
+        diffuseColor.rgb *= 1.0 - ${grano.toFixed(2)} * 0.2 + ${grano.toFixed(2)} * (0.3 * zn + 0.1 * zn2);
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.45, 0.38, 0.3), smoothstep(1.2, 0.0, vAlt) * 0.5);`)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        totalEmissiveRadiance += diffuseColor.rgb * pow(1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0), 3.0) * ${rim.toFixed(2)};`);
+  };
+  m.customProgramCacheKey = () => 'jefe-' + grano + rim;
+  return m;
+}

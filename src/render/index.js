@@ -17,6 +17,7 @@ const CALIDADES = {
   ultra: { pr: 2,    sombra: 4096, ao: true,  aoN: 16, bloom: 5, msaa: 4, fxaa: false, puntuales: 12, clima: 1 },
 };
 
+const BLANCO = new THREE.Color(1, 1, 1);
 const mod1 = (x) => ((x % 1) + 1) % 1;
 const ease = (t) => t * t * (3 - 2 * t);
 
@@ -253,7 +254,7 @@ export function crearRender(juego) {
           if (trans.t >= 1) { const r = trans.resolver; trans = null; transValor = 0; r(); }
         }
       }
-      const eraCol = ERAS[eraObj]?.color; if (eraCol) transColor.set(eraCol).multiplyScalar(1.6).lerp(_v.set(1, 1, 1), 0.25);
+      const eraCol = ERAS[eraObj]?.color; if (eraCol) transColor.set(eraCol).multiplyScalar(1.6).lerp(BLANCO, 0.25);
 
       // destello de pantalla
       if (flashPantalla.v > 0) { flashPantalla.t += dtR; if (flashPantalla.t >= flashPantalla.dur) flashPantalla.v = 0; }

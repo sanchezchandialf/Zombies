@@ -58,8 +58,8 @@ function pistolaChispaPieza(b, { largo = 0.26, esc = 1 } = {}) {
   canon(b, { mat: 'acero', y, z0: -0.02, z1: largo, r: 0.0125, r2: 0.0108, oct: true });
   abrazaderas(b, { mat: 'laton', y, zs: [largo * 0.5, largo * 0.8], r: 0.011, ancho: 0.012 });
   baqueta(b, { y: 0.026, z0: 0.0, z1: largo * 0.84, r: 0.0036, mat: 'acero_c' });
-  llaveChispa(b, { x: -0.0175, z: -0.035, y: 0.037, esc: 0.78 });
-  b.perfil('laton', [[-0.092, -0.1], [-0.07, -0.098], [-0.065, -0.13], [-0.095, -0.13]], 0.034, [0, 0, 0], { suave: 0.004, bisel: 0.002 }); // pomo
+  llaveChispa(b, { x: -0.0175, z: 0.02, y: 0.036, esc: 0.7 });
+  b.caja('laton', [0.036, 0.016, 0.1], [0, -0.122, -0.04], 0.006, [-0.14, 0, 0]); // pomo de latón
   guardamonte(b, { z: -0.03, y: 0.0, largo: 0.085, prof: 0.032, r: 0.0048 });
   b.caja('laton', [0.034, 0.012, 0.03], [0, 0.0, 0.01], 0.004); // refuerzo
   b.caja('laton', [0.005, 0.01, 0.012], [0, y + 0.0165, largo - 0.01], 0.001); // punto de mira
@@ -146,9 +146,10 @@ function carabina_zapador(b) {
   placaLateral(b, 0.0245, -0.03, 0.04, 1.2);
   guardamonte(b, { mat: 'hierro', z: -0.11, y: -0.03, largo: 0.12, prof: 0.045 });
   b.perfil('hierro', [[-0.33, 0.094], [-0.315, 0.094], [-0.312, -0.078], [-0.33, -0.084]], 0.042, [0, 0, 0], { suave: 0.003, bisel: 0.002 });
-  // bayoneta de cubo plegada bajo el cañón
-  b.cil('hierro', 0.011, 0.05, [0, 0.062, 0.6], { seg: 10 });
-  b.perfil('acero_c', [[0, 0], [0.25, 0.0], [0.33, 0.004], [0.25, 0.017], [0, 0.017]], 0.0045, [0, 0.02, 0.62], { bisel: 0.0008 });
+  // bayoneta de cubo calada bajo la boca: virola alrededor del cañón y hoja de sección en cuña
+  b.cil('hierro', 0.0235, 0.07, [0, 0.09, 0.58], { seg: 14 });
+  b.caja('hierro', [0.016, 0.05, 0.03], [0, 0.056, 0.62], 0.004);
+  b.perfil('acero_c', [[0.0, 0.0], [0.3, 0.0], [0.4, 0.006], [0.3, 0.022], [0.0, 0.024]], 0.0048, [0, 0.033, 0.64], { bisel: 0.0009 });
   baqueta(b, { y: 0.045, z0: 0.05, z1: 0.46, r: 0.0042, mat: 'madera_c' });
   return { boca: [0, 0.09, 0.652], manoIzq: [0, 0.035, 0.28], pose: 'larga' };
 }
@@ -184,16 +185,17 @@ function sable(b) {
   b.esf('laton', 0.011, [0.08, -0.002, 0.072], 1, 8); b.esf('laton', 0.011, [-0.08, -0.002, 0.072], 1, 8);
   b.cil('laton', 0.015, 0.02, [0, -0.002, 0.068], { seg: 12 });
   // hoja curva (filo convexo hacia abajo): sector de círculo de radio 3 m
-  const R = 3.2, cz = 0.09, cy = 0.0 + R, pts = [], pts2 = [];
-  const t1 = 0.285;
+  const R = 4.4, cz = 0.09, cy = 0.0 + R, pts = [], pts2 = [];
+  const t1 = 0.215;
   for (let i = 0; i <= 14; i++) {
     const t = (t1 * i) / 14, a = Math.sin(t) * R, c = R - Math.cos(t) * R;
     const ancho = 0.036 * (1 - Math.pow(t / t1, 1.6)) + (i === 14 ? 0 : 0.002);
     pts.push([cz + a, c - 0.014]); pts2.push([cz + a - 0.002 * 0, c - 0.014 + ancho]);
   }
+  const spine = pts2.slice();
   b.perfil('acero_c', pts.concat(pts2.reverse()), 0.0065, [0, 0, 0], { bisel: 0.0012 });
-  // contrafilo ('falso filo') y canal central oscuro
-  b.perfil('acero', pts2.slice().reverse().filter((_, i) => i < 10).map((p) => [p[0], p[1] - 0.012]).concat(pts2.filter((_, i) => i < 10).map((p) => [p[0], p[1] - 0.0145]).reverse()), 0.0072, [0, 0, 0], { bisel: 0.0004 });
+  // canal central (sangradera) más oscuro
+  { const alto = spine.slice(2, 12).map((p) => [p[0], p[1] - 0.0105]), bajo = spine.slice(2, 12).map((p) => [p[0], p[1] - 0.0128]).reverse(); b.perfil('acero', alto.concat(bajo), 0.0072, [0, 0, 0], { bisel: 0.0003 }); }
   const tip = pts[pts.length - 1];
   return { boca: [0, tip[1] + 0.0, tip[0]], manoIzq: null, pose: 'cuerpo' };
 }

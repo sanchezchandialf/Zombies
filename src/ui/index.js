@@ -106,9 +106,12 @@ export function crearUI(juego) {
   modulo('pantallas', crearPantallas);
   modulo('pausa', crearPausa);
 
-  let eraPrev = -1, fasePrev = '', pausaPrev = null;
+  let eraPrev = -1, fasePrev = '', pausaPrev = null, relojPrev = performance.now();
   function actualizar() {
-    const dt = limitar(juego.tiempo?.dtReal ?? 1 / 60, 0, 0.1);
+    // Reloj propio: los temporizadores de la interfaz siguen el tiempo real aunque el juego limite su paso por cuadro.
+    const ahora = performance.now();
+    const dt = limitar((ahora - relojPrev) / 1000, 0, 0.5);
+    relojPrev = ahora;
     const est = juego.estado;
     const era = ctx.era;
     if (era !== eraPrev) { eraPrev = era; aplicarTema(raiz, era); }

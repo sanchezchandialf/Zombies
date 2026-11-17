@@ -117,9 +117,9 @@ export function crearEfectos(ctx) {
           S.drag = 3.2; S.stretch = 0.075; S.flags = F.SIN_SUELO; S.luz = 0;
           lanzar(B, x, y, z, Math.cos(a) * v, rr(-0.4, 0.9), Math.sin(a) * v, rr(0.09, 0.17), 0.42 * s, 0.7 * s, ESTELA, FUF0, FUF1, FUF2);
         }
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
           S.drag = 4; S.nfr = 4; S.flags = F.FUEGO | F.SIN_SUELO | F.SALE; S.rot = rng() * TAU; S.luz = 0;
-          lanzar(B, x + DX * 0.5 * (i + 1) * s, y, z + DZ * 0.5 * (i + 1) * s, DX * 3, 0.4, DZ * 3, rr(0.14, 0.24), 0.45 * s, rr(0.95, 1.4) * s, HUMO, FU0, FU1, FU2);
+          lanzar(B, x + DX * (0.25 + 0.4 * i) * s + rr(-0.1, 0.1), y + rr(-0.08, 0.08), z + DZ * (0.25 + 0.4 * i) * s + rr(-0.1, 0.1), DX * 4, 0.3, DZ * 4, rr(0.12, 0.2), 0.25 * s, rr(0.55, 0.85) * s, HUMO, [2.4, 1.5, 0.55, 0.55], [1.7, 0.55, 0.1, 0.5], FUF2);
         }
         for (let i = 0; i < cnt(7 * g); i++) chispaDir(x + DX * 0.3, y, z + DZ * 0.3, DX * 3 + rr(-1, 1), DZ * 3 + rr(-1, 1), 11 * s, e, CHI0, CHI1, CHI2, 11, 0.5);
         // nube de humo blanco: densa junto a la boca, deriva hacia delante y permanece varios segundos
@@ -361,8 +361,8 @@ export function crearEfectos(ctx) {
 
   // ─────────────────────────────── explosiones ───────────────────────────────
   const PAL = {
-    explosivo: { f0: FU0, f1: FU1, f2: FU2, humo: HUMO_OSC, luz: 0xffa050 },
-    fuego: { f0: [3.6, 2.2, 0.7, 0.95], f1: [2.8, 0.85, 0.12, 0.88], f2: [0.5, 0.05, 0.01, 0], humo: gris(0.05, 0.8), luz: 0xff8a30 },
+    explosivo: { f0: [2.5, 1.65, 0.6, 0.72], f1: [1.9, 0.62, 0.11, 0.72], f2: [0.4, 0.05, 0.01, 0], humo: HUMO_OSC, luz: 0xffa050 },
+    fuego: { f0: [2.7, 1.7, 0.55, 0.8], f1: [2.2, 0.7, 0.1, 0.78], f2: [0.5, 0.05, 0.01, 0], humo: gris(0.05, 0.8), luz: 0xff8a30 },
     veneno: { f0: [1.8, 3.4, 0.9, 0.95], f1: [0.7, 2.2, 0.2, 0.85], f2: [0.1, 0.4, 0.02, 0], humo: [[0.2, 0.34, 0.08, 0.7], [0.22, 0.36, 0.09, 0.62], [0.24, 0.38, 0.1, 0]], luz: 0x9aff40 },
     energia: { f0: [2.4, 3.6, 4.2, 0.95], f1: [0.7, 2.2, 3.6, 0.85], f2: [0.1, 0.2, 0.7, 0], humo: [[0.2, 0.22, 0.32, 0.45], [0.2, 0.22, 0.34, 0.4], [0.22, 0.24, 0.36, 0]], luz: 0x66e8ff },
   };

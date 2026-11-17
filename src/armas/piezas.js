@@ -190,13 +190,13 @@ export function guardamonte(b, { mat = 'laton', x = 0, z = -0.03, y = 0.0, largo
 export function llaveChispa(b, { x = -0.02, z = 0, y = 0.07, esc = 1, lado = -1 } = {}) {
   const s = esc, sx = lado;
   // platina (con bordes biselados) y su contraplatina de latón
-  b.perfil('acero_c', [[-0.07 * s, -0.012 * s], [0.07 * s, -0.004 * s], [0.082 * s, 0.012 * s], [0.04 * s, 0.026 * s], [-0.05 * s, 0.022 * s], [-0.085 * s, 0.002 * s]], 0.008, [x, y - 0.012, z], { suave: 0.007, bisel: 0.002 });
+  b.perfil('acero', [[-0.07 * s, -0.012 * s], [0.07 * s, -0.004 * s], [0.082 * s, 0.012 * s], [0.04 * s, 0.026 * s], [-0.05 * s, 0.022 * s], [-0.085 * s, 0.002 * s]], 0.008, [x, y - 0.012, z], { suave: 0.007, bisel: 0.002 });
   // cazoleta de latón
   b.caja('laton', [0.012, 0.012, 0.026 * s], [x + sx * 0.008, y + 0.016 * s, z + 0.066 * s], 0.003);
   // rastrillo (frizzen) en L
   b.perfil('acero', [[0, 0], [0.012 * s, 0], [0.012 * s, 0.05 * s], [0.002 * s, 0.05 * s], [0.002 * s, 0.01 * s], [0, 0.01 * s]], 0.008, [x + sx * 0.0045, y + 0.026 * s, z + 0.056 * s], { bisel: 0.0012 });
   // gallo: cuerpo curvo con mordazas y pedernal
-  b.perfil('acero', [[0, 0], [0.012, 0], [0.012, 0.028], [0.034, 0.05], [0.04, 0.062], [0.028, 0.064], [0.012, 0.052], [-0.004, 0.034], [-0.006, 0.01]].map((p) => [p[0] * s - 0.03 * s, p[1] * s]), 0.007, [x + sx * 0.0075, y + 0.012 * s, z + 0.012 * s], { suave: 0.003, bisel: 0.0012 });
+  b.perfil('acero_c', [[0, 0], [0.012, 0], [0.012, 0.028], [0.034, 0.05], [0.04, 0.062], [0.028, 0.064], [0.012, 0.052], [-0.004, 0.034], [-0.006, 0.01]].map((p) => [p[0] * s - 0.03 * s, p[1] * s]), 0.007, [x + sx * 0.0075, y + 0.012 * s, z + 0.012 * s], { suave: 0.003, bisel: 0.0012 });
   b.caja('cuero', [0.012, 0.012, 0.012], [x + sx * 0.0075, y + 0.062 * s, z + 0.012 * s + 0.012 * s], 0.002);
   b.caja('piedra', [0.008, 0.008, 0.012], [x + sx * 0.0075, y + 0.067 * s, z + 0.024 * s], 0.001);
   // tornillo de gallo y clavija

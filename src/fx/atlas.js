@@ -104,10 +104,10 @@ function campoHumo(seed) {
     // varios «cúmulos» desplazados: silueta de nube, no de disco
     const lob = fbm(u * 0.9 + seed * 2.1, v * 0.9 + seed * 4.7, seed + 3, 2);
     const base = (1 - r * 1.04) * 1.5 + (w - 0.5) * 1.15 + (w2 - 0.5) * 0.4 + (lob - 0.5) * 0.5 - 0.1;
-    let d = sm(0, 0.75, base) * sm(1, 0.78, r);
+    let d = Math.pow(sm(-0.12, 1.05, base), 1.15) * sm(1, 0.62, r);
     o.a = d;
     o.r = clamp(d * (0.55 + 0.45 * w2) * 1.15);
-    o.h = d * (0.5 + 0.9 * w2 + 0.4 * w) * 0.8; // relieve interno → normales con volumen
+    o.h = d * (0.7 + 0.45 * w2 + 0.35 * w) * 0.9; // relieve interno → normales con volumen
   };
 }
 
@@ -191,7 +191,7 @@ let _atlasParticulas = null;
 export function atlasParticulas() {
   if (_atlasParticulas) return _atlasParticulas;
   const buf = crearBuffer();
-  for (let i = 0; i < 4; i++) escribirCelda(buf, i, campoHumo(i * 1.37 + 1), { normal: 11 });
+  for (let i = 0; i < 4; i++) escribirCelda(buf, i, campoHumo(i * 1.37 + 1), { normal: 4.2 });
   for (let i = 0; i < 4; i++) escribirCelda(buf, 4 + i, campoLlama(i * 1.91 + 2), { normal: 0 });
   escribirCelda(buf, 8, campoBrillo);
   escribirCelda(buf, 9, campoDisco);

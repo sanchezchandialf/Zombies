@@ -23,7 +23,7 @@ export function crearPausa(ctx) {
       <button type="button" class="btn" data-foco data-a="opciones">${icono('engranaje')}<span>Opciones</span></button>
       <button type="button" class="btn" data-foco data-a="controles">${icono('teclado')}<span>Controles</span></button>
       <button type="button" class="btn" data-foco data-a="bestiario">${icono('libro')}<span>Bestiario</span></button>
-      <button type="button" class="btn" data-foco data-a="menu">${icono('flecha')}<span>Abandonar partida</span></button>
+      <button type="button" class="btn" data-foco data-a="menu">${icono('atras')}<span>Abandonar partida</span></button>
     </nav>
     <div class="ps-confirma" hidden>
       <div class="ps-confirma-t">¿Abandonar la partida y volver al menú? Se perderá el progreso de esta partida.</div>
@@ -92,7 +92,7 @@ export function crearPausa(ctx) {
     <div class="fn-roles"></div>
     <div class="fn-acciones">
       <button type="button" class="btn primario" data-foco data-a="reintentar">${icono('recarga')}<span>Reintentar</span></button>
-      <button type="button" class="btn" data-foco data-a="menu">${icono('flecha')}<span>Menú principal</span></button>
+      <button type="button" class="btn" data-foco data-a="menu">${icono('atras')}<span>Menú principal</span></button>
     </div>
   </div>
 </div>`);
@@ -161,6 +161,7 @@ export function crearPausa(ctx) {
       }
       // Si el estado vuelve al menú o a una partida nueva por otra vía, se cierran las capas.
       if (!fin.hidden && (est.fase === 'jugando' || est.fase === 'menu')) cerrarFin();
+      ctx.raiz.classList.toggle('ez-fin', !fin.hidden);
       if (!pausa.hidden && !est.pausado) cerrarPausa();
     },
     destruir() { removeEventListener('keydown', onTecla); document.removeEventListener('visibilitychange', onVis); quitaNav(); pausa.remove(); fin.remove(); },

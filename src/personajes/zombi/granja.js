@@ -23,7 +23,7 @@ export class Modelo {
     this.loc = g(this.loc, 12); this.col = g(this.col, 3); this.grupo = g(this.grupo, 1); this.cap = c;
   }
   /** Añade pieza. pos, rot (Euler Y·X·Z), tam son arrays de 3. col 0xRRGGBB (o [r,g,b]). */
-  anadir(kindIdx, mat, joint, px, py, pz, sx, sy, sz, col, o = null) {
+  anadir(kindIdx, mat, joint, px, py, pz, ex, ey, ez, col, o = null) {
     if (this.n >= this.cap) this.crecer();
     const i = this.n++;
     this.mi[i] = kindIdx * NMAT + mat; this.joint[i] = joint; this.grupo[i] = GRUPO_DE_J[joint];
@@ -34,9 +34,9 @@ export class Modelo {
     const r10 = cx * sz_, r11 = cx * cz, r12 = -sxn;
     const r20 = -sy * cz + cy * sxn * sz_, r21 = sy * sz_ + cy * sxn * cz, r22 = cy * cx;
     const b = i * 12, L = this.loc;
-    L[b] = r00 * sx; L[b + 1] = r10 * sx; L[b + 2] = r20 * sx;
-    L[b + 3] = r01 * sy; L[b + 4] = r11 * sy; L[b + 5] = r21 * sy;
-    L[b + 6] = r02 * sz; L[b + 7] = r12 * sz; L[b + 8] = r22 * sz;
+    L[b] = r00 * ex; L[b + 1] = r10 * ex; L[b + 2] = r20 * ex;
+    L[b + 3] = r01 * ey; L[b + 4] = r11 * ey; L[b + 5] = r21 * ey;
+    L[b + 6] = r02 * ez; L[b + 7] = r12 * ez; L[b + 8] = r22 * ez;
     L[b + 9] = px; L[b + 10] = py; L[b + 11] = pz;
     let r, g, bl;
     if (Array.isArray(col)) { r = col[0]; g = col[1]; bl = col[2]; }
