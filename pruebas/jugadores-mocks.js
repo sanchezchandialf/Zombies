@@ -38,17 +38,18 @@ export function mockCombate(juego) {
       if (!p.mods.municionInfinita) inst.municion--;
       inst.enfriamiento = 1 / (def.cadencia * (p.mods.cadencia ?? 1));
       const n = def.perdigones ?? 1;
-      const crit = juego.rng() < (p.mods.critico ?? 0);
+      const lleva = p.proximoDisparo; p.proximoDisparo = null;
+      const crit = !!lleva?.critico || juego.rng() < (p.mods.critico ?? 0), mult = lleva?.multiplicador ?? 1;
       for (let k = 0; k < n; k++) {
         const r = rot + (juego.rng() - 0.5) * (def.dispersion ?? 0) * (Math.PI / 180) * (p.mods.dispersion ?? 1);
         const d = dirDeRot(r);
         const h = juego.fisica.rayo(origen.x, origen.z, d.x, d.z, def.alcance ?? 30, MASCARA_BALA, (c) => c.datos !== p && c.datos?.bando !== 'jugadores');
         const fin = h ? { x: h.x, y: 1.1, z: h.z } : { x: origen.x + d.x * (def.alcance ?? 30), y: 1.1, z: origen.z + d.z * (def.alcance ?? 30) };
         juego.fx?.trazadora?.(origen, fin, { tipo: def.trazadora });
-        if (h?.cuerpo?.datos?.recibirDanio) api.aplicarDanio(h.cuerpo.datos, { cantidad: def.danio * (p.mods.danio ?? 1) * (crit ? 2 : 1), tipo: def.tipo, atacante: p, arma: def, x: h.x, z: h.z, dirX: d.x, dirZ: d.z, empuje: def.empuje, critico: crit });
+        if (h?.cuerpo?.datos?.recibirDanio) api.aplicarDanio(h.cuerpo.datos, { cantidad: def.danio * (p.mods.danio ?? 1) * mult * (crit ? 2 : 1), tipo: def.tipo, atacante: p, arma: def, x: h.x, z: h.z, dirX: d.x, dirZ: d.z, empuje: def.empuje, critico: crit });
       }
       api.ultimoOrigen = { x: origen.x, z: origen.z };
-      api.ultimoDisparo = { crit, rot, cuadro: juego.tiempo.cuadro, danioMod: p.mods.danio };
+      api.ultimoDisparo = { crit, mult, rot, cuadro: juego.tiempo.cuadro, danioMod: p.mods.danio };
       juego.eventos.emitir('arma:disparo', { portador: p, arma: def, origen, rot });
       return true;
     },

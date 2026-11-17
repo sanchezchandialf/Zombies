@@ -189,8 +189,8 @@ export function crearHudMundo(ctx, { paneles }) {
     let dx = o.x - W / 2, dy = o.y - H / 2;
     if (!o.visible && ((dx === 0 && dy === 0))) dy = -1;
     const fpx = (parseFloat(ctx.raiz.style.getPropertyValue('--px')) || 1) * 16;
-    const mx = 3.2 * fpx, my = 5.4 * fpx;
-    const k = Math.min((W / 2 - mx) / Math.max(1e-3, Math.abs(dx)), (H / 2 - my) / Math.max(1e-3, Math.abs(dy)));
+    const mx = 3 * fpx, myS = 9.6 * fpx, myI = 8.4 * fpx;
+    const k = Math.min((W / 2 - mx) / Math.max(1e-3, Math.abs(dx)), ((dy < 0 ? H / 2 - myS : H / 2 - myI)) / Math.max(1e-3, Math.abs(dy)));
     const px = W / 2 + dx * k, py = H / 2 + dy * k;
     const m = marcador(nMarc++);
     visible(m.el, true);

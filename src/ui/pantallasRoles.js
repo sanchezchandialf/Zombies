@@ -9,10 +9,9 @@ import { iconoDeArma } from './armasUI.js';
 import { retratoRol, retratoZombi } from './retratos.js';
 import { DIFICULTADES, NOMBRE_ARQUETIPO, NOMBRE_DANIO } from './textos.js';
 import { PIE_AYUDA } from './comun.js';
-import { html, contenido, texto, clase, escapar, limitar, decimal, relanzar, visible, primerDiaDeEra as _p } from './util.js';
+import { html, contenido, texto, clase, escapar, limitar, decimal, relanzar, visible } from './util.js';
 import { primerDiaDeEra } from '../datos/eras.js';
 
-void _p;
 const HAB_ICONO = { supresion: 'hab_supresion', suero: 'hab_suero', torreta: 'hab_torreta', acecho: 'hab_acecho', terremoto: 'hab_terremoto' };
 
 /** Estadísticas comparables de un rol (0..1) a partir de sus datos. */
@@ -35,7 +34,7 @@ export function crearPantallaRoles(ctx, gestor) {
   const el = html(`
 <section class="pn pn-roles" hidden>
   <header class="pn-cab">
-    <button type="button" class="btn mini" data-foco data-a="atras">${icono('flecha', 'volver')}<span>Volver</span></button>
+    <button type="button" class="btn mini" data-foco data-a="atras">${icono('atras')}<span>Volver</span></button>
     <h2 class="titulo">Elige tu rol</h2>
     <div class="rl-jug">
       <button type="button" class="rl-tab sel" data-foco data-j="0"><b class="jug-tag num">J1</b><span class="rl-tab-n"></span></button>

@@ -36,7 +36,7 @@ const suelo = new THREE.Mesh(new THREE.PlaneGeometry(130, 130), M({ map: texColo
 suelo.rotation.x = -Math.PI / 2; suelo.receiveShadow = true; escena.add(suelo);
 
 // ── charco reflectante
-const charco = new THREE.Mesh(new THREE.CircleGeometry(3.2, 48), new THREE.MeshPhysicalMaterial({ color: 0x07090c, roughness: 0.03, metalness: 0.0, clearcoat: 1, envMapIntensity: 2.2 }));
+const charco = new THREE.Mesh(new THREE.CircleGeometry(3.2, 48), new THREE.MeshPhysicalMaterial({ color: 0x10141a, roughness: 0.02, metalness: 0.0, ior: 1.9, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 3.5 }));
 charco.rotation.x = -Math.PI / 2; charco.position.set(-3.5, 0.012, 3.5); charco.scale.set(1.5, 1, 0.9); escena.add(charco);
 const charco2 = charco.clone(); charco2.position.set(7, 0.012, 7); charco2.scale.set(0.8, 1, 0.7); escena.add(charco2);
 

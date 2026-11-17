@@ -14,7 +14,7 @@ export function iconoDeArma(arma, tam = 128) {
   if (cache.has(clave)) return cache.get(clave);
   let h = null;
   try {
-    const f = modelos['crearIconoArma'];
+    const clave_ = 'crearIconoArma'; const f = modelos[clave_];
     if (typeof f === 'function') {
       const c = f(def.id, tam);
       if (c && c.toDataURL) h = `<img class="ico-arma" alt="${escapar(def.nombre)}" draggable="false" src="${c.toDataURL('image/png')}">`;

@@ -54,6 +54,7 @@ export class Jugador {
     this._temp = { danio: 1, cadencia: 1, recarga: 1, critico: 0, infinita: false };
     this._infinitaPuesta = false;
     this.mejoras = [];
+    this.segundaUsos = 0;   // usos de «segundo aliento» en esta oleada (mods.segundaOportunidad)
 
     // ── estados ──
     this.estados = crearEstados();
@@ -129,12 +130,15 @@ export class Jugador {
   supresionActiva() { return this.rol.id === 'soldado' && this.habilidad.activa; }
   get habilidadActiva() { return this.habilidad.activa; }
 
+  /** Enfriamiento de la habilidad con las mejoras (mods.habilidadEnfriamiento ×). */
   iniciarEnfriamiento(seg) {
     const h = this.habilidad;
-    h.total = seg ?? h.def.enfriamiento * (this.mods.enfriamiento ?? 1);
+    h.total = (seg ?? h.def.enfriamiento) * (this.mods.habilidadEnfriamiento ?? 1);
     h.restante = h.total;
   }
-  iniciarActiva(dur) { const h = this.habilidad; h.activa = true; h.tiempoActiva = dur; h.duracion = dur; }
+  /** Marca la habilidad como activa durante `dur` s (× mods.habilidadDuracion). Devuelve la duración real. */
+  iniciarActiva(dur) { const h = this.habilidad; dur *= this.mods.habilidadDuracion ?? 1; h.activa = true; h.tiempoActiva = dur; h.duracion = dur; return dur; }
+  get potenciaHabilidad() { return this.mods.habilidadPotencia ?? 1; }
 
   // ───────────────────────────── Armas y equipo ─────────────────────────────
   armaIdsDeEra(eraIdx) {
@@ -168,6 +172,7 @@ export class Jugador {
     if (this.armas.length < 2) return false;
     idx = ((idx % 2) + 2) % 2;
     if (idx === this.armaIdx) return false;
+    this.juego.combate?.cancelarRecarga?.(this.arma);
     this.armaIdx = idx; this.arma = this.armas[idx];
     this.cambioT = AJUSTE.cambioArma;
     this.bufDisparo = 0;
@@ -229,7 +234,9 @@ export class Jugador {
     if (this.invulT > 0) return 0;
     if (juego.opciones?.dios) { this._retroalimentar(info, 0, tipo); return 0; }
     c *= this.rasgos.resiste?.[tipo] ?? 1;
-    c *= this.mods.danioRecibido ?? 1;
+    c *= (this.mods.resistencia ?? 1) * (this.mods.danioRecibido ?? 1);
+    if (tipo === 'veneno') c *= this.mods.resistenciaVeneno ?? 1;
+    else if (tipo === 'acido') c *= this.mods.resistenciaAcido ?? 1;
     if (!info.dot && this.graciaT > 0 && (tipo === 'golpe' || tipo === 'bala' || tipo === 'acido')) c *= AJUSTE.graciaFactor;
     if (this.escudo > 0) {
       const a = Math.min(this.escudo, c);
@@ -251,6 +258,11 @@ export class Jugador {
         const v = Math.min(9, info.empuje * (70 / AJUSTE.masa)) * (this.mods.empujeRecibido ?? 1);
         this.vx += (info.dirX / m) * v; this.vz += (info.dirZ / m) * v;
       }
+    }
+    if (this.vida <= 0.001 && this.segundaUsos < Math.floor(this.mods.segundaOportunidad ?? 0)) {
+      this.segundaUsos++; this.vida = 1; this.invulT = Math.max(this.invulT, 1.4);
+      juego.eventos.emitir('mensaje', { texto: '¡Segundo aliento!', tipo: 'logro', duracion: 1.6 });
+      juego.fx?.destello?.({ x: this.pos.x, y: 1.1, z: this.pos.z }, 0xffd070, 3, 0.4, 5);
     }
     this._retroalimentar(info, c, tipo);
     if (this.vida <= 0.001) this._caer(info);
@@ -319,6 +331,9 @@ export class Jugador {
     this.juego.eventos.emitir('jugador:reanimado', { jugador: this });
     return true;
   }
+
+  /** Al empezar o acabar una oleada se renuevan los «segundo aliento». */
+  nuevaOleada() { this.segundaUsos = 0; }
 
   teletransportar(x, z) {
     this.pos.set(x, 0, z);
@@ -502,7 +517,7 @@ export class Jugador {
     const dist = E.distancia * (this.rasgos.esquivaDistancia ?? 1) * (this.mods.esquiva ?? 1);
     e.activa = true; e.t = 0; e.dur = E.duracion; e.dx = dx; e.dz = dz;
     e.v0 = dist * (E.curva + 1) / E.duracion;
-    e.total = E.enfriamiento * (this.mods.enfriamientoEsquiva ?? 1); e.restante = e.total + E.duracion;
+    e.total = E.enfriamiento * (this.mods.esquivaEnfriamiento ?? 1); e.restante = e.total + E.duracion;
     e.buffer = 0;
     this.invulT = Math.max(this.invulT, E.duracion + E.extra);
     this.cuerpo.mascara = MASCARA_ESQUIVA;
@@ -740,7 +755,7 @@ export class Jugador {
     // 2) Reanimar a un compañero caído cercano (prioridad máxima).
     const caido = this._caidoCercano();
     if (caido) {
-      const t = this.rol.id === 'medico' ? AJUSTE.reanimarMedica : AJUSTE.reanimarTiempo;
+      const t = (this.rol.id === 'medico' ? AJUSTE.reanimarMedica : AJUSTE.reanimarTiempo) / Math.max(0.1, this.mods.reanimacion ?? 1);
       this.interactivo = { obj: caido, etiqueta: `Reanimar${caido.rol ? ' a ' + caido.rol.nombre : ''}`, tipo: 'reanimar', progreso: caido.progresoReanimar, mantener: t };
       this.usoT = 0;
       if (it.usarMantenido && !this.usoBloqueado) {
@@ -827,7 +842,7 @@ export class Jugador {
 
   _reparar(o, dt) {
     const k = (o.def?.vehiculo || o.conductor !== undefined) ? (this.mods.vehiculos ?? 1) : 1;
-    const cantidad = o.vidaMax * AJUSTE.reparar * k * dt;
+    const cantidad = o.vidaMax * AJUSTE.reparar * k * (this.mods.reparacion ?? 1) * dt;
     if (o.reparar) o.reparar(cantidad); else o.vida = Math.min(o.vidaMax, o.vida + cantidad);
     this._repT = (this._repT ?? 0) - dt;
     if (this._repT <= 0) {

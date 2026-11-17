@@ -84,7 +84,7 @@ export function crearPantallas(ctx) {
       <div class="logo-lema">Tres siglos. Una plaga. Ni un solo respiro.</div>
     </div>
     <nav class="menu-lista">
-      <button type="button" class="btn primario" data-foco data-a="jugar">${icono('jugar')}<span>Jugar<small>Día 1 · Año 1800 · Villa de Santa Ceniza</small></span></button>
+      <button type="button" class="btn destacado" data-foco data-a="jugar">${icono('jugar')}<span>Jugar<small>Día 1 · Año 1800 · Villa de Santa Ceniza</small></span></button>
       <button type="button" class="btn" data-foco data-a="practica">${icono('tiempo')}<span>Práctica<small>Empieza en la era que quieras</small></span></button>
       <button type="button" class="btn" data-foco data-a="bestiario">${icono('libro')}<span>Bestiario</span></button>
       <button type="button" class="btn" data-foco data-a="controles">${icono('teclado')}<span>Controles</span></button>
@@ -112,7 +112,7 @@ export function crearPantallas(ctx) {
   // ══ Práctica: elegir era inicial ═══════════════════════════════════════════════════════════════════════════════
   const practica = html(`
 <section class="pn pn-practica" hidden>
-  <header class="pn-cab"><button type="button" class="btn mini" data-foco data-a="atras">${icono('flecha', 'volver')}<span>Volver</span></button>
+  <header class="pn-cab"><button type="button" class="btn mini" data-foco data-a="atras">${icono('atras')}<span>Volver</span></button>
     <h2 class="titulo">Práctica</h2><div class="pn-cab-sub">Elige la era en la que quieres empezar</div></header>
   <div class="pr-grid">${ERAS.map((e) => `
     <button type="button" class="pr-era panel orn" data-foco data-e="${e.idx}" style="--c:${e.color}">
@@ -140,7 +140,7 @@ export function crearPantallas(ctx) {
   // ══ Créditos ═══════════════════════════════════════════════════════════════════════════════════════════════════
   const creditos = html(`
 <section class="pn pn-creditos" hidden>
-  <header class="pn-cab"><button type="button" class="btn mini" data-foco data-a="atras">${icono('flecha', 'volver')}<span>Volver</span></button><h2 class="titulo">Créditos</h2></header>
+  <header class="pn-cab"><button type="button" class="btn mini" data-foco data-a="atras">${icono('atras')}<span>Volver</span></button><h2 class="titulo">Créditos</h2></header>
   <div class="cr-caja panel orn">
     <div class="cr-logo titulo">ERA Z</div>
     <div class="cr-anios num">1800 · 2100</div>

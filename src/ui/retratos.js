@@ -54,12 +54,12 @@ const ROL = {
       <path d="M45 68q15 17 30 0v6q-15 20-30 0z" fill="#2b2118" opacity=".35"/>
       ${ojos()}
       <path d="M54 72q6 2.500 12 0" stroke="#7a4a36" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M36 52c0-22 10-31 24-31s24 9 24 31c-5-6-12-9-24-9s-19 3-24 9z" fill="url(#${id}a)"/>
-      <path d="M36 52c0-22 10-31 24-31s24 9 24 31l-6-1c-3-5-9-8-18-8s-15 3-18 8z" fill="#000" opacity=".12"/>
-      <path d="M33 53h54v6H33z" fill="${oscuro(c, 0.3)}"/>
-      <path d="M42 33q18-9 36 0" stroke="#fff" stroke-opacity=".35" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M36 47c0-22 10-31 24-31s24 9 24 31c-5-5-12-8-24-8s-19 3-24 8z" fill="url(#${id}a)"/>
+      
+      <path d="M33 46h54v5H33z" fill="${oscuro(c, 0.3)}"/>
+      <path d="M42 28q18-9 36 0" stroke="#fff" stroke-opacity=".35" stroke-width="2" fill="none" stroke-linecap="round"/>
       <path d="M40 72q-3 14 6 20M80 72q3 14-6 20" stroke="${oscuro(c, 0.3)}" stroke-width="2.500" fill="none"/>
-      <rect x="58" y="26" width="4" height="10" rx="1.500" fill="${oscuro(c, 0.4)}"/>`);
+      <rect x="58" y="21" width="4" height="9" rx="1.500" fill="${oscuro(c, 0.4)}"/>`);
   },
   medico(id, c) {
     return marco(id, c, `

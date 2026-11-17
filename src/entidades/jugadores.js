@@ -41,7 +41,7 @@ export function crearJugadores(juego) {
 
     /** Al acabar una oleada: los caídos vuelven a la lucha. */
     reanimarTodos() {
-      for (const j of juego.jugadores) if (j.caido) j.reanimar(0.6, 2.5);
+      for (const j of juego.jugadores) { j.nuevaOleada(); if (j.caido) j.reanimar(0.6, 2.5); }
     },
 
     actualizar(dt) {
@@ -61,8 +61,13 @@ export function crearJugadores(juego) {
   }));
   offs.push(juego.eventos.en('danio', (d) => {
     const a = d?.atacante;
-    if (a && a.bando === 'jugadores' && a.comp?.alImpacto) a.comp.alImpacto(a, d);
+    if (!a || a.bando !== 'jugadores' || !a.comp) return;
+    a.comp.alImpacto?.(a, d);
+    // Robo de vida (mejoras): fracción del daño infligido a zombis.
+    const rv = a.mods?.robovida;
+    if (rv > 0 && a.vivo && d.objetivo?.bando === 'zombis' && d.cantidad > 0) a.curar(Math.min(d.cantidad, 400) * rv, true);
   }));
+  offs.push(juego.eventos.en('oleada:inicio', () => { for (const j of juego.jugadores) j.nuevaOleada(); }));
 
   return api;
 }

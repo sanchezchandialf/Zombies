@@ -357,6 +357,7 @@ export function crearMomentos(ctx) {
         if (t.t <= 0) { visible(t.nodo, false); timers.splice(i, 1); }
       }
       if (est.fase === 'menu') { if (!N.era.hidden || !N.anuncio.hidden || !N.inter.hidden || !N.salto.hidden || !N.jefe.hidden) limpiarTodo(), visible(N.inter, false); return; }
+      clase(ctx.raiz, 'ez-cubierto', !N.era.hidden || !N.salto.hidden || !N.inter.hidden);
       actualizarCuenta();
       actualizarMensajes(dtV);
       actualizarSalto(dt);

@@ -82,7 +82,7 @@ export function crearHud(ctx) {
       <div class="racha">
         <svg viewBox="0 0 60 60"><circle class="racha-pista" cx="30" cy="30" r="25"/><circle class="racha-prog" cx="30" cy="30" r="25" transform="rotate(-90 30 30)"/></svg>
         <span class="racha-mult num">×1</span>
-        <span class="racha-txt rotulo">Racha <b class="num">0</b></span>
+        <span class="racha-txt rotulo" title="Racha"><b class="num">0</b></span>
       </div>
     </div>
     <div class="calendario panel"><span class="cal-dia"></span><i></i><span class="cal-anio"></span><i></i><span class="cal-era"></span></div>

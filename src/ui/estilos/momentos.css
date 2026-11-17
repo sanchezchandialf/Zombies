@@ -71,9 +71,9 @@
 .ez .je-banda { display: flex; align-items: center; justify-content: center; gap: 1.8em; padding: 1.2em 10%; background: linear-gradient(90deg, transparent, rgba(26,2,2,.86) 14%, rgba(26,2,2,.86) 86%, transparent); border-top: 2px solid rgba(255,70,60,.7); border-bottom: 2px solid rgba(255,70,60,.7); box-shadow: 0 0 3em rgba(255,40,30,.25); }
 .ez .je-retr { width: 9em; height: 9em; flex: none; border: 2px solid #ff5a4f; border-radius: var(--radio); overflow: hidden; box-shadow: 0 0 1.5em rgba(255,60,50,.5); }
 .ez .je-retr svg { width: 100%; height: 100%; display: block; }
-.ez .je-texto { max-width: 31em; }
+.ez .je-texto { max-width: 36em; }
 .ez .je-rot { color: #ff8a80; letter-spacing: .4em; }
-.ez .je-nombre { font-size: 3.6em; color: #ff6a5f; letter-spacing: .1em; text-shadow: 0 .05em 0 #000, 0 0 .6em rgba(255,50,40,.7); margin: .06em 0; }
+.ez .je-nombre { white-space: nowrap; font-size: 3.2em; color: #ff6a5f; letter-spacing: .1em; text-shadow: 0 .05em 0 #000, 0 0 .6em rgba(255,50,40,.7); margin: .06em 0; }
 .ez .je-titulo { font-size: 1.35em; font-style: italic; color: var(--tinta); text-shadow: 0 .08em .2em #000; }
 .ez .je-desc { margin-top: .5em; font-size: .92em; color: var(--tinta-2); line-height: 1.4; }
 
@@ -85,7 +85,7 @@
 
 /* ── Rótulo de era ────────────────────────────────────────────────────────────────────────────────────────────── */
 .ez .mm-era { inset: 0; display: grid; place-items: center; }
-.ez .er-fondo { position: absolute; inset: 0; background: radial-gradient(90% 80% at 50% 45%, rgba(0,0,0,.35), rgba(0,0,0,.86)); }
+.ez .er-fondo { position: absolute; inset: 0; background: radial-gradient(90% 80% at 50% 45%, rgba(0,0,0,.5), rgba(0,0,0,.9)); }
 .ez .er-fondo::after { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 40% at 50% 50%, rgba(var(--era-rgb), .28), transparent 70%); }
 .ez .er-centro { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: .35em; width: min(60em, 92%); }
 .ez .er-centro > * { animation: ez-aparece .7s cubic-bezier(.16,.84,.3,1) both; }
@@ -173,3 +173,6 @@
 .ez .in-ayuda { color: var(--tinta-3); display: flex; align-items: center; gap: .4em; }
 .ez .in-saltar { width: auto; }
 .ez .mm-inter.completo .in-saltar { animation: ez-latido 1s ease-in-out infinite; }
+
+.ez .ez-mundo { transition: opacity .5s; }
+.ez.ez-cubierto .ez-mundo { opacity: .08; }

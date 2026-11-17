@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prueba · Interfaz (estado simulado)</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #07080a; overflow: hidden; }
+    #juego { position: fixed; inset: 0; }
+    #fondo { position: absolute; inset: 0; overflow: hidden; }
+    #fondo .e { position: absolute; left: 0; top: 0; border-radius: 50%; will-change: transform; }
+  </style>
+</head>
+<body>
+  <div id="juego"><div id="fondo"></div></div>
+  <!-- ?pantalla=menu|roles|hud|intermedio|era|jefe|pausa|fin|bestiario|controles|opciones|practica|anuncio|superado|mensajes|salto|cuenta &era=0..5 &jug=1|2 &dia=N -->
+  <script type="module" src="./ui.js"></script>
+</body>
+</html>

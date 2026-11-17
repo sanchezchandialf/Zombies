@@ -17,16 +17,18 @@ function mensaje(j, texto, tipo = 'aviso', duracion = 1.6) {
 }
 
 // ───────────────────────────── Soldado ─────────────────────────────
+/** Tope de la bonificación de cadencia de Disciplina de fuego (30 % + mods.disciplinaMax de las mejoras). */
+const topeDisciplina = (j) => 0.3 + (j.mods.disciplinaMax ?? 0);
 const soldado = {
   iniciar(j) { j.disciplina = 0; },
   supresion(j) { return j.habilidad.activa; },
   multiplicadores(j, m) {
     // Disciplina de fuego: +2 % de cadencia por baja consecutiva sin recibir daño (máx. 30 %).
-    m.cadencia *= 1 + Math.min(0.3, j.disciplina * 0.02);
+    m.cadencia *= 1 + Math.min(topeDisciplina(j), j.disciplina * 0.02);
     // Fuego de supresión: cadencia +60 % y munición gratis mientras dura.
     if (j.habilidad.activa) { m.cadencia *= 1.6; m.infinita = true; }
   },
-  alBaja(j) { j.disciplina = Math.min(15, j.disciplina + 1); },
+  alBaja(j) { j.disciplina = Math.min(Math.ceil(topeDisciplina(j) / 0.02), j.disciplina + 1); },
   alDanio(j) { if (j.disciplina > 0) { j.disciplina = 0; } },
   /** Las balas de supresión ralentizan a lo que impactan. */
   alImpacto(j, d) {
@@ -68,15 +70,16 @@ const medico = {
     const alc = Math.min(d, 11);
     const x = j.pos.x + (dx / d) * alc, z = j.pos.z + (dz / d) * alc;
     j.iniciarEnfriamiento();
-    j.iniciarActiva(def.duracion ?? 5);
+    const durZona = j.iniciarActiva(def.duracion ?? 5);
     j.visual?.accion?.('lanzar', { duracion: 0.4 });
     j.retardo(0.28, () => {
       const c = j.juego.combate;
-      const opciones = { x, z, radio: 6, duracion: def.duracion ?? 5, tipo: 'curacion', dps: 12, dpsEnemigos: 12, atacante: j, afecta: 'jugadores' };
+      const pot = j.potenciaHabilidad, dps = 12 * pot * (j.mods.curacion ?? 1);
+      const opciones = { x, z, radio: 6, duracion: durZona, tipo: 'curacion', dps, dpsEnemigos: 12 * pot, atacante: j, afecta: 'jugadores' };
       if (c?.crearZona) j.zonaSuero = c.crearZona(opciones);
       else j.zonaSuero = null;
       // Sin sistema de zonas (o sin soporte de 'curacion') la nube cura igualmente a quien esté dentro.
-      j.nubeCuracion = { x, z, radio: 6, resta: def.duracion ?? 5, propia: !c?.crearZona };
+      j.nubeCuracion = { x, z, radio: 6, resta: durZona, propia: !c?.crearZona, dps };
       j.juego.fx?.emitir?.('curacion', pt(x, z, 0.3), { escala: 2.4, cantidad: 40 });
       j.juego.fx?.destello?.(pt(x, z, 1.2), 0x62e0a1, 3, 0.5, 7);
       j.audio('habilidad_suero', x, z);
@@ -94,11 +97,11 @@ function actualizarNube(j, dt) {
       if (n.propia) {
         for (const o of j.juego.jugadores) {
           if (!o.vivo || Math.hypot(o.pos.x - n.x, o.pos.z - n.z) > n.radio) continue;
-          o.curar(12 * t, true);
+          o.curar(n.dps * t, true);
         }
         for (const z of j.juego.zombis) {
           if (!z.vivo || Math.hypot(z.pos.x - n.x, z.pos.z - n.z) > n.radio) continue;
-          j.juego.combate?.aplicarDanio?.(z, { cantidad: 12 * t, tipo: 'acido', atacante: j, x: z.pos.x, z: z.pos.z, dirX: 0, dirZ: 0 });
+          j.juego.combate?.aplicarDanio?.(z, { cantidad: 12 * j.potenciaHabilidad * t, tipo: 'fuego', atacante: j, x: z.pos.x, z: z.pos.z, dirX: 0, dirZ: 0 });
         }
       }
     }
@@ -129,7 +132,7 @@ const ingeniero = {
     }
     const b = m?.desplegarBarricada?.(j);
     if (!b) { mensaje(j, 'No hay sitio para la barricada', 'aviso'); return false; }
-    j.barricada.restante = j.barricada.total * (j.mods.enfriamiento ?? 1);
+    j.barricada.restante = j.barricada.total * (j.mods.habilidadEnfriamiento ?? 1);
     j.visual?.accion?.('habilidad', { duracion: 0.45 });
     j.juego.eventos.emitir('jugador:habilidad', { jugador: j, habilidad: { id: 'barricada', nombre: 'Barricada', enfriamiento: j.barricada.total } });
     j.fxRol('chispas', 1);
@@ -139,18 +142,29 @@ const ingeniero = {
 };
 
 // ───────────────────────────── Cazadora ─────────────────────────────
+/**
+ * El combate lee `portador.proximoDisparo = { multiplicador, critico }` en el siguiente disparo y lo consume.
+ * Aquí se mantiene al día: Ojo clínico (crítico seguro), Acecho (×3) y Bala fantasma (cada N disparos, mods.balaFantasma).
+ */
+function actualizarProximoDisparo(j) {
+  const mult = j.acechoListo ? 3 : 1, crit = j.ojoListo;
+  const n = j.mods.balaFantasma ?? 0, fantasma = n > 0 && (j.disparosCaza + 1) % n === 0;
+  if (mult > 1 || crit || fantasma) {
+    const p = j._proximo ?? (j._proximo = { multiplicador: 1, critico: false, atraviesaTodo: false, perforacion: 0, propio: true });
+    p.multiplicador = mult; p.critico = crit; p.atraviesaTodo = fantasma; p.perforacion = fantasma ? 99 : 0;
+    if (!j.proximoDisparo || j.proximoDisparo.propio) j.proximoDisparo = p;
+  } else if (j.proximoDisparo?.propio) j.proximoDisparo = null;
+}
 const cazador = {
-  iniciar(j) { j.sinDisparoT = 0; j.ojoListo = false; j.acechoListo = false; },
+  iniciar(j) { j.sinDisparoT = 0; j.ojoListo = false; j.acechoListo = false; j.disparosCaza = 0; },
   actualizar(j, dt) {
     j.sinDisparoT += dt;
     j.ojoListo = j.sinDisparoT >= 1.5 && !j.arma?.recargando;
-  },
-  multiplicadores(j, m) {
-    if (j.ojoListo) m.critico += 1;           // probabilidad ≥ 1 → crítico seguro (Ojo clínico)
-    if (j.acechoListo) m.danio *= 3;          // Acecho: el siguiente disparo hace ×3
+    actualizarProximoDisparo(j);
   },
   alDisparo(j) {
-    j.sinDisparoT = 0; j.ojoListo = false;
+    j.sinDisparoT = 0; j.ojoListo = false; j.disparosCaza++;
+    if (j.proximoDisparo?.propio) j.proximoDisparo = null;
     if (j.acechoListo) {
       j.acechoListo = false;
       // Al disparar queda al descubierto poco después.
@@ -162,14 +176,14 @@ const cazador = {
   activar(j) {
     const def = j.habilidad.def;
     j.iniciarEnfriamiento();
-    j.iniciarActiva(def.duracion ?? 5);
-    j.aplicarEstado('invisible', def.duracion ?? 5);
+    const dur = j.iniciarActiva(def.duracion ?? 5);
+    j.aplicarEstado('invisible', dur);
     j.acechoListo = true;
     j.fxRol('humo', 1.5);
     j.audio('habilidad_acecho');
     return true;
   },
-  alTerminarActiva(j) { j.acechoListo = false; },
+  alTerminarActiva(j) { j.acechoListo = false; if (j.proximoDisparo?.propio) j.proximoDisparo = null; },
 };
 
 // ───────────────────────────── Demoledor ─────────────────────────────
@@ -188,8 +202,8 @@ const demoledor = {
 /** Pisotón: daña y derriba en 7 m (más cerca, más fuerte), destroza blindajes, lanza props y sacude la cámara. */
 function golpeSismico(j) {
   if (!j.vivo) return;
-  const juego = j.juego, R = 7, x = j.pos.x, z = j.pos.z;
-  const base = 150 * (j.mods.danio ?? 1) * (j.mods.cuerpo ?? 1) * 0.55;
+  const pot = j.potenciaHabilidad, juego = j.juego, R = 7 * pot, x = j.pos.x, z = j.pos.z;
+  const base = 150 * pot * (j.mods.danio ?? 1) * (j.mods.cuerpo ?? 1) * 0.55;
   for (const o of juego.zombis) {
     if (!o?.vivo || !o.pos) continue;
     const dx = o.pos.x - x, dz = o.pos.z - z, d = Math.hypot(dx, dz);

@@ -48,8 +48,8 @@
 .ez .racha svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 .08em .12em rgba(0,0,0,.7)); }
 .ez .racha-pista { fill: rgba(0,0,0,.55); stroke: rgba(255,255,255,.14); stroke-width: 4; }
 .ez .racha-prog { fill: none; stroke: var(--c); stroke-width: 4.5; stroke-linecap: round; transition: stroke-dashoffset .1s linear; }
-.ez .racha-mult { position: relative; font-size: 1.55em; font-weight: 800; color: var(--c); line-height: 1; margin-top: -.2em; text-shadow: 0 .06em .1em rgba(0,0,0,.8); }
-.ez .racha-txt { position: absolute; left: 0; right: 0; bottom: .55em; text-align: center; font-size: .6em; letter-spacing: .1em; color: var(--tinta-2); }
+.ez .racha-mult { position: relative; font-size: 1.6em; font-weight: 800; color: var(--c); line-height: 1; margin-top: -.5em; text-shadow: 0 .06em .1em rgba(0,0,0,.8); }
+.ez .racha-txt { position: absolute; left: 0; right: 0; bottom: 1em; text-align: center; font-size: .62em; letter-spacing: .06em; color: var(--tinta-2); }
 .ez .racha-txt b { font-weight: 800; color: var(--tinta); }
 .ez .racha[data-nivel="2"] { --c: var(--acento); }
 .ez .racha[data-nivel="3"] { --c: #ffb02e; }
@@ -75,7 +75,7 @@
 .ez-sin-minimapa .mini-caja { display: none; }
 
 /* ── Barra de jefe ────────────────────────────────────────────────────────────────────────────────────────────── */
-.ez .jefe-barra { position: absolute; top: 7.6em; left: 50%; transform: translateX(-50%); width: min(38em, 52%); }
+.ez .jefe-barra { position: absolute; top: 7.6em; left: 0; right: 0; margin: 0 auto; width: min(38em, 46%); }
 .ez .jefe-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 1em; margin-bottom: .25em; padding: 0 .2em; }
 .ez .jefe-nombre { font-size: 1.15em; color: #ff8a82; letter-spacing: .12em; text-shadow: 0 .08em .2em #000, 0 0 .6em rgba(255,60,60,.5); }
 .ez .jefe-titulo { font-size: .78em; font-style: italic; color: var(--tinta-2); text-shadow: 0 .08em .15em #000; }
@@ -95,11 +95,11 @@
 
 /* ── Panel de jugador ─────────────────────────────────────────────────────────────────────────────────────────── */
 .ez .hud-jugs { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 1.2em 1.1em; display: flex; align-items: flex-end; justify-content: space-between; }
-.ez .jug { --rol: #fff; width: 24.4em; display: flex; gap: .75em; align-items: stretch; padding: .65em .8em; }
+.ez .jug { --rol: #fff; width: 26.5em; display: flex; gap: .75em; align-items: stretch; padding: .65em .8em; }
 .ez .jug[data-i="1"] { order: 2; margin-left: auto; }
 .ez .jug[hidden] { display: none; }
 .ez .jug.golpe { animation: ez-sacude .38s ease-out; }
-.ez .jug-retr { width: 4.5em; height: 5.3em; flex: none; border: 2px solid var(--rol); border-radius: var(--radio); overflow: hidden; align-self: flex-start; box-shadow: 0 0 .7em rgba(0,0,0,.6), 0 0 .4em color-mix(in srgb, var(--rol) 50%, transparent); background: #0b0d12; }
+.ez .jug-retr { width: 3.9em; height: 4.6em; flex: none; border: 2px solid var(--rol); border-radius: var(--radio); overflow: hidden; align-self: flex-start; box-shadow: 0 0 .7em rgba(0,0,0,.6), 0 0 .4em color-mix(in srgb, var(--rol) 50%, transparent); background: #0b0d12; }
 .ez .jug-retr svg { width: 100%; height: 100%; display: block; }
 .ez .jug-cuerpo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .4em; }
 .ez .jug-cab { display: flex; align-items: center; gap: .5em; min-height: 1.4em; }
@@ -127,16 +127,16 @@
 .ez .vida.critica .vida-txt b { color: var(--malo); }
 
 .ez .arma-fila { display: flex; align-items: center; gap: .65em; }
-.ez .arma-ico { width: 5.6em; height: 2.8em; flex: none; display: grid; place-items: center; background: rgba(0,0,0,.35); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: .15em .3em; }
+.ez .arma-ico { width: 4.8em; height: 2.5em; flex: none; display: grid; place-items: center; background: rgba(0,0,0,.35); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: .15em .3em; }
 .ez .arma-ico img, .ez .arma-ico svg { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 .08em .12em rgba(0,0,0,.7)); }
 .ez .arma-ico svg { color: var(--tinta); }
 .ez .arma-ico.cambio { animation: ez-pop .3s ease-out; }
 .ez .arma-datos { flex: 1; min-width: 0; }
-.ez .arma-nombre { font-size: .76em; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.ez .arma-nombre { font-size: .76em; letter-spacing: .03em; text-transform: uppercase; color: var(--tinta-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
 .ez .mun-fila { display: flex; align-items: baseline; gap: .1em; line-height: 1; margin: .1em 0 .22em; }
 .ez .mun-act { font-size: 2em; font-weight: 800; color: var(--tinta); text-shadow: 0 .05em .1em rgba(0,0,0,.6); }
-.ez .mun-res { font-size: 1em; color: var(--tinta-3); font-weight: 600; margin-left: .15em; }
-.ez .mun-aviso { margin-left: auto; font-size: .72em; font-weight: 800; letter-spacing: .08em; color: var(--aviso); }
+.ez .mun-res { white-space: nowrap; font-size: 1em; color: var(--tinta-3); font-weight: 600; margin-left: .15em; }
+.ez .mun-aviso { flex: none; white-space: nowrap; margin-left: auto; font-size: .66em; font-weight: 800; letter-spacing: .08em; color: var(--aviso); }
 .ez .mun-aviso.urgente { color: var(--malo); animation: ez-pulso .55s ease-in-out infinite; }
 .ez .mun-barra { height: .38em; }
 .ez .mun-barra.recargando i { --c: var(--aviso); }
@@ -158,7 +158,7 @@
 .ez .arroj-pips b { color: var(--tinta); }
 
 /* Habilidad con enfriamiento radial */
-.ez .hab { position: relative; width: 4em; height: 4em; flex: none; align-self: center; display: grid; place-items: center; margin-right: -.1em; }
+.ez .hab { position: relative; width: 3.7em; height: 3.7em; flex: none; align-self: center; display: grid; place-items: center; margin-right: -.1em; }
 .ez .hab-anillo { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .ez .hab-pista { fill: rgba(0,0,0,.6); stroke: rgba(255,255,255,.14); stroke-width: 3.2; }
 .ez .hab-prog { fill: none; stroke: var(--rol); stroke-width: 3.4; stroke-linecap: round; transition: stroke-dashoffset .1s linear; }
@@ -188,9 +188,9 @@
 .ez .flot.hostil .flot-n { color: #ff5a4a; font-size: 1.25em; }
 .ez-sin-numeros .hm-flot { display: none; }
 
-.ez .etq { --rol: #fff; display: flex; flex-direction: column; align-items: center; width: 9.5em; font-size: .8em; gap: .18em; }
+.ez .etq { --rol: #fff; display: flex; flex-direction: column; align-items: center; width: max-content; min-width: 7em; max-width: 20em; font-size: .8em; gap: .18em; }
 .ez .etq-fila { display: flex; gap: .55em; align-items: baseline; justify-content: center; max-width: 100%; padding: .12em .65em; background: rgba(8,10,14,.7); border-bottom: 2px solid var(--rol); border-radius: var(--radio-s); box-shadow: 0 .1em .4em rgba(0,0,0,.6); }
-.ez .etq-nom { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; letter-spacing: .06em; font-size: .85em; color: var(--tinta-2); }
+.ez .etq-nom { min-width: 0; max-width: 16em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; letter-spacing: .06em; font-size: .85em; color: var(--tinta-2); }
 .ez .etq-mun { font-weight: 800; font-size: 1.15em; color: #fff; }
 .ez .etq-barra { width: 100%; height: .36em; box-shadow: 0 .05em .2em rgba(0,0,0,.6); }
 .ez .etq-barra.recargando i { --c: var(--aviso); }

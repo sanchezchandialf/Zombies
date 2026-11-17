@@ -176,12 +176,12 @@ async function habilidadDe(rolId, j, P) {
     sim(0, { apuntar: { x: 0, z: 12 } }); paso(110);
     ok(P('Ojo clínico: listo tras 1,5 s'), j.ojoListo, `sinDisparo=${j.sinDisparoT.toFixed(2)}`);
     sim(0, { disparar: true }); paso(1); sim(0, { disparar: false }); paso(2);
-    ok(P('Ojo clínico: primer disparo es crítico'), c.ultimoDisparo?.crit === true && !j.ojoListo, `crit=${c.ultimoDisparo?.crit}`);
+    ok(P('Ojo clínico: primer disparo es crítico'), c.ultimoDisparo?.crit === true && !j.ojoListo && !j.proximoDisparo, `crit=${c.ultimoDisparo?.crit}`);
     paso(400);
-    const dBase = j.mods.danio; lanzar(); paso(2);
-    ok(P('Acecho: invisible y daño ×3'), j.invisible && j.tieneEstado('invisible') && Math.abs(j.mods.danio / dBase - 3) < 0.01 && ev === 1, `danio×${(j.mods.danio / dBase).toFixed(2)} inv=${j.invisible}`);
+    lanzar(); paso(2);
+    ok(P('Acecho: invisible y próximo disparo ×3'), j.invisible && j.tieneEstado('invisible') && j.proximoDisparo?.multiplicador === 3 && ev === 1, `prox=${JSON.stringify(j.proximoDisparo)} inv=${j.invisible}`);
     sim(0, { disparar: true }); paso(1); sim(0, { disparar: false }); paso(2);
-    ok(P('Acecho: el disparo consume el ×3'), Math.abs(j.mods.danio / dBase - 1) < 0.01 && Math.abs((c.ultimoDisparo?.danioMod ?? 0) / dBase - 3) < 0.01, `mod=${c.ultimoDisparo?.danioMod}`);
+    ok(P('Acecho: el disparo consume el ×3'), !j.proximoDisparo && c.ultimoDisparo?.mult === 3, `mult=${c.ultimoDisparo?.mult}`);
     paso(100);
     ok(P('Acecho: se revela poco después de disparar'), !j.invisible, '');
   } else if (rolId === 'demoledor') {
@@ -267,6 +267,20 @@ async function pruebaVariadas() {
   off();
   j.aplicarMejora({ id: 'x', aplicar: (p) => { p.mods.danio *= 1.2; p.vidaMax += 10; } });
   ok('aplicarMejora', j.vidaMax === 110 && Math.abs(j.mods.danio - 0.9 * 1.2) < 1e-6, `vidaMax=${j.vidaMax} danio=${j.mods.danio}`);
+  // mejoras que leen claves de mods
+  j.teletransportar(0, 0); j.vida = 50; j.invulT = 0; j.graciaT = 0;
+  j.mods.robovida = 0.1;
+  const zr = juego.sistemas.zombis.crear(0, 6, 1000); zr.vel = 0;
+  juego.combate.aplicarDanio(zr, { cantidad: 100, tipo: 'bala', atacante: j, x: 0, z: 6, dirX: 0, dirZ: 1 });
+  ok('robovida: cura una fracción del daño infligido', Math.abs(j.vida - 60) < 0.01, `vida=${j.vida}`);
+  j.quitarEstado('escudo'); j.mods.resistencia = 0.5; j.vida = j.vidaMax; j.invulT = 0; j.graciaT = 0;
+  const dr = j.recibirDanio({ cantidad: 20, tipo: 'bala' });
+  ok('resistencia reduce el daño recibido', Math.abs(dr - 10) < 0.01, `dr=${dr}`);
+  j.mods.resistencia = 1; j.mods.segundaOportunidad = 1; j.vida = 5; j.invulT = 0; j.graciaT = 0;
+  j.recibirDanio({ cantidad: 999, tipo: 'bala' });
+  ok('segundo aliento: sobrevive con 1 de vida una vez por oleada', j.vivo && j.vida === 1 && j.segundaUsos === 1, `vida=${j.vida}`);
+  j.invulT = 0; j.graciaT = 0; j.recibirDanio({ cantidad: 999, tipo: 'bala' });
+  ok('segundo aliento: la segunda vez cae/muere', !j.vivo, '');
   return resultados.slice(antes);
 }
 
