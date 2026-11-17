@@ -38,7 +38,7 @@ export function crearUI(juego) {
   const raiz = el('div', 'ez');
   raiz.setAttribute('role', 'presentation');
   const capas = {};
-  for (const n of ['mundo', 'momentos', 'pantallas', 'pausa']) {
+  for (const n of ['mundo', 'momentos', 'pausa', 'pantallas']) {
     capas[n] = el('div', `ez-capa ez-${n}`);
     raiz.appendChild(capas[n]);
   }

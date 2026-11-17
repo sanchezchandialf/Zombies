@@ -62,7 +62,16 @@ const raiz = new THREE.Group(); escena.add(raiz);
 const suelo = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: 0x1a1d21, roughness: 1 }));
 suelo.rotation.x = -Math.PI / 2; suelo.receiveShadow = true; suelo.position.y = -0.001; escena.add(suelo);
 
-if (solo) {
+if (q.get('mezcla')) {
+  // ?mezcla=adoquin,hierba[&escalaMascara=0.04] : mezclaSuelo sobre un plano grande
+  const [a, b] = q.get('mezcla').split(',');
+  const mat = materiales.mezclaSuelo(a, b, { escalaMascara: +(q.get('escalaMascara') || 0.06), mojado: opc.mojado });
+  const S = 16, ia = materiales.info(a);
+  const plano = new THREE.Mesh(uvMundo(new THREE.BoxGeometry(S, 0.3, S), ia.escala), mat); plano.position.y = -0.15; plano.receiveShadow = true; raiz.add(plano);
+  const cam = (q.get('cam') || '0,7,9,0,0,0').split(',').map(Number);
+  camara.position.set(cam[0], cam[1], cam[2]); camara.lookAt(cam[3], cam[4], cam[5]);
+  info.textContent = `mezclaSuelo(${a}, ${b})`;
+} else if (solo) {
   const nombre = solo;
   const inf = materiales.info(nombre);
   const mat = materiales.obtener(nombre, opc);

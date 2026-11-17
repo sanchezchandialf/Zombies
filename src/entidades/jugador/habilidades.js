@@ -72,7 +72,7 @@ const medico = {
     j.visual?.accion?.('lanzar', { duracion: 0.4 });
     j.retardo(0.28, () => {
       const c = j.juego.combate;
-      const opciones = { x, z, radio: 6, duracion: def.duracion ?? 5, tipo: 'curacion', dps: 12, atacante: j, afecta: 'todos' };
+      const opciones = { x, z, radio: 6, duracion: def.duracion ?? 5, tipo: 'curacion', dps: 12, dpsEnemigos: 12, atacante: j, afecta: 'jugadores' };
       if (c?.crearZona) j.zonaSuero = c.crearZona(opciones);
       else j.zonaSuero = null;
       // Sin sistema de zonas (o sin soporte de 'curacion') la nube cura igualmente a quien esté dentro.

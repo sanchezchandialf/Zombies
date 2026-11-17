@@ -86,7 +86,7 @@ const acero_pintado = {
       const pv = suave(0.6, 0.64, f);        // 1 = pintura saltada
       const pm = 1 - pv;
       const prim = pv * (1 - suave(0.64, 0.7, f)) * 0.0 + suave(0.6, 0.62, f) * (1 - suave(0.63, 0.66, f));
-      const sk = 0.62 + (sup[i] - 0.5) * 0.3 + (ray[i] - 0.5) * 0.2;
+      const sk = 0.9 + (sup[i] - 0.5) * 0.3 + (ray[i] - 0.5) * 0.2;
       const om = suave(0.58, 0.7, ox[i]) * pv * 0.8;
       const pk = 0.95 + (suc[i] - 0.5) * 0.12 + (sup[i] - 0.5) * 0.04 - hol[i] * 0.0;
       let r = mezcla(metal[0] * sk, pintura[0] * pk, pm), g = mezcla(metal[1] * sk, pintura[1] * pk, pm), b = mezcla(metal[2] * sk, pintura[2] * pk, pm);
@@ -207,9 +207,9 @@ const casco_nave = {
       let k = (0.88 + (id - 0.5) * 0.18 + (fino[i] - 0.5) * 0.06 + (mant[i] - 0.5) * 0.12) * tone;
       k *= 1 - inset * 0.12;
       let r = casco[0] * k, g = casco[1] * k, b = casco[2] * k;
-      const sk = 0.7 + (ray[i] - 0.5) * 0.3 + (fino[i] - 0.5) * 0.2;
+      const sk = 0.95 + (ray[i] - 0.5) * 0.3 + (fino[i] - 0.5) * 0.2;
       r = mezcla(metal[0] * sk, r, pmask); g = mezcla(metal[1] * sk, g, pmask); b = mezcla(metal[2] * sk, b, pmask);
-      const q = suave(0.66, 0.78, quem[i]) * 0.8;
+      const q = suave(0.72, 0.84, quem[i]) * 0.7;
       r = mezcla(r, quema[0], q); g = mezcla(g, quema[1], q); b = mezcla(b, quema[2], q);
       r *= 1 - rem.mask[i] * 0.2; g *= 1 - rem.mask[i] * 0.2; b *= 1 - rem.mask[i] * 0.2;
       r = mezcla(r * 0.2, r, m); g = mezcla(g * 0.2, g, m); b = mezcla(b * 0.2, b, m);

@@ -94,7 +94,7 @@ export function mockCombate(juego) {
         if (z.resta <= 0 || !z.activo) { zonas.splice(i, 1); continue; }
         if (z.tipo === 'curacion') {
           for (const j of juego.jugadores) if (j.vivo && Math.hypot(j.pos.x - z.x, j.pos.z - z.z) < z.radio) j.curar(z.dps * dt, true);
-          for (const q of juego.zombis) if (q.vivo && Math.hypot(q.pos.x - z.x, q.pos.z - z.z) < z.radio) api.aplicarDanio(q, { cantidad: z.dps * dt, tipo: 'acido', atacante: z.atacante, x: q.pos.x, z: q.pos.z, dirX: 0, dirZ: 0 });
+          for (const q of juego.zombis) if (q.vivo && Math.hypot(q.pos.x - z.x, q.pos.z - z.z) < z.radio) api.aplicarDanio(q, { cantidad: (z.dpsEnemigos ?? z.dps) * dt, tipo: 'fuego', atacante: z.atacante, x: q.pos.x, z: q.pos.z, dirX: 0, dirZ: 0 });
         }
       }
     },
