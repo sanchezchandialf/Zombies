@@ -3,7 +3,7 @@
 // · Rejilla (1 m por defecto) sobre `fisica.limites`. Para cada celda se guarda la HOLGURA: distancia exacta del
 //   centro al obstáculo duro más cercano (cuerpos estáticos) y también la de los puntos medios de sus aristas, de
 //   modo que un muro fino nunca se «salta» entre dos celdas vecinas.
-// · Tres CAPAS por tamaño (radio 0,42 · 0,95 · 1,3): los zombis grandes necesitan pasillos más anchos.
+// · Cinco CAPAS por tamaño (radio 0,42 · 0,6 · 0,95 · 1,3 · 1,8): los zombis grandes y los jefes necesitan pasillos más anchos.
 // · Las estructuras destructibles (barricadas, torretas, cajas) son obstáculos BLANDOS: se pueden atravesar con un
 //   coste alto, así la horda las rodea si el rodeo es corto y, si no, va de frente y las rompe.
 // · Campo de flujo por «marcha rápida» (ecuación eikonal): distancias casi euclídeas y direcciones en cualquier
@@ -12,7 +12,7 @@
 // · Varios campos con nombre («jugadores», «senuelos»…), creados bajo demanda y descartados si nadie los consulta.
 import { CAPA } from '../nucleo/fisica.js';
 
-export const RADIOS_CAPA = [0.42, 0.95, 1.3];
+export const RADIOS_CAPA = [0.42, 0.6, 0.95, 1.3, 1.8];
 const HOLGURA_MAX = 2.6;
 const INF = 1e9;
 const B_XP = 1, B_XN = 2, B_ZP = 4, B_ZN = 8, B_PASO = 16;
@@ -67,7 +67,8 @@ export function crearNavegacion(juego, opciones = {}) {
   const capas = RADIOS_CAPA.map((radio) => ({ radio, paso: null, coste: null }));
   const campos = new Map();
   const objetivos = new Map();
-  let version = 0, sucio = true, firma = -1, tFirma = 0, ahora = 0, enCurso = null, turno = 0;
+  let version = 0, sucio = true, sucioSuave = false, firma = -1, tFirma = 0, ahora = 0, tConstr = -1e9, enCurso = null, turno = 0;
+  let listaCampos = null;                               // caché de campos.values() (se invalida al crear/descartar)
 
   // ───────────── Rejilla ─────────────
 
@@ -130,7 +131,7 @@ export function crearNavegacion(juego, opciones = {}) {
       nx = nnx; nz = nnz; W = nx + 2; H = nz + 2; N = W * H;
       holg = new Float32Array(N); holgX = new Float32Array(N); holgZ = new Float32Array(N); blando = new Uint16Array(N);
       for (const L of capas) { L.paso = new Uint8Array(N); L.coste = new Float32Array(N); }
-      campos.clear(); enCurso = null;
+      campos.clear(); listaCampos = null; enCurso = null;
     }
     minX = a; maxX = b; minZ = c0; maxZ = d0;
     // holgura inicial: distancia al borde del mapa (el borde se comporta como un muro)
@@ -152,7 +153,7 @@ export function crearNavegacion(juego, opciones = {}) {
     };
     pasar(fisica.estaticos); pasar(fisica.dinamicos);
     for (const L of capas) construirCapa(L);
-    version++; sucio = false; firma = calcularFirma();
+    version++; sucio = false; sucioSuave = false; tConstr = ahora; firma = calcularFirma();
   }
 
   function construirCapa(L) {
@@ -307,7 +308,7 @@ export function crearNavegacion(juego, opciones = {}) {
   function campo(nombre, capa) {
     const clave = nombre + ':' + capa;
     let c = campos.get(clave);
-    if (!c) { c = crearCampo(nombre, capa); campos.set(clave, c); }
+    if (!c) { c = crearCampo(nombre, capa); campos.set(clave, c); listaCampos = null; }
     c.tUso = ahora;
     if (!c.valido) { if (enCurso === c) enCurso = null; calcularYa(c); }   // la primera vez, de una sola pasada
     return c;
@@ -354,12 +355,17 @@ export function crearNavegacion(juego, opciones = {}) {
 
     /** Marca la rejilla como obsoleta; se rehace en la siguiente consulta o cuadro. */
     reconstruir() { sucio = true; },
+    /** Como `reconstruir` pero agrupado (como mucho cada ~0,2 s): para estructuras que aparecen y se rompen sin parar. */
+    reconstruirSuave() { sucioSuave = true; },
 
     /** Fija los puntos de destino de un campo: [{ x, z, sesgo? }]. */
     objetivos(nombre, lista) { objetivos.set(nombre, lista); },
 
     /** Capa de navegación adecuada para un radio de cuerpo. */
-    capaDeRadio(r) { return r > 1.05 ? 2 : r > 0.7 ? 1 : 0; },
+    capaDeRadio(r) {
+      for (let i = 0; i < RADIOS_CAPA.length; i++) if (RADIOS_CAPA[i] >= r - 0.04) return i;
+      return RADIOS_CAPA.length - 1;
+    },
 
     /**
      * Dirección unitaria del campo de flujo en (x, z), interpolada entre celdas. (0,0) si ya se está en el destino.
@@ -477,16 +483,17 @@ export function crearNavegacion(juego, opciones = {}) {
     actualizar(dt) {
       ahora += dt;
       tFirma -= dt;
-      if (tFirma <= 0) { tFirma = 0.4; if (!sucio && calcularFirma() !== firma) sucio = true; }
+      if (tFirma <= 0) { tFirma = 0.4; if (!sucio && calcularFirma() !== firma) sucioSuave = true; }
+      if (sucioSuave && ahora - tConstr >= 0.2) sucio = true;
       asegurar();
       let quedan = presupuesto;
       for (let vueltas = 0; vueltas < 4 && quedan > 0; vueltas++) {
         if (!enCurso) {
           // elige el siguiente campo que toca refrescar (por turnos)
-          const lista = [...campos.values()];
+          const lista = listaCampos || (listaCampos = [...campos.values()]);
           for (let n = 0; n < lista.length; n++) {
             const c = lista[(turno + n) % lista.length];
-            if (ahora - c.tUso > CADUCIDAD) { campos.delete(c.clave); continue; }
+            if (ahora - c.tUso > CADUCIDAD) { campos.delete(c.clave); listaCampos = null; if (enCurso === c) enCurso = null; break; }
             if (ahora - c.tFin < PERIODO && c.version === version) continue;
             const obj = objetivos.get(c.nombre) || [];
             if (c.version === version && firmaDe(obj) === c.firmaSemillas) { c.tFin = ahora; continue; }   // nada ha cambiado
@@ -516,7 +523,7 @@ export function crearNavegacion(juego, opciones = {}) {
       return { W, H, nx, nz, minX, minZ, celda, holgura: holg, paso: capas[capa].paso, coste: capas[capa].coste, blando, T: c.T, dirX: c.dirX, dirZ: c.dirZ, INF };
     },
 
-    limpiar() { campos.clear(); enCurso = null; objetivos.clear(); sucio = true; },
+    limpiar() { campos.clear(); listaCampos = null; enCurso = null; objetivos.clear(); sucio = true; },
   };
   return api;
 }

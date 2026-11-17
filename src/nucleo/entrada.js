@@ -433,7 +433,9 @@ export function crearEntrada(juego) {
     },
 
     actualizar() {
-      const ahora = ahoraReal(), dt = Math.min(0.1, Math.max(0, ahora - tPrevio));
+      const ahora = ahoraReal();
+      // Con el bucle real, el paso del cuadro; con `juego.avanzar(dt)` a mano (pruebas) se usa el mismo paso.
+      const dt = Math.min(0.1, Math.max(0, juego.tiempo?.dtReal > 0 ? juego.tiempo.dtReal : ahora - tPrevio));
       tPrevio = ahora;
       const lista = leerMandos();
       const dos = api.dosJugadores || juego.jugadores.length > 1;
