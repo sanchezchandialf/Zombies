@@ -85,7 +85,8 @@ export function crearEscombros(juego, escena, opciones = {}) {
       sx[i] = (d[0][0] + (d[0][1] - d[0][0]) * rng()) * e; sy[i] = (d[1][0] + (d[1][1] - d[1][0]) * rng()) * e; sz[i] = (d[2][0] + (d[2][1] - d[2][0]) * rng()) * e;
       estado[i] = 1; tm[i] = 0; reposoMax[i] = M.reposo * (0.8 + rng() * 0.5); rebote[i] = M.reb; rebotes[i] = 0; mat_[i] = idMat;
       const v = 1 + (rng() - 0.5) * 2 * M.var;
-      col.setRGB(M.col[0] * v, M.col[1] * (1 + (rng() - 0.5) * M.var), M.col[2] * v);
+      const osc = mn === 'carne' || mn === 'vidrio' ? 1 : 0.62;
+      col.setRGB(M.col[0] * v * osc, M.col[1] * (1 + (rng() - 0.5) * M.var) * osc, M.col[2] * v * osc);
       malla.setColorAt(i, col); colorSucio = true;
       pbr.setXY(i, M.rug, M.met); pbr.needsUpdate = true;
       tw[i] = 0;
