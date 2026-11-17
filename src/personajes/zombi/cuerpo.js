@@ -259,8 +259,8 @@ function heridas(c) {
   const n = clase === 'acorazado' ? 1 : rng.entero(1, 3);
   for (let k = 0; k < n; k++) {
     const y = d.th * rng.rango(0.25, 0.85), x = rng.rango(-0.35, 0.35) * d.tw;
-    const s = rng.rango(0.07, 0.13);
-    p('almohada', MAT.MATE, J.TORSO, [x, y, d.td * 0.5 * 0.86], [s * 1.6, s * 1.2, 0.025], rng() < 0.5 ? SANGRE : lin(0x1a0808), { rz: rng.rango(-0.8, 0.8), lod: true });
+    const s = rng.rango(0.04, 0.085);
+    p('almohada', MAT.MATE, J.TORSO, [x, y, d.td * 0.5 * 0.86], [s * 1.6, s * 1.2, 0.02], rng() < 0.5 ? SANGRE : lin(0x1a0808), { rz: rng.rango(-0.8, 0.8), lod: true });
   }
   if (rng() < 0.35) p('almohada', MAT.MATE, J.CABEZA, [rng.signo() * c.d.hr * 0.5, c.d.hr * 1.15, c.d.hr * 0.65], [0.07, 0.09, 0.03], SANGRE, { lod: true });
 }

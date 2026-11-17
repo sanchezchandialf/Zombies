@@ -307,7 +307,7 @@ export function crearMomentos(ctx) {
   });
 
   function accionPad({ accion, pad }) {
-    if (!I.activo || N.inter.hidden) return false;
+    if (!I.activo || N.inter.hidden || pad < 0) return false;
     const slot = jugadorDePad(pad);
     if (!slot) return false;
     if (accion === 'izq') { resaltar(slot, (slot.resalte < 0 ? 0 : slot.resalte) - 1); return true; }

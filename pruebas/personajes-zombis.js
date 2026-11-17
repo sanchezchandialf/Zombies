@@ -3,6 +3,7 @@
 //   ?jefe=coracero              un jefe (todos si jefe=todos)
 //   ?horda=200&era=2            modo horda
 //   ?muertes=1                  modo muertes
+//   ?manual=1 (sin bucle: usa P.render()) ?calidad=baja
 //   ?vista=juego|cerca|alto     cámara (juego = ~25 m, 55°)   ?quieto=1  sin andar   ?elite=1
 import * as THREE from 'three';
 import { crearArnes } from './arnes.js';
@@ -107,4 +108,6 @@ window.P = {
 };
 function renderInfo() { const r = juego.render.renderer.info; return { calls: r.render.calls, tris: r.render.triangles }; }
 paso(0.016); paso(0.016);
+window.P.render = () => { juego.avanzar(1 / 60); return renderInfo(); };
+if (q.get('manual') === '1') { juego.detener(); window.P.render(); }
 a.lista();

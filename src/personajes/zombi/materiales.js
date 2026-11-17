@@ -19,7 +19,8 @@ function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
       .replace('#include <color_fragment>', `#include <color_fragment>
         float zn = zr(vLoc * 6.0 + vColor.rgb * 13.0);
         float zn2 = zr(vLoc * 17.0 + 3.7);
-        diffuseColor.rgb *= 1.0 - ${granulado.toFixed(2)} * 0.22 + ${granulado.toFixed(2)} * (0.32 * zn + 0.1 * zn2);
+        diffuseColor.rgb *= 1.0 - ${granulado.toFixed(2)} * 0.3 + ${granulado.toFixed(2)} * (0.44 * zn + 0.14 * zn2);
+        diffuseColor.rgb *= 0.7 + 0.3 * smoothstep(-0.55, 0.45, vLoc.y);
         float suc = smoothstep(0.75, 0.0, vAlt);
         diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.42, 0.36, 0.3), suc * ${suciedad.toFixed(2)});
         diffuseColor.rgb *= 1.0 - vFx.y * 0.93;
@@ -38,8 +39,8 @@ function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
 let mats = null;
 export function materialesZombi() {
   if (mats) return mats;
-  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.12, suciedad: 0.55 });
-  const metal = parchear(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.38, metalness: 0.85 }), { granulado: 0.55, rim: 0.06, suciedad: 0.4 });
+  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.12, suciedad: 0.55 });
+  const metal = parchear(new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.38, metalness: 0.85 }), { granulado: 0.55, rim: 0.06, suciedad: 0.4 });
   const emisivo = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
   mats = { mate, metal, emisivo };
   return mats;

@@ -179,6 +179,7 @@ export function crearHudMundo(ctx, { paneles }) {
     return marcs[i];
   }
   let nMarc = 0;
+  const colocados = [];
   function ponerMarcador(x, y, z, tipo, color, etiquetaIco, distM) {
     const o = proy(x, y, z);
     if (!o) return;
@@ -191,7 +192,10 @@ export function crearHudMundo(ctx, { paneles }) {
     const fpx = (parseFloat(ctx.raiz.style.getPropertyValue('--px')) || 1) * 16;
     const mx = 3 * fpx, myS = 9.6 * fpx, myI = 8.4 * fpx;
     const k = Math.min((W / 2 - mx) / Math.max(1e-3, Math.abs(dx)), ((dy < 0 ? H / 2 - myS : H / 2 - myI)) / Math.max(1e-3, Math.abs(dy)));
-    const px = W / 2 + dx * k, py = H / 2 + dy * k;
+    let px = W / 2 + dx * k, py = H / 2 + dy * k;
+    // Separa los marcadores que caerían uno sobre otro.
+    for (let i = 0; i < nMarc; i++) { const q = colocados[i]; if (Math.abs(q.x - px) < 3.4 * fpx && Math.abs(q.y - py) < 3.6 * fpx) { px += (dy * k * dy * k > dx * k * dx * k ? 1 : 0) * 3.6 * fpx; if (Math.abs(dx * k) >= Math.abs(dy * k)) py += 3.8 * fpx; } }
+    colocados[nMarc] = { x: px, y: py };
     const m = marcador(nMarc++);
     visible(m.el, true);
     estilo(m.el, 'transform', `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0) translate(-50%, -50%)`);

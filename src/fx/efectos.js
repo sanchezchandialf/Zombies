@@ -11,7 +11,7 @@ const _c = new THREE.Color();
 export const col = (hex, a = 1, m = 1) => { _c.set(hex); return [_c.r * m, _c.g * m, _c.b * m, a]; };
 
 // paletas de fuego (HDR para el bloom)
-const FU0 = [3.6, 2.6, 1.1, 0.95], FU1 = [2.5, 0.95, 0.22, 0.85], FU2 = [0.5, 0.07, 0.012, 0];
+const FU0 = [2.7, 1.7, 0.55, 0.9], FU1 = [2.0, 0.6, 0.1, 0.8], FU2 = [0.45, 0.05, 0.008, 0];
 const FUF0 = [3.0, 1.9, 0.7, 0.9], FUF1 = [2.0, 0.65, 0.12, 0.8], FUF2 = [0.35, 0.04, 0.0, 0];
 const CHI0 = [4.2, 2.8, 1.0, 1], CHI1 = [2.4, 0.8, 0.14, 0.9], CHI2 = [0.35, 0.05, 0.0, 0];
 const FLASH0 = [7, 5.2, 2.4, 1], FLASH1 = [4, 1.8, 0.5, 0.75], FLASH2 = [0.8, 0.15, 0.0, 0];
