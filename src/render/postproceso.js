@@ -233,7 +233,7 @@ export function crearPostproceso(renderer) {
   const camQ = new THREE.Camera();
 
   const mat = (fs, uniforms, defines, extra = {}) => new THREE.ShaderMaterial({
-    vertexShader: VS, fragmentShader: fs, uniforms, defines, depthTest: false, depthWrite: false, toneMapped: false, ...extra,
+    vertexShader: VS, fragmentShader: fs, uniforms, defines: defines ?? {}, depthTest: false, depthWrite: false, toneMapped: false, ...extra,
   });
   const tex = (v = null) => ({ value: v });
   const cam = { uNear: { value: 0.4 }, uFar: { value: 450 } };

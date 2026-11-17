@@ -245,10 +245,10 @@ const neon = {
       E[i * 3] = e; E[i * 3 + 1] = e; E[i * 3 + 2] = e;
       poner(c, i, 0.02, 0.02, 0.02);
       c.tinte[i] = 0;
-      c.h[i] = 0.5 + nucleo * 0.4;
+      c.h[i] = 0.5 + nucleo * 0.08;
       c.rug[i] = 0.25;
     }
-    c.fuerzaNormal = 1.5; c.cav = [{ r: 2, f: 0.5 }];
+    c.fuerzaNormal = 0.6; c.cav = [{ r: 2, f: 0.2 }];
   },
 };
 
@@ -275,7 +275,7 @@ const pantalla = {
       rect(Math.round(x0), Math.round(y0), Math.round(ancho), Math.round(px(5)), 0.6 + rng() * 0.3);
     }
     // gráfica de barras
-    for (let k = 0; k < 14; k++) { const h = px(20 + rng() * 120), w = px(14); rect(Math.round(px(280 + k * 16)), Math.round(px(250) - h), Math.round(w), Math.round(h), 0.55 + rng() * 0.4); }
+    for (let k = 0; k < 14; k++) { const h = px(20 + rng() * 120), w = px(14); rect(Math.round(px(280 + k * 16)), Math.round(px(250)), Math.round(w), Math.round(h), 0.55 + rng() * 0.4); }
     // círculo radar
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       const dx = x - px(150), dy = y - px(390), r = Math.sqrt(dx * dx + dy * dy);
@@ -360,25 +360,33 @@ const madera_lacada = {
 
 const marmol = {
   nombre: 'marmol', grupo: 'otros', tam: 512, escala: 1.6,
-  descripcion: 'Mármol pulido (admite color): fondo lechoso, vetas grises y doradas ramificadas, poco poro y mucho brillo.',
+  descripcion: 'Mármol pulido (admite color): fondo lechoso con nubes, vetas grises y doradas finas y fluidas, mucho brillo.',
   material: { macro: [0.06, 0.03, 0.04], desgaste: 0.1, props: { envMapIntensity: 1.2 } },
   generar(c) {
     const N = c.N, n = c.n;
-    const nube = c.fbm(3, 6, { warp: { amp: 0.8, freq: 2 } }), v1 = c.fbm(4, 6, { warp: { amp: 1.2, freq: 3 } }), v2 = c.fbm(6, 6, { warp: { amp: 1.0, freq: 4 } }), fino = c.fbm(60, 2), bl = blanco(N, 79), pul = c.fbm(5, 4);
-    const base = col(0xeeeae0), gris = col(0x6a6a72), oro = col(0xa88a4a);
-    for (let i = 0; i < n; i++) {
-      // vetas: líneas finas donde el ruido deformado cruza 0.5
-      const a = Math.abs(v1[i] - 0.5), b = Math.abs(v2[i] - 0.5);
-      const ve1 = 1 - suave(0.0, 0.028 + nube[i] * 0.02, a), ve2 = 1 - suave(0.0, 0.012, b);
-      const hal = 1 - suave(0.0, 0.1, a);
-      let k = 0.96 - (nube[i] - 0.5) * 0.18 + (fino[i] - 0.5) * 0.03 - hal * 0.07;
+    const nube = c.fbm(3, 6, { warp: { amp: 0.8, freq: 2 } }), cae = c.fbm(3, 5), fino = c.fbm(60, 2), pul = c.fbm(5, 4), rn1 = c.fbm(3, 5), rn2 = c.fbm(5, 5), rn3 = c.fbm(7, 4), dif = c.fbm(9, 4);
+    const base = col(0xeeeae1), gris = col(0x5e6068), oro = col(0xb08d4a), nubeC = col(0xc9c6bc);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const i = y * N + x, u = x / N, v = y / N;
+      const t1 = 2 * u + 1 * v + (rn1[i] - 0.5) * 3.4 + (cae[i] - 0.5) * 1.1;
+      const t2 = 1 * u + 2 * v + (rn2[i] - 0.5) * 3.0;
+      const t3 = 3 * u - 1 * v + (rn3[i] - 0.5) * 2.4;
+      const a1 = Math.abs(Math.sin(t1 * Math.PI)), a2 = Math.abs(Math.sin(t2 * Math.PI)), a3 = Math.abs(Math.sin(t3 * Math.PI));
+      const m1 = suave(0.2, 0.5, rn1[i]), m2 = suave(0.3, 0.6, rn2[i]);
+      const v1 = (1 - suave(0.0, 0.05 + 0.06 * dif[i], a1)) * m1;
+      const hal = (1 - suave(0.0, 0.2, a1)) * m1;
+      const v2 = (1 - suave(0.0, 0.026, a2)) * m2;
+      const v3 = (1 - suave(0.0, 0.012, a3)) * suave(0.5, 0.75, dif[i]);
+      let k = 0.97 - (nube[i] - 0.5) * 0.14 + (fino[i] - 0.5) * 0.025;
       let r = base[0] * k, g = base[1] * k, b2 = base[2] * k;
-      r = mezcla(r, gris[0], ve1 * 0.75); g = mezcla(g, gris[1], ve1 * 0.75); b2 = mezcla(b2, gris[2], ve1 * 0.75);
-      r = mezcla(r, oro[0], ve2 * 0.5); g = mezcla(g, oro[1], ve2 * 0.5); b2 = mezcla(b2, oro[2], ve2 * 0.5);
+      r = mezcla(r, nubeC[0], hal * 0.35); g = mezcla(g, nubeC[1], hal * 0.35); b2 = mezcla(b2, nubeC[2], hal * 0.35);
+      r = mezcla(r, gris[0], v1 * 0.9); g = mezcla(g, gris[1], v1 * 0.9); b2 = mezcla(b2, gris[2], v1 * 0.9);
+      r = mezcla(r, gris[0], v2 * 0.55); g = mezcla(g, gris[1], v2 * 0.55); b2 = mezcla(b2, gris[2], v2 * 0.55);
+      r = mezcla(r, oro[0], v3 * 0.6); g = mezcla(g, oro[1], v3 * 0.6); b2 = mezcla(b2, oro[2], v3 * 0.6);
       poner(c, i, r, g, b2);
       c.tinte[i] = 1;
-      c.h[i] = 0.5 + (fino[i] - 0.5) * 0.015 - ve1 * 0.01;
-      c.rug[i] = clamp(0.1 + (pul[i] - 0.5) * 0.1 + (fino[i] - 0.5) * 0.06 + ve1 * 0.03);
+      c.h[i] = 0.5 + (fino[i] - 0.5) * 0.015;
+      c.rug[i] = clamp(0.09 + (pul[i] - 0.5) * 0.1 + (fino[i] - 0.5) * 0.05 + v1 * 0.02);
     }
     c.fuerzaNormal = 1; c.cav = [{ r: 2, f: 0.8 }];
   },

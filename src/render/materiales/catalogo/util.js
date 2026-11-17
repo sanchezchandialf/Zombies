@@ -32,7 +32,7 @@ export function calidez(c, i, k) { const a = c.alb, j = i * 3; a[j] *= 1 + k; a[
  * Madera sobre un despiece: devuelve { grano (0..1, claro-oscuro), poro (relieve), nudo (máscara) }.
  * desp: resultado de c.despiece(). Las vetas siguen el eje x de la pieza (o y si vertical).
  */
-export function maderaVeta(c, desp, { frecAnillo = 16, anillos = 1.0, deform = 1.0, poros = 1, nudos = 0.2, vertical = false } = {}) {
+export function maderaVeta(c, desp, { frecAnillo = 16, anillos = 1.0, deform = 0.4, poros = 1, nudos = 0.2, vertical = false } = {}) {
   const N = c.N, n = c.n;
   const lento = c.fbm(vertical ? [6, 2] : [2, 6], 4, { warp: { amp: 0.25, freq: 3 } });
   const fibra = c.fbm(vertical ? [220, 5] : [5, 220], 2, { exacto: true });

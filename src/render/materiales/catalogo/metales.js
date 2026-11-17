@@ -34,28 +34,33 @@ const hierro_forjado = {
 
 const hierro_oxidado = {
   nombre: 'hierro_oxidado', grupo: 'metales', tam: 512, escala: 1.2,
-  descripcion: 'Chapa de hierro muy oxidada: costra naranja y parda, picaduras, escamas desprendidas y metal desnudo.',
+  descripcion: 'Chapa de hierro oxidada: restos de pintura verdosa, costra parda y naranja, picaduras, escamas y metal desnudo.',
   material: { macro: [0.2, 0.08, 0.12], desgaste: 0.5 },
   generar(c) {
     const N = c.N, n = c.n, px = (v) => c.px(v);
-    const costra = c.fbm(6, 6, { warp: { amp: 0.7, freq: 3 } }), pic = c.worley(48, { jit: 1 }), cr = c.cresta(10, 5), fino = c.fbm(70, 3), bl = blanco(N, 43), hol = c.fbm([20, 3], 3, { exacto: true }), desn = c.fbm(5, 5, { warp: { amp: 0.6, freq: 2 } });
-    const acero = col(0x5a5c5e), orin = [col(0x4a220f), col(0x7a3a16), col(0xa24e1e), col(0xc4682a), col(0x8a5a2e)];
+    const costra = c.fbm(5, 6, { warp: { amp: 0.7, freq: 3 } }), pic = c.worley(52, { jit: 1 }), cr = c.cresta(9, 5), fino = c.fbm(80, 3), bl = blanco(N, 43);
+    const pint = c.fbm(4, 6, { warp: { amp: 0.8, freq: 3 } }), pint2 = c.fbm(16, 4), hol = c.fbm([22, 3], 3, { exacto: true }), desn = c.fbm(6, 5, { warp: { amp: 0.6, freq: 2 } });
+    const acero = col(0x6a6d70), pintura = col(0x5b6e62), orin = [col(0x2e170c), col(0x5a2c14), col(0x8a4220), col(0xb6602a), col(0x6e4a2c)];
     for (let i = 0; i < n; i++) {
-      const cap = suave(0.3, 0.42, costra[i] * 0.8 + cr[i] * 0.2);         // 1 = óxido
-      const bare = (1 - cap) * 0.0 + suave(0.7, 0.8, desn[i]) * (1 - cap * 0.3);
-      const pit = (1 - suave(0, 0.2, pic.f1[i])) * (pic.id[i] > 0.4 ? 1 : 0);
-      const t = clamp(costra[i] * 0.9 + cr[i] * 0.4 + (fino[i] - 0.5) * 0.4 - 0.1);
+      const pv = suave(0.5, 0.56, pint[i] + (pint2[i] - 0.5) * 0.18 + (bl[i] - 0.5) * 0.03); // 1 = pintura conservada
+      const costra0 = suave(0.42, 0.5, costra[i] * 0.7 + cr[i] * 0.3);
+      const t = clamp(costra[i] * 0.9 + cr[i] * 0.45 + (fino[i] - 0.5) * 0.5 - 0.15);
       rampa(orin, t, tmp);
-      let k = 0.75 + (fino[i] - 0.5) * 0.5 + (bl[i] - 0.5) * 0.15 - pit * 0.35 + (hol[i] - 0.5) * 0.15;
+      const pit = (1 - suave(0, 0.2, pic.f1[i])) * (pic.id[i] > 0.4 ? 1 : 0);
+      let k = 0.85 + (fino[i] - 0.5) * 0.5 + (bl[i] - 0.5) * 0.12 - pit * 0.45 + (hol[i] - 0.5) * 0.2;
       let r = tmp[0] * k, g = tmp[1] * k, b = tmp[2] * k;
-      const m = bare * 0.0;
-      const metal = suave(0.74, 0.82, desn[i]) * 0.9 * (1 - suave(0.55, 0.62, costra[i]));
-      r = mezcla(r, acero[0] * (0.7 + fino[i] * 0.5), metal); g = mezcla(g, acero[1] * (0.7 + fino[i] * 0.5), metal); b = mezcla(b, acero[2] * (0.7 + fino[i] * 0.5), metal);
+      // metal desnudo en rasguños y zonas lijadas por el óxido desprendido
+      const metal = suave(0.78, 0.86, desn[i]) * (1 - costra0 * 0.6);
+      r = mezcla(r, acero[0] * (0.7 + fino[i] * 0.6), metal); g = mezcla(g, acero[1] * (0.7 + fino[i] * 0.6), metal); b = mezcla(b, acero[2] * (0.7 + fino[i] * 0.6), metal);
+      // pintura restante (gris verdosa, con óxido que la atraviesa)
+      const pk = 0.8 + (fino[i] - 0.5) * 0.3 + (hol[i] - 0.5) * 0.15;
+      const pm = pv * (1 - metal);
+      r = mezcla(r, pintura[0] * pk, pm * 0.95); g = mezcla(g, pintura[1] * pk, pm * 0.95); b = mezcla(b, pintura[2] * pk, pm * 0.95);
       poner(c, i, r, g, b);
       c.tinte[i] = 0;
-      c.h[i] = 0.4 + cap * (0.25 + cr[i] * 0.2 + (fino[i] - 0.5) * 0.15) - pit * 0.2 + (hol[i] - 0.5) * 0.04 - metal * 0.12;
+      c.h[i] = 0.4 + (1 - pv) * (0.12 + costra0 * 0.12 + cr[i] * 0.12 + (fino[i] - 0.5) * 0.12) + pv * 0.22 - pit * 0.2 - metal * 0.1;
       c.met[i] = metal * 0.9;
-      c.rug[i] = clamp(mezcla(0.92 + (fino[i] - 0.5) * 0.1, 0.45, metal));
+      c.rug[i] = clamp(mezcla(0.93 + (fino[i] - 0.5) * 0.1, 0.5, metal) * (1 - pm * 0.4) + pm * 0.0);
     }
     c.fuerzaNormal = 4; c.cav = [{ r: 2, f: 3 }, { r: 8, f: 1.6 }];
   },
@@ -101,27 +106,27 @@ const acero_pintado = {
 
 const laton_bronce = {
   nombre: 'laton_bronce', grupo: 'metales', tam: 512, escala: 1,
-  descripcion: 'Latón y bronce envejecidos: dorado cálido, golpes de martillo, arañazos y pátina verde en las hendiduras.',
+  descripcion: 'Latón y bronce envejecidos: dorado cálido, martilleado suave, arañazos y pátina verdosa en las hendiduras.',
   material: { macro: [0.12, 0.05, 0.1], desgaste: 0.3, props: { envMapIntensity: 1.3 } },
   generar(c) {
     const N = c.N, n = c.n;
-    const mart = c.worley(10, { jit: 1, warp: { amp: 0.2, freq: 5 } }), sup = c.fbm(50, 4), blot = c.fbm(4, 5, { warp: { amp: 0.5, freq: 2 } }), rayas = c.fbm([3, 200], 2, { exacto: true }), ray2 = c.fbm([100, 2], 2, { exacto: true }), pat = c.fbm(6, 5, { warp: { amp: 0.6, freq: 3 } }), bl = blanco(N, 51);
-    const oro = col(0xd9a642), bronce = col(0xa8662a), verde = col(0x3f8f78), verde2 = col(0x6bb5a0);
+    const mart = c.worley(8, { jit: 1, warp: { amp: 0.35, freq: 4 } }), sup = c.fbm(50, 4), blot = c.fbm(3, 5, { warp: { amp: 0.5, freq: 2 } }), rayas = c.fbm([3, 200], 2, { exacto: true }), ray2 = c.fbm([140, 2], 2, { exacto: true }), pat = c.fbm(5, 6, { warp: { amp: 0.7, freq: 3 } }), bl = blanco(N, 51), pat2 = c.fbm(22, 4);
+    const oro = col(0xd2a043), bronce = col(0x9a5a28), verde = col(0x4a8a72), verde2 = col(0x78b4a0);
     for (let i = 0; i < n; i++) {
-      const e = suave(0, 0.6, mart.f1[i]);
-      const h = 0.55 + (1 - e) * 0.2 * (mart.id[i] - 0.4) + (sup[i] - 0.5) * 0.05;
+      const e = suave(0, 0.55, mart.f1[i]);
+      const h = 0.55 + (1 - e) * 0.07 * (mart.id[i] - 0.3) + (mart.borde[i] < 0.05 ? -0.03 : 0) + (sup[i] - 0.5) * 0.05;
       c.h[i] = h;
-      par(bronce, oro, clamp(0.3 + blot[i] * 0.8), tmp);
-      let k = 0.5 + (1 - e) * 0.35 + (rayas[i] - 0.5) * 0.3 + (sup[i] - 0.5) * 0.2 + (bl[i] - 0.5) * 0.04;
+      par(bronce, oro, clamp(0.25 + blot[i] * 0.9), tmp);
+      let k = 0.72 + (rayas[i] - 0.5) * 0.3 + (sup[i] - 0.5) * 0.18 + (bl[i] - 0.5) * 0.04 + (e - 0.5) * 0.08;
       let r = tmp[0] * k, g = tmp[1] * k, b = tmp[2] * k;
-      // pátina en las zonas bajas
-      const pv = suave(0.55, 0.7, pat[i] * 0.7 + (1 - h) * 0.4) * (0.5 + 0.5 * e);
+      // pátina: solo en hendiduras y en manchas dispersas
+      const pv = suave(0.64, 0.78, pat[i] * 0.75 + (1 - h) * 0.3 + (pat2[i] - 0.5) * 0.2) * (0.6 + 0.4 * (1 - e));
       par(verde, verde2, sup[i], tmp2);
-      r = mezcla(r, tmp2[0] * (0.6 + sup[i] * 0.5), pv); g = mezcla(g, tmp2[1] * (0.6 + sup[i] * 0.5), pv); b = mezcla(b, tmp2[2] * (0.6 + sup[i] * 0.5), pv);
+      r = mezcla(r, tmp2[0] * (0.55 + sup[i] * 0.4), pv * 0.85); g = mezcla(g, tmp2[1] * (0.55 + sup[i] * 0.4), pv * 0.85); b = mezcla(b, tmp2[2] * (0.55 + sup[i] * 0.4), pv * 0.85);
       poner(c, i, r, g, b);
       c.tinte[i] = 0;
       c.met[i] = (1 - pv * 0.85);
-      c.rug[i] = clamp(0.32 + (sup[i] - 0.5) * 0.25 + (rayas[i] - 0.5) * 0.2 + (ray2[i] - 0.5) * 0.1 + pv * 0.5);
+      c.rug[i] = clamp(0.3 + (sup[i] - 0.5) * 0.25 + (rayas[i] - 0.5) * 0.2 + (ray2[i] - 0.5) * 0.1 + pv * 0.5);
     }
     c.fuerzaNormal = 3; c.cav = [{ r: 2, f: 2.4 }, { r: 8, f: 1.4 }];
   },

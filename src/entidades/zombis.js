@@ -336,7 +336,12 @@ export class Zombi {
     }
     // atasco: si la masa no deja avanzar, abrirse en abanico alrededor del objetivo
     let tx = 0, tz = 0;
-    if (this.prog < 0.35 && !this.atk && this.dObj < 9) { tx = -gz * this.lado * 0.9; tz = gx * this.lado * 0.9; }
+    if (this.prog < 0.45 && !this.atk && this.dObj < 9) {
+      tx = -gz * this.lado * 0.9; tz = gx * this.lado * 0.9;
+      // en cola: sin sitio delante, deja de empujar (no se apelmaza contra los de delante)
+      if (this.dObj > 2.4 && vel > 0.3) { const e = 0.3 + this.prog * 0.8; if (e < vel) vel = e; }
+      sepPeso *= 1.5;
+    }
     let dxd = gx + sx * sepPeso + ex + tx, dzd = gz + sz * sepPeso + ez + tz;
     // tambaleo (paso irregular)
     if (this.ampTambaleo > 0) {
@@ -360,7 +365,7 @@ export class Zombi {
   /** Ataque cuerpo a cuerpo genérico: anticipación + golpe. `obj` Dañable. */
   puedeGolpear() { return !this.atk && this.tCoolAtaque <= this.sis.ahora && this.tAturdido <= 0 && this.tEmerge <= 0; }
 
-  alcanceA(obj) { return this.alcance + this.radio + (obj.radio ?? 0.4); }
+  alcanceA(obj) { return this.alcance + this.radio + (obj.radio ?? obj.cuerpo?.rb ?? 0.4); }
 
   iniciarGolpe(obj, dur = this.anticipacion) {
     const sis = this.sis;
@@ -738,7 +743,7 @@ export function crearZombis(juego) {
         if (n >= reg.length) break;
         const r = reg[n++];
         r.ent = ent; r.jugador = p; r.pos = ent.pos; r.x = ent.pos.x; r.z = ent.pos.z;
-        r.radio = ent.radio ?? ent.cuerpo?.radio ?? 0.5; r.esVehiculo = ent !== p;
+        r.radio = ent.radio ?? ent.cuerpo?.rb ?? ent.cuerpo?.radio ?? 0.5; r.esVehiculo = ent !== p;
       }
     }
     sis.nObjetivos = n;
@@ -846,6 +851,7 @@ export function crearZombis(juego) {
       apagar.push(juego.eventos.en('estructura:destruida', () => nav.reconstruirSuave()));
       apagar.push(juego.eventos.en('explosion', (e) => sis.alExplosion?.(e)));
       apagar.push(juego.eventos.en('ui:menu', () => limpiar()));
+      apagar.push(juego.eventos.en('partida:inicio', () => limpiar()));
     },
 
     actualizar(dt) {

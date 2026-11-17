@@ -242,10 +242,10 @@ const tablones = {
     const D = c.despiece({ filas: 8, piezas: 2, wVar: 0.45, hVar: 0.04, desfase: 'azar', deform: dd });
     const V = maderaVeta(c, D, { frecAnillo: 16, nudos: 0.22 });
     const sucio = c.fbm(4, 5), ray = c.fbm([3, 140], 2, { exacto: true }), bl = blanco(N, 6), paso = c.fbm([5, 3], 4);
-    const claro = col(0xb98552), oscuro = col(0x5e3a1d), nud = col(0x2f1a0b);
+    const claro = col(0xa57c55), oscuro = col(0x5a4128), nud = col(0x2f1a0b);
     for (let i = 0; i < n; i++) {
       const d = D.d[i], id = D.id[i];
-      const m = suave(px(1.6), px(3.4), d);
+      const m = suave(px(1.2), px(2.6), d);
       const b = suave(0, px(7), d);
       const lum = clamp(0.25 + id * 0.55 + (sucio[i] - 0.5) * 0.3);
       mezclaPar(oscuro, claro, lum, tmp);
@@ -455,7 +455,7 @@ const placa_antideslizante = {
     const N = c.N, n = c.n, px = (v) => c.px(v);
     const cel = 6, T = N / cel;
     const bl = blanco(N, 71), mancha = c.fbm(4, 5, { warp: { amp: 0.5, freq: 2 } }), fino = c.fbm(90, 2), ray = c.fbm([3, 120], 2, { exacto: true }), desc = c.fbm(7, 5, { warp: { amp: 0.4, freq: 3 } }), des2 = c.fbm(24, 3);
-    const metal = col(0x9a9da0), pintura = col(0xe2e2e2), sucio = col(0x2b2a28);
+    const metal = col(0xb4b8bc), pintura = col(0xd9dadc), sucio = col(0x6a6358);
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       const i = y * N + x;
       const gx = Math.floor(x / T), gy = Math.floor(y / T);
@@ -467,12 +467,12 @@ const placa_antideslizante = {
       const dom = lug * (0.6 + 0.4 * Math.sqrt(clamp(1 - sd * sd * 0.6)));
       c.h[i] = 0.2 + dom * 0.75 + (fino[i] - 0.5) * 0.03;
       // pintura saltada: ruido suave, más desgaste en los relieves
-      const pv = suave(0.46, 0.56, desc[i] - lug * 0.14 + (des2[i] - 0.5) * 0.3);
+      const pv = suave(0.6, 0.68, desc[i] + lug * 0.2 + (des2[i] - 0.5) * 0.22);
       const pm = 1 - pv;               // 1 = pintura
       const sup = 0.62 + (fino[i] - 0.5) * 0.3 + (ray[i] - 0.5) * 0.2;
       const pr = 0.92 + (bl[i] - 0.5) * 0.06 + (fino[i] - 0.5) * 0.08;
       let r = mezcla(metal[0] * sup, pintura[0] * pr, pm), g = mezcla(metal[1] * sup, pintura[1] * pr, pm), b2 = mezcla(metal[2] * sup, pintura[2] * pr, pm);
-      const su = clamp((1 - lug) * 0.45 + suave(0.55, 0.85, mancha[i]) * 0.5);
+      const su = clamp((1 - lug) * 0.4 + suave(0.6, 0.9, mancha[i]) * 0.35);
       r = mezcla(r, sucio[0], su * 0.32); g = mezcla(g, sucio[1], su * 0.32); b2 = mezcla(b2, sucio[2], su * 0.32);
       poner(c, i, r, g, b2);
       c.tinte[i] = clamp(pm * (1 - su * 0.5));

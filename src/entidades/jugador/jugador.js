@@ -183,7 +183,7 @@ export class Jugador {
     const c = this.juego.combate;
     for (const inst of this.armas) {
       const d = inst?.def; if (!d || d.reserva === -1) continue;
-      if (c?.darMunicion) { c.darMunicion(inst, fraccion, this); continue; }
+      if (c?.darMunicion) { c.darMunicion(inst, fraccion, this); if (fraccion >= 1 && inst.cargador) inst.municion = inst.cargador; continue; }
       const max = Math.ceil((d.reserva ?? 0) * (d.cargador ?? 1) * (this.mods.reserva ?? 1));
       if (inst.reserva >= 0) inst.reserva = Math.min(max, (inst.reserva ?? 0) + Math.ceil(max * fraccion));
       if (fraccion >= 1) inst.municion = d.cargador ?? inst.municion;

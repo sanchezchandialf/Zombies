@@ -19,7 +19,7 @@ const a = await crearArnes({
   eraIdx: +(q.get('era') ?? 0), hora: 0.5, orbita: false,
   sistemas: {
     entrada: crearEntrada, personajes: crearPersonajes,
-    combate: real ? crearCombate : mockCombate, jugadores: crearJugadores,
+    combate: (real || q.get('combate') === 'real') ? crearCombate : mockCombate, jugadores: crearJugadores,
     zombis: real ? crearZombis : mockZombis, mundo: real ? crearMundo : mockMundo,
   },
 });

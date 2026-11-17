@@ -7,53 +7,55 @@ const par = (a, b, t, o) => { o[0] = a[0] + (b[0] - a[0]) * t; o[1] = a[1] + (b[
 
 const teja_arabe = {
   nombre: 'teja_arabe', grupo: 'cubiertas', tam: 512, escala: 1.6,
-  descripcion: 'Cubierta de teja árabe de barro: canales y cobijas en hileras, solapes sombreados, líquenes y hollín.',
-  material: { macro: [0.2, 0.07, 0.1], desgaste: 0.4 },
+  descripcion: 'Cubierta de teja árabe de barro: canales y cobijas semicilíndricas, solapes sombreados, líquenes y hollín.',
+  material: { macro: [0.18, 0.06, 0.1], desgaste: 0.4 },
   generar(c) {
     const N = c.N, n = c.n, px = (v) => c.px(v);
-    const cols = 8, Wc = N / cols, filasT = 4, L = N / filasT;
+    const cols = 10, Wc = N / cols, filasT = 4, L = N / filasT;
     const rng = crearRng(c.semilla * 5 + 2);
     const off = [], tid = [];
-    for (let k = 0; k < cols; k++) { off.push(rng() * N); for (let j = 0; j < filasT + 1; j++) tid.push(rng()); }
-    const warp = c.deform(6, px(2.2)), sup = c.fbm(30, 4), blot = c.fbm(5, 5, { warp: { amp: 0.5, freq: 3 } }), bl = blanco(N, 33), liq = c.fbm(11, 5), sombra = c.fbm(4, 3);
-    const pal = [col(0x8a3d22), col(0xb0562e), col(0xc4703c), col(0x9c4a2a), col(0xd08a52)];
+    for (let k = 0; k < cols; k++) { off.push((k & 1 ? 0.35 : 0) * L + rng() * L * 0.12); for (let j = 0; j < filasT + 1; j++) tid.push(rng()); }
+    const warp = c.deform(6, px(1.4)), sup = c.fbm(30, 4), blot = c.fbm(5, 5, { warp: { amp: 0.5, freq: 3 } }), bl = blanco(N, 33), liq = c.fbm(11, 5), sombra = c.fbm(4, 3);
+    const pal = [col(0xa24f2a), col(0xb85f32), col(0xc06c3a), col(0xaa5530)];
     const liquen = col(0x8a9a5a), hollin = col(0x2a211b);
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       const i = y * N + x;
-      const xx = x + warp.dx[i] * 0.6, yy = y + warp.dy[i] * 0.4;
-      const cx = Math.floor((((xx % N) + N) % N) / Wc);
-      const lx = ((((xx % N) + N) % N) / Wc - cx) * 2 - 1;      // -1..1
-      const cover = (cx & 1) === 0;                              // cobija (convexa) o canal (cóncava)
-      const ty = (((yy + off[cx]) % N) + N) % N;
-      const seg = Math.floor(ty / L), t = (ty / L - seg);
+      const xx = ((x + warp.dx[i] * 0.5) % N + N) % N, yy = y + warp.dy[i] * 0.3;
+      const cx = Math.floor(xx / Wc);
+      const lx = (xx / Wc - cx) * 2 - 1;                         // -1..1
+      const cover = (cx & 1) === 0;
+      const ty = (((yy + off[cx] * 0) % N) + N) % N;
+      const tt = (((ty + off[cx]) % N) + N) % N;
+      const seg = Math.floor(tt / L), t = tt / L - seg;
       const id = tid[cx * (filasT + 1) + seg];
-      // perfil transversal: cobija = cúpula estrecha, canal = vaguada
-      const dome = Math.sqrt(Math.max(0, 1 - lx * lx));
-      let perfil = cover ? 0.55 + 0.45 * dome : 0.3 + 0.1 * (1 - dome) * 0;
-      if (!cover) perfil = 0.28 + 0.22 * (1 - Math.abs(lx)) * 0.6 - 0.1 * dome * 0.0;
-      // el solape: la teja crece hacia el extremo inferior y termina en un borde con sombra
-      const rampa2 = 0.72 + 0.28 * suave(0, 0.88, t);
-      const caida = 1 - suave(0.9, 0.995, t);
-      const h = perfil * rampa2 * (0.45 + 0.55 * caida) + (sup[i] - 0.5) * 0.06 + (id - 0.5) * 0.05;
+      // semicilindro: cobija convexa (más ancha en la cresta) y canal cóncavo
+      const ax = Math.abs(lx);
+      const cy = Math.sqrt(Math.max(0, 1 - ax * ax));
+      const perfil = cover ? 0.35 + 0.65 * cy : 0.2 + 0.25 * (1 - cy * 0.0) * (1 - ax * ax * 0.0) * (0.5 + 0.5 * ax);
+      const canalH = cover ? 0 : 0.18 * (1 - cy) ;
+      // el solape: el extremo inferior de cada teja descansa sobre la siguiente
+      const subida = 0.8 + 0.2 * suave(0, 0.9, t);
+      const borde = suave(0.94, 0.995, t);
+      const h = (cover ? perfil : 0.3 + canalH) * subida - borde * 0.25 + (sup[i] - 0.5) * 0.04 + (id - 0.5) * 0.04;
       c.h[i] = h;
-      const p = Math.min(3.99, id * 5), pi = Math.floor(p);
-      par(pal[pi], pal[pi + 1], p - pi, tmp);
-      let k = 0.9 + (blot[i] - 0.5) * 0.5 + (sup[i] - 0.5) * 0.25 + (bl[i] - 0.5) * 0.1;
-      k *= 0.55 + 0.45 * rampa2 + 0.0;                              // más oscuro bajo el solape
-      k *= 0.5 + 0.5 * caida + 0.0;
-      k *= 0.7 + 0.3 * (cover ? 0.6 + 0.4 * dome : 0.6 + 0.4 * (1 - Math.abs(lx)));
+      mezclaPar(pal[(id * 2.99) | 0], pal[((id * 2.99) | 0) + 1], (id * 7) % 1, tmp);
+      let k = 0.95 + (blot[i] - 0.5) * 0.35 + (sup[i] - 0.5) * 0.22 + (bl[i] - 0.5) * 0.08;
+      k *= 0.82 + 0.18 * suave(0, 0.8, t);
+      k *= 1 - suave(0.955, 0.995, t) * 0.5;
+      k *= cover ? 0.85 + 0.3 * Math.pow(cy, 1.5) : 0.52 + 0.14 * (1 - cy * 0.5);
       let r = tmp[0] * k, g = tmp[1] * k, b = tmp[2] * k;
-      const ho = suave(0.55, 0.8, sombra[i]) * (cover ? 0.3 : 0.7) * 0.6 + (!cover ? 0.25 : 0);
-      r = mezcla(r, hollin[0], ho * 0.5); g = mezcla(g, hollin[1], ho * 0.5); b = mezcla(b, hollin[2], ho * 0.5);
-      const lq = suave(0.62, 0.78, liq[i]) * 0.55;
+      const ho = suave(0.55, 0.8, sombra[i]) * (cover ? 0.25 : 0.6);
+      r = mezcla(r, hollin[0], ho * 0.45); g = mezcla(g, hollin[1], ho * 0.45); b = mezcla(b, hollin[2], ho * 0.45);
+      const lq = suave(0.64, 0.8, liq[i]) * 0.45 * (cover ? 1 : 0.4);
       r = mezcla(r, liquen[0], lq); g = mezcla(g, liquen[1], lq); b = mezcla(b, liquen[2], lq);
       poner(c, i, r, g, b);
       c.tinte[i] = 0;
-      c.rug[i] = clamp(0.78 + (sup[i] - 0.5) * 0.25 - (1 - caida) * 0.0 + lq * 0.1);
+      c.rug[i] = clamp(0.76 + (sup[i] - 0.5) * 0.25 + lq * 0.1);
     }
-    c.fuerzaNormal = 7; c.cav = [{ r: 2, f: 2.6 }, { r: 10, f: 2.2 }];
+    c.fuerzaNormal = 9; c.cav = [{ r: 2, f: 2.6 }, { r: 10, f: 2.2 }];
   },
 };
+function mezclaPar(a, b, t, o) { o[0] = a[0] + (b[0] - a[0]) * t; o[1] = a[1] + (b[1] - a[1]) * t; o[2] = a[2] + (b[2] - a[2]) * t; }
 
 const pizarra = {
   nombre: 'pizarra', grupo: 'cubiertas', tam: 512, escala: 1.4,

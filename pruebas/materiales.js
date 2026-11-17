@@ -78,17 +78,17 @@ if (solo) {
   info.textContent = `${nombre} · ${inf.grupo} · mosaico ${inf.escala} m · ${inf.tam}px\n${inf.descripcion}`;
 } else {
   const cols = +(q.get('cols') || Math.min(6, Math.ceil(Math.sqrt(sel.length * 1.4))));
-  const sp = 2.9;
+  const sp = 2.7, spz = 3.7;
   const filas = Math.ceil(sel.length / cols);
   sel.forEach((m, i) => {
-    const x = (i % cols - (cols - 1) / 2) * sp, z = (Math.floor(i / cols) - (filas - 1) / 2) * sp * 1.15;
+    const x = (i % cols - (cols - 1) / 2) * sp, z = (Math.floor(i / cols) - (filas - 1) / 2) * spz;
     raiz.add(celda(m.nombre, x, z));
   });
-  const w = cols * sp, d = filas * sp * 1.15;
-  const dist = Math.max(w / (2 * Math.tan(17.5 * Math.PI / 180) * (W / H)), d / (2 * Math.tan(17.5 * Math.PI / 180))) * 1.02;
+  const w = cols * sp, d = filas * spz;
+  const dist = Math.max(w / (2 * Math.tan(17.5 * Math.PI / 180) * (W / H)), d / (2 * Math.tan(17.5 * Math.PI / 180))) * 0.82;
   const cam = (q.get('cam') || '').split(',').map(Number);
   if (cam.length === 6) { camara.position.set(cam[0], cam[1], cam[2]); camara.lookAt(cam[3], cam[4], cam[5]); }
-  else { camara.position.set(0, dist * 0.88, dist * 0.62); camara.lookAt(0, 0.3, 0.1); }
+  else { camara.position.set(0, dist * 0.8, dist * 0.7); camara.lookAt(0, 0.3, 0.1); }
   info.textContent = `${sel.length} materiales · ${sel.map((m) => m.nombre).join(' · ')}`;
 }
 if (q.get('t')) materiales.tiempo(+q.get('t'));
