@@ -165,7 +165,7 @@ export function crearCielo() {
       // las nubes reciben la luz dominante: de día, color del sol; de noche, tenues y azuladas
       const dia = 1 - noche;
       U.uNubeClaro.value.copy(a.nubeClaro).multiply(_t.copy(a.sol).lerp(a.luna, noche)).multiplyScalar(0.35 + 0.95 * dia * (0.6 + 0.12 * a.solI));
-      U.uNubeClaro.value.addScaledVector(a.luna, 0.25 * noche);
+      { const k = 0.25 * noche, c = U.uNubeClaro.value; c.r += a.luna.r * k; c.g += a.luna.g * k; c.b += a.luna.b * k; }
       U.uNubeOscuro.value.copy(a.nubeOscuro).multiply(a.horizonte).multiplyScalar(0.9 + 0.5 * dia).lerp(a.cenit, 0.2);
     },
     liberar() { geo.dispose(); matPantalla.dispose(); matEntorno.dispose(); },

@@ -54,8 +54,8 @@ const T = (nombre, subtitulo, mult = {}, extra = {}) => ({ nombre, subtitulo, mu
 export const TEMAS = [
   /*  1 */ T('Primera noche', 'Llaman a las puertas. Solo son caminantes… por ahora.', {}, { grupos: 0 }),
   /*  2 */ T('Noche de corredores', 'Pasos rápidos entre la niebla: no dejes que te alcancen.', { corredor: 5 }, { grupos: 0 }),
-  /*  3 */ T('Primeros acorazados', 'El hierro viejo también se levanta.', { acorazado: 4, corredor: 0.6 }, { grupos: 0.2 }),
-  /*  4 */ T('Lluvia de ácido', 'Algo escupe desde las sombras.', { escupidor: 5 }, { grupos: 0.25 }),
+  /*  3 */ T('Primeros acorazados', 'El hierro viejo también se levanta.', { acorazado: 4, corredor: 0.6 }, { grupos: 0.1 }),
+  /*  4 */ T('Lluvia de ácido', 'Algo escupe desde las sombras.', { escupidor: 5 }, { grupos: 0.12 }),
   /*  5 */ T('La carga del Coracero', JEFES.coracero.titulo, { acorazado: 1.6, corredor: 1.3 }, { pres: 1 }),
   /*  6 */ T('Noche de podredumbre', 'El aire se vuelve irrespirable.', { apestado: 6 }, { grupos: 0.3 }),
   /*  7 */ T('Mecha corta', 'Todo lo que corre, explota.', { detonador: 6, corredor: 1.6 }, { grupos: 0.3 }),
@@ -132,7 +132,8 @@ export function pesoContra(claseId, roles = []) {
 /** Nº de élites esperado: probabilidad de que una unidad suelta sea élite en ese día. */
 export function probElite(dia, dificultad = 'normal', temaElite = 1) {
   if (dia < DIA_PRIMER_ELITE) return 0;
-  return Math.min(0.5, (0.04 + 0.05 * (dia - DIA_PRIMER_ELITE + 1)) * dificultadDe(dificultad).elite * temaElite);
+  const base = Math.min(0.3, 0.03 + 0.03 * (dia - DIA_PRIMER_ELITE));
+  return Math.min(0.7, base * dificultadDe(dificultad).elite * temaElite);
 }
 
 /**

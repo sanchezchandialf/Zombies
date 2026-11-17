@@ -17,6 +17,8 @@
 //   auto            true = automática (mantener) · false = semiautomática (un disparo por pulsación)
 //   radio           radio de explosión (proyectil y arrojadiza) · velocidad: m/s del proyectil · gravedad: parábola
 //   fogonazo, trazadora, casquillo, sonido, retroceso, visual → sensación (FX, audio, cámara)
+//   color           (energía) tinte de fogonazo, trazadora y destello · calorMax: s hasta sobrecalentar (solo emplazamientos) ·
+//   atraviesaMuros  true = los muros no detienen la bala · recarga de las armas con `reserva`: balas = reserva × cargador (la instancia guarda balas sueltas)
 //   descripcion     una frase para la interfaz
 //
 // IDENTIDAD DE LOS ARQUETIPOS
@@ -27,7 +29,16 @@
 //   ligera       volumen de fuego: la cadencia más alta de su era, poco daño por bala.
 //   herramienta  escopeta de zapador: corta distancia, mucho empuje.
 //
-/*DPS*/
+// DPS SOSTENIDO (daño por segundo a un objetivo incluyendo recargas = danio × cargador ÷ (cargador/cadencia + recarga);
+// perdigones: ×0,75 de aciertos). Entre paréntesis, DPS de zona con los objetivos típicos (perforación, explosión, cono).
+//   era          fusil        pistola      precision      pesada           ligera       herramienta   cuerpo a cuerpo
+//   0 Pólvora    26           20           46 (102)       58               31           33            112
+//   1 Vapor      106          76           76 (168)       135              100          98            140
+//   2 Trinchera  193          106          203 (446)      153 (460)        164          122           150
+//   3 Atómica    264          135          408 (898)      162 (649)        231          175           173
+//   4 Digital    391          244          456 (1003)     372 (1488)       340          318           243
+//   5 Sintética  585          314          667 (1467)     422 (1897)       545          368           418
+// Cada columna crece con la era. `pesada` se mide en la cifra de zona; `precision` perfora siempre y es la que más crítico hace.
 export const ARMAS = {
   // ───────────────────────────── Era 0 · Pólvora (1800–1849) ─────────────────────────────
   mosquete: { id: 'mosquete', nombre: 'Mosquete de chispa', era: 0, arquetipo: 'fusil', comportamiento: 'hitscan', danio: 95, tipo: 'bala', cadencia: 1, cargador: 1, recarga: 2.6, reserva: 40, dispersion: 2.5, alcance: 38, caida: [0.6, 0.6], perforacion: 1, perdida: 0.35, empuje: 6, auto: false, fogonazo: 'polvora', trazadora: 'bala', sonido: 'mosquete', retroceso: 1.0,
@@ -72,7 +83,7 @@ export const ARMAS = {
     descripcion: 'Ocho disparos tan rápidos como tu dedo y un cargador que entra de un golpe.' },
   fusil_cerrojo: { id: 'fusil_cerrojo', nombre: 'Fusil de cerrojo con mira', era: 2, arquetipo: 'precision', comportamiento: 'hitscan', danio: 290, tipo: 'perforante', cadencia: 1.1, cargador: 5, recarga: 2.6, reserva: 9, dispersion: 0.15, alcance: 80, caida: null, perforacion: 4, perdida: 0.13, critico: 0.3, multCritico: 2.4, empuje: 10, auto: false, fogonazo: 'moderno', trazadora: 'bala', sonido: 'fusil_cerrojo', retroceso: 1.3, casquillo: true,
     descripcion: 'Cinco balas, un cerrojo y una mira telescópica: cada tiro cruza la tierra de nadie de lado a lado.' },
-  lanzallamas: { id: 'lanzallamas', nombre: 'Lanzallamas', era: 2, arquetipo: 'pesada', comportamiento: 'llama', danio: 170, tipo: 'fuego', cadencia: 20, cargador: 120, recarga: 3.0, reserva: 4, dispersion: 10, cono: 24, alcance: 11, caida: [0.6, 0.5], empuje: 0.5, quemadura: { duracion: 3, dps: 40 }, residuo: { radio: 1.5, duracion: 2.8, dps: 45, cada: 0.45 }, objetivosTipicos: 3, auto: true, fogonazo: 'ninguno', sonido: 'lanzallamas', retroceso: 0.05,
+  lanzallamas: { id: 'lanzallamas', nombre: 'Lanzallamas', era: 2, arquetipo: 'pesada', comportamiento: 'llama', danio: 230, tipo: 'fuego', cadencia: 20, cargador: 120, recarga: 3.0, reserva: 4, dispersion: 10, cono: 24, alcance: 11, caida: [0.6, 0.5], empuje: 0.5, quemadura: { duracion: 3, dps: 40 }, residuo: { radio: 1.5, duracion: 2.8, dps: 45, cada: 0.45 }, objetivosTipicos: 3, auto: true, fogonazo: 'ninguno', sonido: 'lanzallamas', retroceso: 0.05,
     descripcion: 'Un chorro de fuego líquido que prende a la horda y deja el suelo ardiendo tras de sí.' },
   carabina_m: { id: 'carabina_m', nombre: 'Carabina ligera', era: 2, arquetipo: 'ligera', comportamiento: 'hitscan', danio: 24, tipo: 'bala', cadencia: 12, cargador: 30, recarga: 1.9, reserva: 7, dispersion: 3, calentamiento: 1.8, alcance: 32, caida: [0.5, 0.5], perforacion: 0, empuje: 2, auto: true, fogonazo: 'moderno', trazadora: 'bala', sonido: 'carabina_m', retroceso: 0.3, casquillo: true,
     descripcion: 'Ligera, de fuego selectivo y hambrienta de munición: vacía el cargador antes de que la horda pestañee.' },
@@ -90,7 +101,7 @@ export const ARMAS = {
     descripcion: 'El revólver más potente del mundo: lento, atronador y capaz de agujerear una coraza.' },
   rifle_francotirador: { id: 'rifle_francotirador', nombre: 'Rifle de francotirador', era: 3, arquetipo: 'precision', comportamiento: 'hitscan', danio: 420, tipo: 'perforante', cadencia: 1.3, cargador: 10, recarga: 2.6, reserva: 7, dispersion: 0.1, alcance: 90, caida: null, perforacion: 5, perdida: 0.12, critico: 0.33, multCritico: 2.5, empuje: 12, auto: false, fogonazo: 'moderno_grande', trazadora: 'bala', sonido: 'francotirador', retroceso: 1.4, casquillo: true,
     descripcion: 'Semiautomático y de cañón pesado: diez disparos que enhebran a la horda como cuentas.' },
-  lanzacohetes: { id: 'lanzacohetes', nombre: 'Lanzacohetes', era: 3, arquetipo: 'pesada', comportamiento: 'proyectil', danio: 520, tipo: 'explosivo', radio: 6.5, velocidad: 34, cadencia: 0.8, cargador: 1, recarga: 2.6, reserva: 14, dispersion: 1, alcance: 60, empuje: 28, aturdimiento: 1.0, objetivosTipicos: 4, auto: false, fogonazo: 'cohete', sonido: 'lanzacohetes', retroceso: 1.6, efecto: 'explosion_grande', visual: 'cohete',
+  lanzacohetes: { id: 'lanzacohetes', nombre: 'Lanzacohetes', era: 3, arquetipo: 'pesada', comportamiento: 'proyectil', danio: 560, tipo: 'explosivo', radio: 6.5, velocidad: 34, cadencia: 0.8, cargador: 1, recarga: 2.2, reserva: 14, dispersion: 1, alcance: 60, empuje: 28, aturdimiento: 1.0, objetivosTipicos: 4, auto: false, fogonazo: 'cohete', sonido: 'lanzacohetes', retroceso: 1.6, efecto: 'explosion_grande', visual: 'cohete',
     descripcion: 'Un cohete que cruza la avenida y convierte un grupo de muertos en un cráter. No lo dispares cerca.' },
   subfusil_compacto: { id: 'subfusil_compacto', nombre: 'Subfusil compacto', era: 3, arquetipo: 'ligera', comportamiento: 'hitscan', danio: 27, tipo: 'bala', cadencia: 15, cargador: 32, recarga: 1.6, reserva: 7, dispersion: 5, calentamiento: 1.6, alcance: 26, caida: [0.5, 0.5], perforacion: 0, empuje: 2, auto: true, fogonazo: 'moderno', trazadora: 'bala', sonido: 'subfusil_rapido', retroceso: 0.3, casquillo: true,
     descripcion: 'Cabe bajo una chaqueta y escupe quince balas por segundo; apunta al bulto.' },
@@ -120,21 +131,21 @@ export const ARMAS = {
     descripcion: 'Acero de una pieza pensado para abrir puertas; los cráneos ceden antes.' },
 
   // ───────────────────────────── Era 5 · Sintética (2050–2100) ─────────────────────────────
-  rifle_pulsos: { id: 'rifle_pulsos', nombre: 'Rifle de pulsos', era: 5, arquetipo: 'fusil', comportamiento: 'hitscan', danio: 74, tipo: 'energia', cadencia: 11, cargador: 45, recarga: 1.6, reserva: 9, dispersion: 1.5, calentamiento: 3.0, alcance: 50, caida: [0.65, 0.65], perforacion: 2, perdida: 0.3, empuje: 3, auto: true, fogonazo: 'plasma', sonido: 'rifle_pulsos', retroceso: 0.25, trazadora: 'pulso',
+  rifle_pulsos: { id: 'rifle_pulsos', nombre: 'Rifle de pulsos', era: 5, arquetipo: 'fusil', comportamiento: 'hitscan', danio: 74, tipo: 'energia', cadencia: 11, cargador: 45, recarga: 1.6, reserva: 9, dispersion: 1.5, calentamiento: 3.0, alcance: 50, caida: [0.65, 0.65], perforacion: 2, perdida: 0.3, empuje: 3, auto: true, fogonazo: 'plasma', color: 0x66e8ff, sonido: 'rifle_pulsos', retroceso: 0.25, trazadora: 'pulso',
     descripcion: 'Dardos de energía coherente que atraviesan a tres objetivos sin perder el paso.' },
-  pistola_plasma: { id: 'pistola_plasma', nombre: 'Pistola de plasma', era: 5, arquetipo: 'pistola', comportamiento: 'proyectil', danio: 110, tipo: 'energia', radio: 1.6, velocidad: 48, cadencia: 4, cargador: 12, recarga: 1.2, reserva: -1, dispersion: 1.5, alcance: 34, empuje: 5, auto: false, fogonazo: 'plasma', sonido: 'pistola_plasma', retroceso: 0.4, efecto: 'plasma', visual: 'plasma',
+  pistola_plasma: { id: 'pistola_plasma', nombre: 'Pistola de plasma', era: 5, arquetipo: 'pistola', comportamiento: 'proyectil', danio: 110, tipo: 'energia', radio: 1.6, velocidad: 48, cadencia: 4, cargador: 12, recarga: 1.2, reserva: -1, dispersion: 1.5, alcance: 34, empuje: 5, auto: false, fogonazo: 'plasma', color: 0x5ad8ff, sonido: 'pistola_plasma', retroceso: 0.4, efecto: 'plasma', visual: 'plasma',
     descripcion: 'Dispara esferas de plasma que estallan al contacto y salpican a los que van detrás.' },
-  canon_riel: { id: 'canon_riel', nombre: 'Cañón de riel', era: 5, arquetipo: 'precision', comportamiento: 'hitscan', danio: 1300, tipo: 'perforante', cadencia: 0.8, cargador: 4, recarga: 2.8, reserva: 8, dispersion: 0, alcance: 140, caida: null, perforacion: 99, perdida: 0.06, critico: 0.4, multCritico: 2.8, empuje: 26, aturdimiento: 0.4, auto: false, fogonazo: 'riel', sonido: 'canon_riel', retroceso: 2.2, trazadora: 'riel', atraviesaMuros: false,
+  canon_riel: { id: 'canon_riel', nombre: 'Cañón de riel', era: 5, arquetipo: 'precision', comportamiento: 'hitscan', danio: 1300, tipo: 'perforante', cadencia: 0.8, cargador: 4, recarga: 2.8, reserva: 8, dispersion: 0, alcance: 140, caida: null, perforacion: 99, perdida: 0.06, critico: 0.4, multCritico: 2.8, empuje: 26, aturdimiento: 0.4, auto: false, fogonazo: 'riel', color: 0xbfd6ff, sonido: 'canon_riel', retroceso: 2.2, trazadora: 'riel', atraviesaMuros: false,
     descripcion: 'Un clavo de tungsteno a siete veces la velocidad del sonido: atraviesa todo lo que no sea un muro.' },
-  canon_arco: { id: 'canon_arco', nombre: 'Cañón de arco', era: 5, arquetipo: 'pesada', comportamiento: 'arco', danio: 420, tipo: 'energia', cadencia: 5, cargador: 60, recarga: 2.8, reserva: 5, dispersion: 0, cono: 28, alcance: 16, saltos: 6, radioSalto: 6, perdidaSalto: 0.15, ralentiza: [0.55, 0.5], empuje: 1, objetivosTipicos: 4.5, auto: true, fogonazo: 'electrico', trazadora: 'arco', sonido: 'canon_arco', retroceso: 0.1,
+  canon_arco: { id: 'canon_arco', nombre: 'Cañón de arco', era: 5, arquetipo: 'pesada', comportamiento: 'arco', danio: 520, tipo: 'energia', cadencia: 5, cargador: 60, recarga: 2.8, reserva: 5, dispersion: 0, cono: 28, alcance: 16, saltos: 6, radioSalto: 6, perdidaSalto: 0.15, ralentiza: [0.55, 0.5], empuje: 1, objetivosTipicos: 4.5, auto: true, fogonazo: 'electrico', trazadora: 'arco', color: 0xb08cff, sonido: 'canon_arco', retroceso: 0.1,
     descripcion: 'Un rayo encadenado que salta de cadáver en cadáver y los deja clavados en el sitio.' },
-  subfusil_agujas: { id: 'subfusil_agujas', nombre: 'Subfusil de agujas', era: 5, arquetipo: 'ligera', comportamiento: 'hitscan', danio: 40, tipo: 'perforante', cadencia: 20, cargador: 60, recarga: 1.4, reserva: 7, dispersion: 3, calentamiento: 2.2, alcance: 34, caida: [0.5, 0.5], perforacion: 2, perdida: 0.3, empuje: 1.5, auto: true, fogonazo: 'plasma', sonido: 'agujas', retroceso: 0.2, trazadora: 'aguja',
+  subfusil_agujas: { id: 'subfusil_agujas', nombre: 'Subfusil de agujas', era: 5, arquetipo: 'ligera', comportamiento: 'hitscan', danio: 40, tipo: 'perforante', cadencia: 20, cargador: 60, recarga: 1.4, reserva: 7, dispersion: 3, calentamiento: 2.2, alcance: 34, caida: [0.5, 0.5], perforacion: 2, perdida: 0.3, empuje: 1.5, auto: true, fogonazo: 'plasma', color: 0xff7ad9, sonido: 'agujas', retroceso: 0.2, trazadora: 'aguja',
     descripcion: 'Veinte agujas magnéticas por segundo: un zumbido y la primera fila ya no está.' },
-  proyector_ondas: { id: 'proyector_ondas', nombre: 'Proyector de ondas', era: 5, arquetipo: 'herramienta', comportamiento: 'perdigones', danio: 34, tipo: 'energia', perdigones: 12, cadencia: 1.8, cargador: 8, recarga: 2.2, reserva: 6, dispersion: 18, alcance: 14, caida: [0.45, 0.45], perforacion: 2, perdida: 0.25, empuje: 26, aturdimiento: 0.35, auto: false, fogonazo: 'onda', trazadora: 'pulso', sonido: 'proyector_ondas', retroceso: 1.2,
+  proyector_ondas: { id: 'proyector_ondas', nombre: 'Proyector de ondas', era: 5, arquetipo: 'herramienta', comportamiento: 'perdigones', danio: 34, tipo: 'energia', perdigones: 12, cadencia: 1.8, cargador: 8, recarga: 2.2, reserva: 6, dispersion: 18, alcance: 14, caida: [0.45, 0.45], perforacion: 2, perdida: 0.25, empuje: 26, aturdimiento: 0.35, auto: false, fogonazo: 'onda', trazadora: 'pulso', color: 0xff8ae6, sonido: 'proyector_ondas', retroceso: 1.2,
     descripcion: 'Una onda de choque en abanico que atraviesa la primera fila y lanza por los aires al resto.' },
-  granada_singularidad: { id: 'granada_singularidad', nombre: 'Granada de singularidad', era: 5, arquetipo: 'arrojadiza', comportamiento: 'arrojadiza', danio: 650, tipo: 'energia', radio: 7, mecha: 1.0, alcance: 20, empuje: -30, sonido: 'singularidad', efecto: 'singularidad', visual: 'granada_singularidad', zona: { tipo: 'gravedad', duracion: 2.5, dps: 0 },
+  granada_singularidad: { id: 'granada_singularidad', nombre: 'Granada de singularidad', era: 5, arquetipo: 'arrojadiza', comportamiento: 'arrojadiza', danio: 650, tipo: 'energia', radio: 7, mecha: 1.0, alcance: 20, empuje: -30, color: 0xb070ff, sonido: 'singularidad', efecto: 'singularidad', visual: 'granada_singularidad', zona: { tipo: 'gravedad', duracion: 2.5, dps: 0 },
     descripcion: 'Abre un pozo de gravedad que se traga a la horda y la aplasta al cerrarse.' },
-  hoja_termica: { id: 'hoja_termica', nombre: 'Hoja térmica', era: 5, arquetipo: 'cuerpo', comportamiento: 'cuerpo', danio: 190, tipo: 'fuego', cadencia: 2.2, alcance: 2.3, arco: 120, objetivos: 5, empuje: 8, quemadura: { duracion: 2, dps: 30 }, sonido: 'hoja_termica',
+  hoja_termica: { id: 'hoja_termica', nombre: 'Hoja térmica', era: 5, arquetipo: 'cuerpo', comportamiento: 'cuerpo', danio: 190, tipo: 'fuego', cadencia: 2.2, alcance: 2.3, arco: 120, objetivos: 5, empuje: 8, quemadura: { duracion: 2, dps: 30 }, color: 0xff9a50, sonido: 'hoja_termica',
     descripcion: 'Un filo al rojo blanco que corta y cauteriza de un solo gesto.' },
 };
 export const LISTA_ARMAS = Object.values(ARMAS);

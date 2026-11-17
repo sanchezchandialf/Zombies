@@ -32,37 +32,34 @@ export function calidez(c, i, k) { const a = c.alb, j = i * 3; a[j] *= 1 + k; a[
  * Madera sobre un despiece: devuelve { grano (0..1, claro-oscuro), poro (relieve), nudo (máscara) }.
  * desp: resultado de c.despiece(). Las vetas siguen el eje x de la pieza (o y si vertical).
  */
-export function maderaVeta(c, desp, { frecAnillo = 14, anillos = 1.0, deform = 1.2, poros = 1, nudos = 0.25, vertical = false } = {}) {
+export function maderaVeta(c, desp, { frecAnillo = 16, anillos = 1.0, deform = 1.0, poros = 1, nudos = 0.2, vertical = false } = {}) {
   const N = c.N, n = c.n;
-  const lento = c.fbm(vertical ? [8, 2] : [2, 8], 4, { warp: { amp: 0.3, freq: 3 } });
-  const fino = c.fbm(vertical ? [180, 6] : [6, 180], 2, { exacto: true });
+  const lento = c.fbm(vertical ? [6, 2] : [2, 6], 4, { warp: { amp: 0.25, freq: 3 } });
+  const fibra = c.fbm(vertical ? [220, 5] : [5, 220], 2, { exacto: true });
+  const fibra2 = c.fbm(vertical ? [90, 3] : [3, 90], 3, { exacto: true });
   const grano = new Float32Array(n), poro = new Float32Array(n), nudo = new Float32Array(n);
-  // nudos: pocos centros aleatorios por pieza (en coordenadas locales u,v)
-  const rng = crearRng(c.semilla * 31 + 5);
+  const px = (v) => c.px(v);
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
     const i = y * N + x;
     const idp = desp.id[i];
     const along = vertical ? desp.v[i] * desp.ph[i] : desp.u[i] * desp.pw[i];
     const across = vertical ? desp.u[i] * desp.pw[i] : desp.v[i] * desp.ph[i];
-    // anillos: ondas en el eje transversal, deformadas por ruido lento (ondulación a lo largo)
-    const fase = (across / c.px(frecAnillo)) * anillos + lento[i] * deform * 3 + idp * 20 + (along / N) * 0.8 * Math.sin(idp * 40);
-    const r = Math.abs(Math.sin(fase * Math.PI));
-    const anillo = Math.pow(r, 1.6);
-    const fin = fino[i];
-    grano[i] = clamp(anillo * 0.7 + (fin - 0.5) * 0.5 * poros + 0.15);
-    poro[i] = clamp((fin - 0.5) * poros * 0.9 + 0.5 + (anillo - 0.5) * 0.25);
-  }
-  if (nudos > 0) {
-    // un nudo ocasional por pieza: elipse alargada en la dirección de la veta
-    const w = c.worley(6, { jit: 0.8 });
-    for (let i = 0; i < n; i++) {
-      const idp = desp.id2[i];
-      if (idp < nudos) {
-        const d = w.f1[i];
-        const m = 1 - suave(0.0, 0.35, d);
-        nudo[i] = m;
-      }
+    // nudo: elipse alargada con anillos concéntricos que desvían los anillos de la madera
+    let nd = 0, dev = 0;
+    if (desp.id2[i] < nudos) {
+      const cx = (0.2 + 0.6 * ((idp * 7.31) % 1)) * (vertical ? desp.ph[i] : desp.pw[i]), cy = (0.25 + 0.5 * ((idp * 3.7) % 1)) * (vertical ? desp.pw[i] : desp.ph[i]);
+      const a = px(26 + 18 * ((idp * 11.3) % 1)), b = a * 0.42;
+      const dx = (along - cx) / a, dy = (across - cy) / b;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 2.2) { nd = 1 - suave(0.75, 1.0, d); dev = (1 - suave(0, 2.2, d)) * Math.sign(dy || 1) * 1.6; nd *= 0.55 + 0.45 * Math.cos(d * 14); }
     }
+    const fase = (across / px(frecAnillo)) * anillos + lento[i] * deform * 3 + idp * 20 + dev;
+    const r = Math.abs(Math.sin(fase * Math.PI));
+    const anillo = Math.pow(r, 2.2);
+    const fin = fibra[i] * 0.6 + fibra2[i] * 0.4;
+    grano[i] = clamp(0.38 + (anillo - 0.4) * 0.38 + (fin - 0.5) * 0.9 * poros);
+    poro[i] = clamp((fibra[i] - 0.5) * poros * 1.1 + 0.5 + (anillo - 0.5) * 0.15);
+    nudo[i] = nd;
   }
   return { grano, poro, nudo };
 }

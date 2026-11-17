@@ -1,18 +1,40 @@
-// PROVISIONAL — lo sustituye el agente de Combate. API en docs/ARQUITECTURA.md §Combate.
-import { ARMAS } from '../datos/armas.js';
+// Sistema de combate de ERA Z. API en docs/ARQUITECTURA.md §Combate.
+//   armas.js        instancias, cadencia, recarga, gatillo, hitscan / perdigones / proyectil
+//   especiales.js   llama, arco eléctrico, cuerpo a cuerpo
+//   danio.js        aplicarDanio (mods, fuego amigo, críticos, eventos) y explotar (muros, cadena)
+//   zonas.js        fuego, gas, ácido, curación, gravedad
+//   proyectiles.js  proyectil() genérico y objetos lanzados (lanzar)
+//   visuales.js     modelos de proyectil, discos de zona, avisos, tajos
+import { crearVisuales } from './visuales.js';
+import { instalarDanio } from './danio.js';
+import { instalarZonas } from './zonas.js';
+import { instalarProyectiles } from './proyectiles.js';
+import { instalarArmas } from './armas.js';
+import { instalarEspeciales } from './especiales.js';
+
 export function crearCombate(juego) {
-  return {
-    crearArma(armaId, portador) { const def = ARMAS[armaId]; return { def, id: armaId, municion: def?.cargador ?? 0, reserva: 0, recargando: false, progresoRecarga: 0, enfriamiento: 0 }; },
-    actualizarArma(inst, dt, portador) {},
-    gatillo(portador, inst, origen, rot, apretado, recienApretado) { return false; },
-    recargar(inst, portador) { return false; },
-    golpear(portador, armaId, origen, rot) { return false; },
-    lanzar(portador, armaId, origen, destino) {},
-    aplicarDanio(objetivo, info) { return objetivo?.recibirDanio ? objetivo.recibirDanio(info) : 0; },
-    explotar(opciones) {},
-    crearZona(opciones) { return { activo: true, quitar() {} }; },
-    proyectil(opciones) { return null; },
-    limpiar() {},
-    actualizar(dt) {},
+  const c = { juego, visuales: crearVisuales(juego) };
+  instalarDanio(c);
+  instalarZonas(c);
+  instalarProyectiles(c);
+  instalarArmas(c);
+  instalarEspeciales(c);
+
+  c.actualizar = function actualizar(dt) {
+    c._actualizarProyectiles(dt);
+    c._actualizarZonas(dt);
+    c._actualizarCadena();
+    c._volcarContinuo();
+    c.visuales.actualizar(dt);
   };
+
+  /** Quita proyectiles, zonas, explosiones pendientes y visuales (cambio de mapa o fin de partida). */
+  c.limpiar = function limpiar() {
+    c._limpiarProyectiles();
+    c._limpiarZonas();
+    c._limpiarEspeciales();
+    c._pendientes.length = 0;
+    c.visuales.limpiar();
+  };
+  return c;
 }

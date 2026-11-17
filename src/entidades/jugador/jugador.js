@@ -167,7 +167,7 @@ export class Jugador {
   cambiarArma(idx) {
     if (this.armas.length < 2) return false;
     idx = ((idx % 2) + 2) % 2;
-    if (idx === this.armaIdx || this.cambioT > 0.12) return false;
+    if (idx === this.armaIdx) return false;
     this.armaIdx = idx; this.arma = this.armas[idx];
     this.cambioT = AJUSTE.cambioArma;
     this.bufDisparo = 0;
@@ -609,7 +609,7 @@ export class Jugador {
     let rot = this.rot;
     if (Math.hypot(ax, az) > 1.8) {
       const r = Math.atan2(ax, az);
-      if (Math.abs(difAngulo(this.rot, r)) < 0.5) rot = r;
+      if (Math.abs(difAngulo(this.rot, r)) < 1.5) rot = r;   // el tiro sale hacia la mira aunque el cuerpo aún esté girando
     }
     out.rot = rot;
     return out;

@@ -253,7 +253,15 @@ export function desenfocar(f, N, r, pasadas = 2) {
 
 /** Cavidad (oclusión ambiental desde altura): 1 = abierto, <1 = hendidura. */
 export function cavidad(h, N, radio, fuerza) {
-  const b = desenfocar(h, N, radio, 2);
+  // el desenfoque es suave: se calcula a menor resolución cuando el radio es grande
+  const f = radio >= 6 ? 4 : radio >= 3 ? 2 : 1;
+  let b;
+  if (f === 1) b = desenfocar(h, N, radio, 2);
+  else {
+    const M = N / f, s = new Float32Array(M * M), k = 1 / (f * f);
+    for (let y = 0; y < M; y++) for (let x = 0; x < M; x++) { let a = 0; for (let j = 0; j < f; j++) for (let i = 0; i < f; i++) a += h[(y * f + j) * N + x * f + i]; s[y * M + x] = a * k; }
+    b = reescalar(desenfocar(s, M, Math.max(1, Math.round(radio / f)), 2), M, N);
+  }
   const o = new Float32Array(N * N);
   for (let i = 0; i < o.length; i++) { const v = 1 - (b[i] - h[i]) * fuerza; o[i] = v < 0 ? 0 : v > 1 ? 1 : v; }
   return o;
@@ -425,11 +433,17 @@ export function crearContexto(N, semilla = 1) {
 }
 
 // ───────────────────────────── Utilidades de dibujo ─────────────────────────────
-/** Grietas: máscara 1 en la grieta (bordes de Worley deformados, dos escalas). */
-export function grietas(c, { freq = 5, ancho = 0.03, deform = 0.35, oct = 1, semilla } = {}) {
+/** Grietas: máscara 1 en la grieta (bordes de Worley deformados). `zona` (0..1) limita dónde aparecen: pocas y que mueren a medio camino. */
+export function grietas(c, { freq = 5, ancho = 0.03, deform = 0.35, zona = 0.5 } = {}) {
   const w = c.worley(freq, { jit: 0.9, warp: { amp: deform, freq: Math.max(2, freq), semilla: c.sem() } });
   const o = new Float32Array(c.n);
-  for (let i = 0; i < c.n; i++) o[i] = 1 - suave(0, ancho, w.borde[i]);
+  const reg = zona < 1 ? c.fbm(Math.max(2, freq), 3, { warp: { amp: 0.5, freq: 2 } }) : null;
+  const u = 1 - zona;
+  for (let i = 0; i < c.n; i++) {
+    let m = 1 - suave(0, ancho, w.borde[i]);
+    if (reg) m *= suave(0.5 + u * 0.1, 0.62 + u * 0.1, reg[i] + (w.id[i] - 0.5) * 0.35);
+    o[i] = m;
+  }
   return o;
 }
 /** Vetas tipo mármol/madera: líneas finas 0..1 siguiendo un ruido deformado. */

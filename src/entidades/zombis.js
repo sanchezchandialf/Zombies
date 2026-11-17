@@ -171,7 +171,7 @@ export class Zombi {
     cant *= mult;
     this.vida -= cant;
     this.tUltimoGolpe = sis.ahora; this.ultimoAtacante = info.atacante || this.ultimoAtacante;
-    if (info.empuje) this.empujar(dx * info.empuje, dz * info.empuje);
+    if (info.empuje) this.empujar(dx * info.empuje * 70, dz * info.empuje * 70);   // empuje del contrato ≈ m/s sobre 70 kg
     if (this.tAturdido <= 0 || this.vida <= 0 || true) this.visual.accion('golpe', { dirX: dx, dirZ: dz, duracion: 0.25 });
     this.visual.destello?.();
     if (rebote && sis.ahora - this.tChispa > 0.07) {
@@ -385,7 +385,7 @@ export class Zombi {
     if (!esJugador && this.def.danioEstructuras) cant *= this.def.danioEstructuras;
     const info = {
       cantidad: cant, tipo: 'golpe', atacante: this, arma: null, x: obj.pos.x, z: obj.pos.z, dirX, dirZ,
-      empuje: this.masa * (this.def.id === 'mole' ? 2.2 : 0.9) * (this.esJefe ? 0.6 : 1), critico: false, ...extra,
+      empuje: (this.def.id === 'mole' ? 8 : this.def.id === 'acorazado' ? 3.2 : this.esJefe ? 5 : 1.8), critico: false, ...extra,
     };
     return sis.danar(obj, info);
   }
@@ -593,15 +593,122 @@ export function crearZombis(juego) {
 
     /** Explosión: delega en combate.explotar y suma el daño extra a estructuras. */
     explotar(x, z, radio, danio, o = {}) {
-      juego.combate?.explotar?.({ x, z, radio, danio, tipo: o.tipo || 'explosivo', atacante: o.atacante, empuje: o.empuje ?? 400 });
+      const c = juego.combate;
+      if (c?.explotar) c.explotar({ x, z, radio, danio, tipo: o.tipo || 'explosivo', atacante: o.atacante, empuje: o.empuje ?? 5, danioEstructuras: o.danioEstructuras, quemadura: o.quemadura });
       sis.fxEmitir(o.fx || 'explosion', x, 0.6, z, { escala: radio / 4.5 });
-      juego.render?.sacudir?.(Math.min(1, radio / 7), 0.35);
     },
 
     zona(o) { return juego.combate?.crearZona?.(o) ?? null; },
 
     alMorirZombi() {},
+
+    /** Grito del Aullador: la horda cercana corre +40 % durante `grito.duracion` y los jugadores cercanos quedan silenciados. */
+    gritar(z) {
+      const g = z.def.grito, x = z.pos.x, zz = z.pos.z, ahora = sis.ahora;
+      for (const o of juego.zombis) {
+        if (!o.vivo || o === z || o.esJefe) continue;
+        if (Math.hypot(o.pos.x - x, o.pos.z - zz) <= g.radio * 1.8) { o.tFuria = Math.max(o.tFuria, g.duracion); o.visual.estado('furia', true); }
+      }
+      z.tFuria = 0;
+      for (const j of juego.jugadores) {
+        if (!j || j.vivo === false) continue;
+        if (Math.hypot(j.pos.x - x, j.pos.z - zz) <= g.radio) j.silenciado = Math.max(j.silenciado || 0, g.silencio);
+      }
+      sis.fxEmitir('onda', x, 1.2, zz, { escala: 1.5, color: '#d98fd0' });
+      juego.render?.sacudir?.(0.25, 0.4);
+      juego.eventos.emitir('zombi:grito', { zombi: z, t: ahora });
+    },
+
+    // ─── Nubes de gas inflamables (Apestado) ───
+    crearNube(x, z, radio, duracion, dps, atacante) {
+      const zona = sis.zona({ x, z, radio, duracion, tipo: 'gas', dps, atacante, afecta: 'jugadores' });
+      nubes.push({ x, z, radio, hasta: sis.ahora + duracion, zona, atacante });
+      sis.fxEmitir('gas_toxico', x, 0.3, z, { escala: radio / 3 });
+    },
+    /** Detona el gas: explosión de fuego en (x,z) y las nubes vecinas se inflaman en cadena. */
+    detonarNube(x, z, radio, atacante) {
+      sis.explotar(x, z, radio * 0.9, 55 * (atacante?.escDanio ?? 1), { tipo: 'fuego', atacante, fx: 'explosion', empuje: 5, quemadura: { duracion: 3, dps: 8 } });
+      sis.zona({ x, z, radio: radio * 0.6, duracion: 3, tipo: 'fuego', dps: 9, atacante, afecta: 'todos' });
+    },
+    alExplosion(e) {
+      for (let i = nubes.length - 1; i >= 0; i--) {
+        const n = nubes[i];
+        if (n.detonada) continue;
+        if (Math.hypot(n.x - e.x, n.z - e.z) <= e.radio + n.radio * 0.6) {
+          n.detonada = true; n.zona?.quitar?.(); nubes.splice(i, 1);
+          sis.detonarNube(n.x, n.z, n.radio, n.atacante);
+        }
+      }
+    },
+    actualizarNubes() {
+      const zonas = juego.combate?.zonas;
+      for (let i = nubes.length - 1; i >= 0; i--) {
+        const n = nubes[i];
+        if (n.hasta <= sis.ahora || (n.zona && n.zona.activo === false)) { nubes.splice(i, 1); continue; }
+        if (!zonas) continue;
+        for (let k = 0; k < zonas.length; k++) {
+          const f = zonas[k];
+          if (f.activo && f.tipo === 'fuego' && f !== n.zona && Math.hypot(f.x - n.x, f.z - n.z) < f.radio + n.radio * 0.6) {
+            nubes.splice(i, 1); n.zona?.quitar?.(); n.detonada = true; sis.detonarNube(n.x, n.z, n.radio, n.atacante); break;
+          }
+        }
+      }
+    },
+
+    /**
+     * Proyectil en parábola desde (x,y,z) hasta (tx,tz) en `tiempo` s, con aviso en el suelo. Usa combate.proyectil si existe;
+     * si no, simula el arco aquí. alImpactar(x, z, conCombate) se llama al aterrizar (o al chocar en vuelo).
+     */
+    parabola(o) {
+      const ox = o.x, oz = o.z, oy = o.y ?? 1.5, D = Math.hypot(o.tx - ox, o.tz - oz) || 0.01;
+      const T = Math.max(0.2, o.tiempo ?? D / 12);
+      if (o.telegrafo !== false) {
+        const radioAv = o.radioAviso ?? o.radio ?? 1.6;
+        tel.disco(o.tx, o.tz, radioAv, T, { color: o.colorAviso || '#ff4a2a' });
+      }
+      let hecho = false, usaCombate = false;
+      const impactar = (a, b) => {
+        if (hecho) return; hecho = true;
+        let px = o.tx, pz = o.tz;
+        if (typeof a === 'number' && typeof b === 'number') { px = a; pz = b; }
+        else if (a && typeof a.x === 'number' && typeof a.z === 'number') { px = a.x; pz = a.z; }
+        o.alImpactar?.(px, pz, usaCombate);
+      };
+      const c = juego.combate?.proyectil?.({
+        x: ox, y: oy, z: oz, dirX: (o.tx - ox) / D, dirZ: (o.tz - oz) / D, velocidad: D / T, alcance: D, danio: o.danio ?? 0,
+        tipo: o.tipo || 'acido', radio: 0.25, radioExplosion: o.radio ?? 0, gravedad: o.gravedad ?? 20, atacante: o.atacante,
+        bando: 'zombis', efecto: o.efecto, alImpactar: impactar,
+      });
+      if (c) { usaCombate = true; return c; }
+      vuelos.push({ ox, oz, oy, tx: o.tx, tz: o.tz, T, t: 0, impactar, mesh: crearBola(o.efecto) });
+      return null;
+    },
   };
+
+  // Vuelos propios (cuando combate no ofrece proyectiles)
+  const vuelos = [];
+  let geoBola = null; const matsBola = {};
+  function crearBola(efecto) {
+    const esc = juego.render?.escena;
+    if (!esc) return null;
+    if (!geoBola) geoBola = new THREE.IcosahedronGeometry(0.22, 1);
+    const col = efecto === 'acido' ? 0x8cff3a : efecto === 'gas' ? 0xc8d84a : efecto === 'fuego' ? 0xff7a1c : 0xff4a2a;
+    const m = matsBola[col] || (matsBola[col] = new THREE.MeshBasicMaterial({ color: col, toneMapped: false }));
+    const mesh = new THREE.Mesh(geoBola, m);
+    esc.add(mesh);
+    return mesh;
+  }
+  function actualizarVuelos(dt) {
+    for (let i = vuelos.length - 1; i >= 0; i--) {
+      const v = vuelos[i];
+      v.t += dt;
+      const s = Math.min(1, v.t / v.T), alt = 0.5 * Math.hypot(v.tx - v.ox, v.tz - v.oz) * 0.35 + 1.2;
+      if (v.mesh) v.mesh.position.set(v.ox + (v.tx - v.ox) * s, v.oy * (1 - s) + 4 * alt * s * (1 - s), v.oz + (v.tz - v.oz) * s);
+      if (s >= 1) { v.mesh?.removeFromParent(); vuelos.splice(i, 1); v.impactar(v.tx, v.tz); }
+    }
+  }
+  sis.actualizarVuelos = actualizarVuelos;
+  sis.vuelos = vuelos;
 
   function refrescarObjetivos() {
     let n = 0;
@@ -707,6 +814,8 @@ export function crearZombis(juego) {
     juego.zombis.length = 0; lote.length = 0;
     for (const n of nubes) n.zona?.quitar?.();
     nubes.length = 0; senuelos.length = 0;
+    for (const v of vuelos) v.mesh?.removeFromParent();
+    vuelos.length = 0;
     for (const d of drones.slice()) d.liberar();
     drones.length = 0;
     tel.limpiar();
@@ -751,6 +860,7 @@ export function crearZombis(juego) {
       }
       // nubes inflamables y drones
       if (nubes.length) sis.actualizarNubes?.(dt);
+      if (vuelos.length) actualizarVuelos(dt);
       for (let i = drones.length - 1; i >= 0; i--) drones[i].actualizar(dt);
       tel.actualizar(dt);
     },
