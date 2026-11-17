@@ -105,7 +105,8 @@ const FABRICAS = {
     for (let i = 0; i < 4; i++) { const a = new THREE.Mesh(aleta, matMetal(0x3a3d34, 0.6, 0.5)); a.position.z = -0.32; a.rotation.z = i * Math.PI / 2; a.translateY(0.1); g.add(a); }
     const llama = new THREE.Mesh(memo(geos, 'cohete_llama', () => { const c = new THREE.ConeGeometry(0.075, 0.55, 12); c.rotateX(-Math.PI / 2); c.translate(0, 0, -0.68); return c; }),
       new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 0.9, 0.35), toneMapped: false, transparent: true, opacity: 0.9, blending: AD, depthWrite: false }));
-    g.add(llama, Object.assign(sprite(0xff9a3c, 1.6, 0.8), { position: new THREE.Vector3(0, 0, -0.5) }));
+    const halo = sprite(0xff9a3c, 1.6, 0.8); halo.position.set(0, 0, -0.5);
+    g.add(llama, halo);
     g.userData.llama = llama; return g;
   },
   granada40() {
@@ -156,7 +157,8 @@ const FABRICAS = {
     const g = new THREE.Group();
     g.add(new THREE.Mesh(memo(geos, 'botella', () => new THREE.LatheGeometry([[0, -0.11], [0.05, -0.1], [0.055, -0.02], [0.04, 0.05], [0.018, 0.1], [0.02, 0.15], [0, 0.15]].map(([r, y]) => new THREE.Vector2(r, y)), 12)),
       memo(mats, 'vidrio', () => new THREE.MeshStandardMaterial({ color: 0x5a7a52, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.8 }))));
-    const trapo = sprite(0xff8a2c, 0.42, 1); trapo.position.set(0, 0.2, 0); g.add(trapo, Object.assign(sprite(0xffcf6a, 0.2, 1), { position: new THREE.Vector3(0, 0.19, 0) }));
+    const trapo = sprite(0xff8a2c, 0.42, 1); trapo.position.set(0, 0.2, 0);
+    const nucleo = sprite(0xffcf6a, 0.2, 1); nucleo.position.set(0, 0.19, 0); g.add(trapo, nucleo);
     g.userData.chispa = trapo; return g;
   },
   granada_singularidad() {

@@ -53,7 +53,7 @@ export function instalarProyectiles(c) {
     }
     p.visual = visuales.proyectil(o.visual ?? 'bala', o.escala ?? 1);
     if (p.visual) { p.visual.obj.position.set(p.x, p.y, p.z); orientar(p); }
-    if (p.gravedad || p.rebota) p.sombra = visuales.sombra(0.35);
+    if (p.gravedad || p.rebota) p.sombra = visuales.sombra(0.5);
     if (o.aviso) {
       const a = o.aviso === true ? {} : o.aviso;
       const ax = o.x + dx * alcance, az = o.z + dz * alcance;
@@ -256,7 +256,7 @@ export function instalarProyectiles(c) {
         }
         return false;
       },
-      escala: 1.25,
+      escala: 1.8,
     });
     if (!p) return null;
     p.mecha = mecha; // molotov: mecha 0 → se rompe al tocar el suelo (ver paso)

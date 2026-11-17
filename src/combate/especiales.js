@@ -99,7 +99,7 @@ export function instalarEspeciales(c) {
         const fin = Math.max(1.5, largo * (0.55 + 0.4 * rng()));
         const rx = ox + tir.dx * fin, rz = oz + tir.dz * fin;
         for (let i = residuos.length - 1; i >= 0; i--) if (!residuos[i].activo) residuos.splice(i, 1);
-        if (residuos.length < MAX_RESIDUOS_ACTIVOS || true) {
+        if (residuos.length < MAX_RESIDUOS_ACTIVOS) {
           const z = c.crearZona({ x: rx, z: rz, radio: res.radio, duracion: res.duracion, tipo: 'fuego', dps: res.dps, atacante: portador, afecta: portador?.bando === 'jugadores' ? 'zombis' : undefined });
           if (z && !residuos.includes(z)) residuos.push(z);
         }

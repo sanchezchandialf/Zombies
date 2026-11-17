@@ -195,7 +195,7 @@ const distancia = {
       z.componer(0, 0, 0);
       return;
     }
-    if (ahora - dat.tVista > 0.3) { dat.tVista = ahora; dat.vista = sis.fisica.lineaLibre(x, zz, b.pos.x, b.pos.z); }
+    if (ahora - dat.tVista > 0.3) { dat.tVista = ahora; const fin = Math.max(0.5, bd - (b.radio ?? 0.5) - 0.6); dat.vista = sis.fisica.lineaLibre(x, zz, x + bx * fin, zz + bz * fin); }
     const rango = esJug ? dat.rango : Math.min(dat.rango, 11);
     if (bd > rango + 1.5 || !dat.vista) {
       // acercarse: a la estructura/vehículo con paso libre o al jugador por el campo de flujo
@@ -241,16 +241,15 @@ function escupirAcido(z, sis, b) {
   const D = Math.hypot(tx - ox, tz - oz), T = Math.max(0.45, D / v);
   const estr = z.def.danioEstructuras || 3, danio = z.danio * 0.9;
   sis.parabola({
-    x: ox, z: oz, y: 1.5, tx, tz, tiempo: T, atacante: z, danio, tipo: 'acido', radio: 1.7, efecto: 'acido',
+    x: ox, z: oz, y: 1.5, tx, tz, tiempo: T, atacante: z, danio: 0, tipo: 'acido', radio: 0, radioAviso: 1.8, efecto: 'acido',
     colorAviso: '#8cff3a',
-    alImpactar(px, pz, conCombate) {
+    alImpactar(px, pz) {
       sis.zona({ x: px, z: pz, radio: 1.9, duracion: 4.5, tipo: 'acido', dps: 7 + z.danio * 0.45, atacante: z, afecta: 'jugadores' });
       sis.fxEmitir('acido', px, 0.2, pz, { escala: 1.1 });
       sis.juego.fx?.calco?.('acido', px, pz, 3.2);
       sis.amigos(px, pz, 1.7, (e) => {
         const dura = !(e.bando === 'jugadores' && e.rol);
-        if (conCombate) { if (dura) sis.danar(e, { cantidad: danio * (estr - 1), tipo: 'acido', atacante: z, x: px, z: pz, dirX: 0, dirZ: 0, area: true }); }
-        else sis.danar(e, { cantidad: danio * (dura ? estr : 1), tipo: 'acido', atacante: z, x: px, z: pz, dirX: 0, dirZ: 0, area: true });
+        sis.danar(e, { cantidad: danio * (dura ? estr : 1), tipo: 'acido', atacante: z, x: px, z: pz, dirX: 0, dirZ: 0, area: true });
       });
     },
   });
@@ -280,7 +279,7 @@ const cargar = {
       // carrera despejada de muros hasta casi el objetivo
       if (sis.nav.distanciaLibre(z.pos.x, z.pos.z, dx, dz, d, z.radio * 0.9, true) >= d - 1.2) {
         z.modo = 'rugir'; z.tModo = 1.0; dat.dx = dx; dat.dz = dz;
-        dat.max = Math.min(30, d + 14);
+        dat.max = Math.min(40, d + 14);
         z.parar(); z.visual.accion('cargar', { duracion: 1.0, dirX: dx, dirZ: dz });
         z.visual.estado('cargando', true);
         sis.juego.audio?.reproducir?.('mole_rugido', { x: z.pos.x, z: z.pos.z, volumen: 1 });
@@ -374,7 +373,7 @@ function chocar(z, sis, muro) {
 // ───────────────────────── Apoyo (Aullador) ─────────────────────────
 
 const apoyo = {
-  iniciar(z, sis) { const d = z.datosClase; d.tGrito = sis.ahora + 3 + z.rng() * 3; d.banda = 14 + z.rng() * 3; },
+  iniciar(z, sis) { const d = z.datosClase; d.tGrito = sis.ahora + 3 + z.rng() * 3; d.banda = 11 + z.rng() * 3; },
   pensar(z, sis) {
     mantenerMirada(z);
     if (z.modo === 'gritar') return;

@@ -21,7 +21,7 @@ export function crearCombateFalso(juego) {
       const f = factor(info.atacante?.bando ?? info.bando ?? 'neutral', obj.bando ?? 'neutral', !!info.area);
       if (f <= 0) return 0;
       const real = obj.recibirDanio({ ...info, cantidad: info.cantidad * f });
-      reg.danio.push({ obj, tipo: info.tipo, cantidad: real, atacante: info.atacante });
+      reg.danio.push({ obj, tipo: info.tipo, cantidad: real, atacante: info.atacante, continuo: !!info.continuo });
       return real;
     },
     explotar(o) {
@@ -89,7 +89,7 @@ export class JugadorFalso {
     this.rol = { id: o.rol || 'soldado', nombre: o.rol || 'soldado' };
     this.invisible = false; this.caido = false; this.silenciado = 0; this.vehiculo = null;
     this.recibido = {}; this.golpes = 0; this.ultimoImpulso = 0;
-    this.cuerpo = juego.fisica.crearCuerpo({ forma: 'circulo', x, z, radio: 0.4, masa: 80, capa: CAPA.JUGADOR, datos: this, amortiguacion: 6 });
+    this.cuerpo = juego.fisica.crearCuerpo({ forma: 'circulo', x, z, radio: 0.4, masa: o.masa ?? 80, capa: CAPA.JUGADOR, datos: this, amortiguacion: 6 });
     this.meta = o.meta || null;       // {x,z}: lo mueve hacia allí a 5 m/s
     this.vel = o.vel ?? 5;
     juego.jugadores.push(this);
@@ -100,7 +100,7 @@ export class JugadorFalso {
     this.recibido.total = (this.recibido.total || 0) + info.cantidad;
     if (info.tipo === 'golpe') this.golpes++;
     this.vida -= info.cantidad;
-    if (info.empuje > 0 && info.dirX !== undefined) {
+    if (info.empuje > 0 && info.dirX !== undefined && this.cuerpo.masa < 1e5) {
       this.cuerpo.vx += info.dirX * info.empuje * 70 / 80; this.cuerpo.vz += (info.dirZ ?? 0) * info.empuje * 70 / 80;
       this.ultimoImpulso = info.empuje;
     }

@@ -326,7 +326,7 @@ export function despiece(N, o = {}) {
         const qx = Math.abs(lx - w / 2) - (w / 2 - redondeo), qy = Math.abs(ly - hh / 2) - (hh / 2 - redondeo);
         const ox = qx > 0 ? qx : 0, oy = qy > 0 ? qy : 0;
         d[i] = redondeo - (Math.sqrt(ox * ox + oy * oy) + Math.min(Math.max(qx, qy), 0));
-      } else d[i] = Math.min(lx, w - lx, ly, hh - ly);
+      } else d[i] = o.soloX ? Math.min(lx, w - lx) : Math.min(lx, w - lx, ly, hh - ly);
     }
   }
   return { id, id2, u, v, d, pw, ph };

@@ -746,7 +746,10 @@ export function crearJefeIA(sis, z) {
       }
       // golpe básico si está pegado
       const d = ia.ap.d;
-      if (d <= z.alcanceA(r.ent) && z.puedeGolpear()) z.iniciarGolpe(r.ent, 0.55);
+      if (d <= z.alcanceA(r.ent) && z.puedeGolpear()) {
+        z.iniciarGolpe(r.ent, 0.55);
+        sis.tel.cono(z.pos.x, z.pos.z, Math.atan2(ia.ap.dx, ia.ap.dz), z.alcance + z.radio + 0.9, 1.4, 0.55, { color: ROJO });
+      }
       z.guiar(r.x, r.z, d);
       z.componer(z.gx, z.gz, d <= z.alcanceA(r.ent) ? 0.1 : 1, 0.5);
     },

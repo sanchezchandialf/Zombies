@@ -97,7 +97,7 @@ const FS_BLOOM_DOWN = /* glsl */`
 const FS_BLOOM_UP = /* glsl */`
   varying vec2 vUv; uniform sampler2D tSrc; uniform vec2 uTexel; uniform float uPeso;
   void main() {
-    vec4 d = vec4(1., 1., -1., 0.) * uTexel * 1.1;
+    vec4 d = uTexel.xyxy * vec4(1., 1., -1., 0.) * 1.1;
     vec3 s = texture2D(tSrc, vUv - d.xy).rgb + texture2D(tSrc, vUv - d.wy).rgb * 2. + texture2D(tSrc, vUv - d.zy).rgb
            + texture2D(tSrc, vUv + d.zw).rgb * 2. + texture2D(tSrc, vUv).rgb * 4. + texture2D(tSrc, vUv + d.xw).rgb * 2.
            + texture2D(tSrc, vUv + d.zy).rgb + texture2D(tSrc, vUv + d.wy).rgb * 2. + texture2D(tSrc, vUv + d.xy).rgb;

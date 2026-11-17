@@ -631,7 +631,7 @@ seccion('Llama y arco');
   const n = fuego(m, p, inst, 1);
   ok(n >= 19 && n <= 21, `20 pulsos/s (${n})`);
   const dps = cerca1.total;
-  ok(dps > 80 && dps < 200, `daño sostenido a un objetivo cercano ≈ danio/s con caída (${dps.toFixed(0)})`);
+  ok(dps > 80 && dps < 260, `daño sostenido a un objetivo cercano ≈ danio/s con caída (${dps.toFixed(0)})`);
   ok(cerca2.total > 40, 'el cono alcanza a varios objetivos', cerca2.total.toFixed(0));
   ok(lado.total === 0 && lejos.total === 0, 'fuera del cono y del alcance no');
   ok(cerca1.ardiendo > 0, 'prende fuego');

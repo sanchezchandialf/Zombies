@@ -26,6 +26,14 @@ export function visualNulo() {
   };
 }
 
+/** Completa con funciones vacías lo que le falte a un visual (módulos de personajes aún incompletos). */
+function asegurarVisual(v) {
+  const n = visualNulo();
+  for (const k of Object.keys(n)) if (typeof v[k] !== 'function') v[k] = k === 'boca' ? (o) => o : n[k];
+  if (typeof v.altura !== 'number') v.altura = 1.8;
+  return v;
+}
+
 let _sigId = 1;
 const _o = { x: 0, z: 0, d: 0 };
 
@@ -109,7 +117,7 @@ export class Zombi {
       alColisionar: (otro, nx, nz, solape, velRel) => this.contacto(otro, nx, nz, solape, velRel),
     });
 
-    this.visual = o.visual || visualNulo();
+    this.visual = o.visual ? asegurarVisual(o.visual) : visualNulo();
     this.comp = COMPORTAMIENTOS[def.comportamiento] || COMPORTAMIENTOS.perseguir;
     this.extra = EXTRAS[def.id] || null;
     this.ia = null;       // jefes: máquina de estados
@@ -385,7 +393,7 @@ export class Zombi {
     if (!esJugador && this.def.danioEstructuras) cant *= this.def.danioEstructuras;
     const info = {
       cantidad: cant, tipo: 'golpe', atacante: this, arma: null, x: obj.pos.x, z: obj.pos.z, dirX, dirZ,
-      empuje: (this.def.id === 'mole' ? 8 : this.def.id === 'acorazado' ? 3.2 : this.esJefe ? 5 : 1.8), critico: false, ...extra,
+      empuje: (this.def.id === 'mole' ? 8 : this.def.id === 'acorazado' ? 1.6 : this.esJefe ? 5 : 0.55), critico: false, ...extra,
     };
     return sis.danar(obj, info);
   }
@@ -612,7 +620,7 @@ export function crearZombis(juego) {
       z.tFuria = 0;
       for (const j of juego.jugadores) {
         if (!j || j.vivo === false) continue;
-        if (Math.hypot(j.pos.x - x, j.pos.z - zz) <= g.radio) j.silenciado = Math.max(j.silenciado || 0, g.silencio);
+        if (Math.hypot(j.pos.x - x, j.pos.z - zz) <= g.radio * 1.4) j.silenciado = Math.max(j.silenciado || 0, g.silencio);
       }
       sis.fxEmitir('onda', x, 1.2, zz, { escala: 1.5, color: '#d98fd0' });
       juego.render?.sacudir?.(0.25, 0.4);
@@ -633,9 +641,10 @@ export function crearZombis(juego) {
     alExplosion(e) {
       for (let i = nubes.length - 1; i >= 0; i--) {
         const n = nubes[i];
-        if (n.detonada) continue;
+        if (!n || n.detonada) continue;
         if (Math.hypot(n.x - e.x, n.z - e.z) <= e.radio + n.radio * 0.6) {
-          n.detonada = true; n.zona?.quitar?.(); nubes.splice(i, 1);
+          n.detonada = true; n.zona?.quitar?.();
+          const k = nubes.indexOf(n); if (k >= 0) nubes.splice(k, 1);
           sis.detonarNube(n.x, n.z, n.radio, n.atacante);
         }
       }
@@ -644,12 +653,16 @@ export function crearZombis(juego) {
       const zonas = juego.combate?.zonas;
       for (let i = nubes.length - 1; i >= 0; i--) {
         const n = nubes[i];
+        if (!n || n.detonada) continue;
         if (n.hasta <= sis.ahora || (n.zona && n.zona.activo === false)) { nubes.splice(i, 1); continue; }
         if (!zonas) continue;
         for (let k = 0; k < zonas.length; k++) {
           const f = zonas[k];
           if (f.activo && f.tipo === 'fuego' && f !== n.zona && Math.hypot(f.x - n.x, f.z - n.z) < f.radio + n.radio * 0.6) {
-            nubes.splice(i, 1); n.zona?.quitar?.(); n.detonada = true; sis.detonarNube(n.x, n.z, n.radio, n.atacante); break;
+            n.detonada = true; n.zona?.quitar?.();
+            const q = nubes.indexOf(n); if (q >= 0) nubes.splice(q, 1);
+            sis.detonarNube(n.x, n.z, n.radio, n.atacante);
+            break;
           }
         }
       }

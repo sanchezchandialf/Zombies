@@ -319,6 +319,7 @@ export function instalarArmas(c) {
       danio: (def.danio ?? 50) * (tir.extra?.multiplicador ?? 1), tipo: def.tipo, radioExplosion: def.radio ?? 0, gravedad: !!def.gravedad,
       atacante: portador, arma: def, efecto: def.efecto, visual: def.visual, empuje: def.empuje, aturdimiento: def.aturdimiento,
       quemadura: def.quemadura, estela: def.visual === 'cohete' ? 'humo' : undefined,
+      escala: { cohete: 1.5, granada40: 2.2, plasma: 1.2 }[def.visual] ?? 1,
     });
   }
 }

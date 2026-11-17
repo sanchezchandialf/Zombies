@@ -1,3 +1,7 @@
-// Ensambla el catálogo completo (45+ materiales).
+// Ensambla el catálogo completo.
 import suelos from './suelos.js';
-export const CATALOGO = [...suelos];
+import muros from './muros.js';
+import cubiertas from './cubiertas.js';
+import metales from './metales.js';
+import otros from './otros.js';
+export const CATALOGO = [...suelos, ...muros, ...cubiertas, ...metales, ...otros];

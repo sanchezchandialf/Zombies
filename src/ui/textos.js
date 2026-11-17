@@ -46,11 +46,12 @@ export const NOMBRE_COMPORTAMIENTO = {
   cargar: 'Carga en línea recta', apoyo: 'Apoya a la horda', suicida: 'Suicida',
 };
 
-/** Dificultades: el id viaja en `ui:jugar`. */
+/** Dificultades: el id viaja en `ui:jugar` (los nombres coinciden con datos/oleadas.js). */
 export const DIFICULTADES = [
   { id: 'facil', nombre: 'Recluta', nota: 'Hordas más pequeñas y zombis más blandos. Para aprender.' },
   { id: 'normal', nombre: 'Veterano', nota: 'La experiencia pensada por los diseñadores.' },
-  { id: 'dificil', nombre: 'Pesadilla', nota: 'Más zombis, más élites y ningún respiro.' },
+  { id: 'dificil', nombre: 'Pesadilla', nota: 'Más zombis, más élites y menos botiquines.' },
+  { id: 'pesadilla', nombre: 'Apocalipsis', nota: 'Hordas inmensas y ningún respiro. Solo para locos.' },
 ];
 export const CALIDADES = [
   { id: 'baja', nombre: 'Baja' }, { id: 'media', nombre: 'Media' }, { id: 'alta', nombre: 'Alta' }, { id: 'ultra', nombre: 'Ultra' },
