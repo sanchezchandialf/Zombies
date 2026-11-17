@@ -196,7 +196,7 @@ if (q.has('arma') && q.get('arma').includes(',')) {
   // parrilla
   const fila = q.has('fila') ? num('fila', 0) : null;
   const filas = fila === null ? [0, 1, 2, 3, 4, 5] : [fila];
-  const dx = fila === null ? 1.7 : 1.9, dy = fila === null ? 0.95 : 1.3;
+  const dx = fila === null ? 2.25 : 2.35, dy = fila === null ? 1.05 : 1.3;
   const cols = fila === null ? 8 : 4;
   const filasN = fila === null ? 6 : 2;
   filas.forEach((e, fi) => {
@@ -207,7 +207,7 @@ if (q.has('arma') && q.get('arma').includes(',')) {
       else { cx = ((ci % cols) - 1.5) * dx; cy = (1 - Math.floor(ci / cols)) * dy; }
       const { g } = expositor(id, cx, cy);
       esc.add(g);
-      const t = etiqueta(ARMAS[id].nombre, fila === null ? 0.13 : 0.15); t.position.set(cx, cy - dy * 0.36, 0.6); esc.add(t);
+      const t = etiqueta(ARMAS[id].nombre, fila === null ? 0.17 : 0.17); t.position.set(cx, cy - dy * 0.36, 0.6); esc.add(t);
     });
   });
   const W = cols * dx + 0.6, H = filasN * dy + 0.4, cyc = fila === null ? 2.5 * dy : 0;

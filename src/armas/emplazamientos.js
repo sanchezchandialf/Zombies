@@ -73,7 +73,7 @@ function ametralladoraPesada() {
   const base = new Constructor(), cab = new Constructor();
   // anillo de sacos terreros (abierto por detrás) y plataforma de tablones
   base.cil('madera_g', 0.95, 0.06, [0, 0, 0], { rot: [-PI / 2, 0, 0], seg: 18 });
-  for (let capa = 0; capa < 3; capa++) for (let i = 0; i < 11; i++) {
+  for (let capa = 0; capa < 2; capa++) for (let i = 0; i < 11; i++) {
     const a = -2.05 + i * 0.41 + (capa % 2) * 0.2, r = 0.88 - capa * 0.03;
     if (capa === 2 && (i < 3 || i > 7)) continue;
     saco(base, Math.sin(a) * r, 0.14 + capa * 0.21, Math.cos(a) * r, a + PI / 2, 1.0);

@@ -24,6 +24,8 @@ const cacheArma = new Map();   // id → { partes:[{mat,geo}], ud }
 const cacheEsc = new Map();    // 'torreta:i' | 'emplazamiento:i' → { grupos, ud }
 const cacheIcono = new Map();
 
+/** Factor de escala por pose (agarre de mano ya incluido: el origen de la empuñadura no se mueve). */
+const ESCALA = { larga: 1.18, pistola: 1.3, doble: 1.3, pesada: 1.15, cuerpo: 1.15, arrojadiza: 1.4 };
 const v3 = (a) => (a ? new THREE.Vector3(a[0], a[1], a[2]) : null);
 
 function datosArma(id) {
@@ -35,6 +37,10 @@ function datosArma(id) {
   if (f) ud = f(b);
   else { b.caja('acero', [0.05, 0.08, 0.7], [0, 0.04, 0.25], 0.008); ud = { boca: [0, 0.05, 0.6], manoIzq: [0, 0.03, 0.3], pose: 'larga' }; }
   const partes = b.construir();
+  // Exageración heroica (ARTE §8: manos y equipo ×1,15): a 25 m de cámara las armas deben leerse. Se hornea en la geometría y en los metadatos.
+  const K = ESCALA[ud.pose] ?? ESCALA.larga;
+  for (const p of partes) { p.geo.scale(K, K, K); p.geo.computeBoundingBox(); p.geo.computeBoundingSphere(); }
+  for (const k of ['boca', 'manoIzq', 'bocaIzq']) if (ud[k]) ud[k] = ud[k].map((v) => v * K);
   // longitud total para encuadre
   const box = new THREE.Box3();
   for (const p of partes) box.union(p.geo.boundingBox);
@@ -113,7 +119,7 @@ export function crearIconoArma(armaId, tam = 128) {
   g.fillStyle = '#fff'; g.strokeStyle = '#fff'; g.lineJoin = 'round'; g.lineWidth = Math.max(0.6, tam / 220);
   g.beginPath();
   for (const p of d.partes) {
-    if (p.mat === 'negro' || p.mat === 'vidrio_c') continue;
+    if (p.mat === 'negro') continue;
     const pos = p.geo.attributes.position;
     for (let i = 0; i < pos.count; i += 3) {
       let ax = pos.getZ(i) * esc + ox, ay = oy - pos.getY(i) * esc, bx2 = pos.getZ(i + 1) * esc + ox, by = oy - pos.getY(i + 1) * esc;

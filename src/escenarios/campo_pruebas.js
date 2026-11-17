@@ -40,7 +40,7 @@ export async function construir(juego, kit) {
   kit.zona({ circulo: { x: 0, z: 0, r: 13 }, material: P.plaza, alto: 0.03, borde: { material: 'silleria', ancho: 0.4, alto: 0.12 }, mojado: P.mojado });
 
   // ───────────── 2. EDIFICIOS (3-5 volúmenes grandes que crean calles) ─────────────
-  const casa = kit.edificio({ x: -28, z: -23, ancho: 14, fondo: 9, pisos: 2, estilo: P.estilo, colorMuro: P.tinte, tejado: { chimenea: true }, balcon: eraIdx < 2, puertas: [{ cara: 'sur', u: -2.5, arco: eraIdx === 0 }], luzPuertas: true, colorLuz: era.color && 0xffb561, semilla: 1, nombre: 'casa_norte' });
+  const casa = kit.edificio({ x: -28, z: -23, ancho: 14, fondo: 9, pisos: 2, estilo: P.estilo, colorMuro: P.tinte, tejado: { chimenea: true }, balcon: eraIdx < 2, puertas: [{ cara: 'sur', u: -2.5, arco: eraIdx === 0 }], luzPuertas: true, semilla: 1, nombre: 'casa_norte' });
   kit.edificio({ x: 26, z: -26, ancho: 13, fondo: 9, pisos: 1, alto: 5.2, estilo: eraIdx >= 3 ? P.estilo : 'industrial', puertas: [{ cara: 'sur', u: 0, ancho: 2.6, alto: 3.2 }], ventanas: { sep: 3.6, luz: 0.35 }, semilla: 2, nombre: 'almacen' });
   kit.edificio({ x: -31, z: 20, ancho: 9, fondo: 7, pisos: 1, estilo: eraIdx === 0 ? 'encalado' : P.estilo, rot: 0.1, tejado: { chimenea: eraIdx < 3 }, puertas: [{ cara: 'sur', u: 1 }], semilla: 3, nombre: 'casa_oeste' });
   kit.edificio({ x: 31, z: 23, ancho: 8, fondo: 11, pisos: 1, alto: 5.6, estilo: eraIdx < 2 ? 'piedra' : P.estilo, tejado: { eje: 'z', pendiente: 0.7 }, puertas: [{ cara: 'oeste', u: 0, arco: true }], semilla: 4, nombre: 'capilla' });
@@ -67,7 +67,7 @@ export async function construir(juego, kit) {
   kit.catenaria({ desde: [-8, pa.puntaY, -40], hasta: [8, pb.puntaY, -40], caida: 0.9 });
 
   // ───────────── 4. DETALLES DE SUELO ─────────────
-  const evitar = kit._edificios.map((e) => ({ x: e.x, z: e.z, hx: e.ancho / 2, hz: e.fondo / 2, rot: -e.rot, margen: 1 }));
+  const evitar = kit._edificios.map((e) => ({ x: e.x, z: e.z, hx: e.ancho / 2, hz: e.fondo / 2, rot: e.rot, margen: 1 }));
   kit.parches({ tipo: 'charco', area: { x0: -40, z0: -40, x1: 40, z1: 40 }, cantidad: P.mojado > 0 ? 12 : 5, radio: [0.9, 2.4], evitar, semilla: 7 });
   kit.parches({ tipo: 'mancha', area: { x0: -40, z0: -40, x1: 40, z1: 40 }, cantidad: 14, radio: [0.7, 1.8], evitar, color: 0x2b2118, opacidad: 0.55, semilla: 8 });
   for (let i = 0; i < 7; i++) kit.parche({ tipo: 'hojas', x: rng.rango(-38, 38), z: rng.rango(-38, 38), radio: rng.rango(2, 4), cantidad: 26, semilla: i });
