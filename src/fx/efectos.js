@@ -11,7 +11,7 @@ const _c = new THREE.Color();
 export const col = (hex, a = 1, m = 1) => { _c.set(hex); return [_c.r * m, _c.g * m, _c.b * m, a]; };
 
 // paletas de fuego (HDR para el bloom)
-const FU0 = [2.7, 1.7, 0.55, 0.9], FU1 = [2.0, 0.6, 0.1, 0.8], FU2 = [0.45, 0.05, 0.008, 0];
+const FU0 = [2.0, 1.1, 0.32, 0.85], FU1 = [1.55, 0.38, 0.06, 0.75], FU2 = [0.35, 0.03, 0.005, 0];
 const FUF0 = [3.0, 1.9, 0.7, 0.9], FUF1 = [2.0, 0.65, 0.12, 0.8], FUF2 = [0.35, 0.04, 0.0, 0];
 const CHI0 = [4.2, 2.8, 1.0, 1], CHI1 = [2.4, 0.8, 0.14, 0.9], CHI2 = [0.35, 0.05, 0.0, 0];
 const FLASH0 = [7, 5.2, 2.4, 1], FLASH1 = [4, 1.8, 0.5, 0.75], FLASH2 = [0.8, 0.15, 0.0, 0];
@@ -78,7 +78,7 @@ export function crearEfectos(ctx) {
   /** Paso de un emisor continuo de fuego (tasas por segundo ∝ escala). */
   function fuegoCont(p, e, dt, acum) {
     const area = Math.pow(e, 1.35);
-    acum.a += dt * 30 * area * ctx.factor; acum.b += dt * 5 * area * ctx.factor; acum.c += dt * 6.5 * area * ctx.factor; acum.d += dt * 3.2;
+    acum.a += dt * 19 * area * ctx.factor; acum.b += dt * 5 * area * ctx.factor; acum.c += dt * 6.5 * area * ctx.factor; acum.d += dt * 3.2;
     const y = Math.max(0, Y(p, 0.05));
     while (acum.a >= 1) { acum.a--; const a = rng() * TAU, r = Math.sqrt(rng()) * 0.5 * e; lengua(p.x + Math.cos(a) * r, y, p.z + Math.sin(a) * r, e * rr(0.8, 1.15)); }
     while (acum.b >= 1) { acum.b--; chispaBrasa(p.x + rr(-0.3, 0.3) * e, y + 0.3 * e, p.z + rr(-0.3, 0.3) * e, e); }
@@ -361,7 +361,7 @@ export function crearEfectos(ctx) {
 
   // ─────────────────────────────── explosiones ───────────────────────────────
   const PAL = {
-    explosivo: { f0: [2.5, 1.65, 0.6, 0.72], f1: [1.9, 0.62, 0.11, 0.72], f2: [0.4, 0.05, 0.01, 0], humo: HUMO_OSC, luz: 0xffa050 },
+    explosivo: { f0: [2.0, 1.15, 0.38, 0.6], f1: [1.55, 0.45, 0.07, 0.62], f2: [0.4, 0.05, 0.01, 0], humo: HUMO_OSC, luz: 0xffa050 },
     fuego: { f0: [2.7, 1.7, 0.55, 0.8], f1: [2.2, 0.7, 0.1, 0.78], f2: [0.5, 0.05, 0.01, 0], humo: gris(0.05, 0.8), luz: 0xff8a30 },
     veneno: { f0: [1.8, 3.4, 0.9, 0.95], f1: [0.7, 2.2, 0.2, 0.85], f2: [0.1, 0.4, 0.02, 0], humo: [[0.2, 0.34, 0.08, 0.7], [0.22, 0.36, 0.09, 0.62], [0.24, 0.38, 0.1, 0]], luz: 0x9aff40 },
     energia: { f0: [2.4, 3.6, 4.2, 0.95], f1: [0.7, 2.2, 3.6, 0.85], f2: [0.1, 0.2, 0.7, 0], humo: [[0.2, 0.22, 0.32, 0.45], [0.2, 0.22, 0.34, 0.4], [0.22, 0.24, 0.36, 0]], luz: 0x66e8ff },
@@ -386,7 +386,7 @@ export function crearEfectos(ctx) {
     }
     for (let i = 0; i < 4; i++) {   // núcleo candente
       S.drag = 3; S.rot = rng() * TAU; S.nfr = 4; S.flags = F.FUEGO | F.SALE | F.SIN_SUELO; S.luz = 0;
-      lanzar(B, x + rr(-0.2, 0.2) * R, y0 + R * 0.45, z + rr(-0.2, 0.2) * R, 0, rr(0.5, 1.5), 0, rr(0.35, 0.55), R * 0.8, R * rr(1.4, 1.9), HUMO, [5, 4, 2.2, 1], P.f1, P.f2);
+      lanzar(B, x + rr(-0.2, 0.2) * R, y0 + R * 0.45, z + rr(-0.2, 0.2) * R, 0, rr(0.5, 1.5), 0, rr(0.35, 0.55), R * 0.8, R * rr(1.4, 1.9), HUMO, [3.2, 2.3, 0.95, 0.8], P.f1, P.f2);
     }
     // columna de humo
     if (tipo !== 'energia') {

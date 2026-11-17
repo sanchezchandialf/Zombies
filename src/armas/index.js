@@ -119,10 +119,14 @@ export function crearIconoArma(armaId, tam = 128) {
       let ax = pos.getZ(i) * esc + ox, ay = oy - pos.getY(i) * esc, bx2 = pos.getZ(i + 1) * esc + ox, by = oy - pos.getY(i + 1) * esc;
       let cx = pos.getZ(i + 2) * esc + ox, cy = oy - pos.getY(i + 2) * esc;
       if ((bx2 - ax) * (cy - ay) - (by - ay) * (cx - ax) < 0) { const tx = bx2, ty = by; bx2 = cx; by = cy; cx = tx; cy = ty; } // mismo giro: el relleno no se anula
-      g.moveTo(ax, ay); g.lineTo(bx2, by); g.lineTo(cx, cy); g.closePath();
+      // se ensancha medio píxel desde el baricentro para que no queden rendijas entre triángulos (sin trazo: mucho más rápido)
+      const mx = (ax + bx2 + cx) / 3, my = (ay + by + cy) / 3, k = 0.45;
+      const ex = (x, y) => { const dx = x - mx, dy = y - my, l = Math.hypot(dx, dy) || 1; return [x + (dx / l) * k, y + (dy / l) * k]; };
+      const A = ex(ax, ay), B = ex(bx2, by), C = ex(cx, cy);
+      g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); g.lineTo(C[0], C[1]); g.closePath();
     }
   }
-  g.fill('nonzero'); g.stroke();
+  g.fill('nonzero');
   cacheIcono.set(clave, c);
   return c;
 }

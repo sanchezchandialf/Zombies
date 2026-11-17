@@ -14,6 +14,8 @@ const camaras = {
   cerca: { x: 0, alto: 2.6, dist: 7, objetivo: [0, 1, 0] },
   juego: { x: 0, alto: 18, dist: 17, objetivo: [0, 0, 0] },
   alto: { x: 0, alto: 30, dist: 12, objetivo: [0, 0, 0] },
+  lejos: { x: 0, alto: 16, dist: 17, objetivo: [0, 2, 0] },
+  medio: { x: 0, alto: 9, dist: 11, objetivo: [0, 0.5, 0] },
   galeria: { x: 0, alto: 26, dist: 21, objetivo: [0, 0, -2] },
 };
 const a = await crearArnes({ hora: q.has('hora') ? +q.get('hora') : 0.25, camara: camaras[q.get('efecto') === 'galeria' ? 'galeria' : cam] ?? camaras.juego });

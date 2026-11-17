@@ -33,7 +33,7 @@ function fbm(x, y, s, oct = 4) {
   for (let i = 0; i < oct; i++) { t += a * vn(x * f, y * f, s + i * 17); n += a; a *= 0.5; f *= 2.03; }
   return t / n;
 }
-const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const sm = (a, b, x) => { const d = b - a; if (d === 0) return x >= a ? 1 : 0; const t = Math.min(1, Math.max(0, (x - a) / d)); return t * t * (3 - 2 * t); };
 const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
 function rngSemilla(s) {
   let a = (s * 2654435761) >>> 0 || 1;
@@ -116,12 +116,12 @@ function campoLlama(seed) {
     const y = clamp((v + 0.92) / 1.84);             // 0 base · 1 punta
     const sway = Math.sin(y * 4.6 + seed * 2.3) * 0.16 * y + (fbm(v * 1.7 + seed * 5, seed, seed, 2) - 0.5) * 0.5 * y;
     const turb = (fbm(u * 2.4 + seed * 3.7, v * 3.1 - seed * 2.9, seed, 4) - 0.5) * 0.85 * (0.25 + y);
-    const ancho = 0.62 * Math.pow(Math.max(0, 1 - y), 0.78) * sm(0, 0.16, y) ** 0.45;
+    const ancho = Math.max(0.004, 0.62 * Math.pow(Math.max(0, 1 - y), 0.78) * sm(0, 0.16, y) ** 0.45);
     const dx = Math.abs(u - sway - turb);
     const cuerpo = sm(ancho, ancho * 0.25, dx);
     // lengüetas rotas en el borde y la punta
     const er = fbm(u * 3.3 + seed * 8.3, v * 4.2 - seed * 1.3, seed + 5, 3);
-    let a = cuerpo * sm(0.12, 0.5, er + (1 - y) * 0.55) * (1 - sm(0.9, 1, y));
+    let a = cuerpo * sm(0.12, 0.5, er + (1 - y) * 0.55) * (1 - sm(0.9, 1, y)) * sm(0.0, 0.05, y);
     // brasa hueca en la base para que parezcan gases y no un globo
     a = clamp(a * 1.25);
     o.a = a;
@@ -330,7 +330,7 @@ function quemadura(idx, buf, semilla) {
     const r = Math.hypot(u, v), ang = Math.atan2(v, u);
     // halo de hollín moteado
     const halo = sm(0.9, 0.2, r + (fbm(u * 3.2, v * 3.2, sem, 4) - 0.5) * 0.62) * (0.3 + 0.35 * fbm(u * 9, v * 9, sem + 4, 2));
-    const nucleo = sm(UMBRAL - 0.05, UMBRAL + 0.12, s + (fbm(u * 7, v * 7, sem + 7, 3) - 0.5) * 0.12);
+    const nucleo = sm(UMBRAL - 0.3, UMBRAL + 0.25, s + (fbm(u * 7, v * 7, sem + 7, 3) - 0.5) * 0.3);
     const a = clamp(Math.max(nucleo * 0.96, halo)) * sm(1, 0.9, r);
     out.a = a; out.r = clamp(nucleo * 0.7 + halo * 0.5 + 0.3 * Math.max(0, s)); out.h = 0.3 * a + 0.1 * Math.sin(ang * 0);
   });

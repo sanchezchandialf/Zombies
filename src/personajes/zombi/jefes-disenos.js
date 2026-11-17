@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { J } from './matematica.js';
 
 const PI = Math.PI;
-const vap = (B, pos) => B.juego.fx?.crearEmisor?.('vapor', pos, { escala: 1.2 }) || null;
+const vap = (B, pos) => B.juego.fx?.crearEmisor?.('vapor', pos, { escala: 0.45 }) || null;
 
 /** Miembros genéricos: brazos y piernas con las mallas dadas. */
 function miembros(B, o) {
@@ -162,7 +162,7 @@ function fogonero(B) {
   B.pieza('esfera', horno, J.ANTEBRAZO_I, [0, -0.98, 0.08], [0.22, 0.2, 0.2]);
   B.emisor = vap(B, { x: 0, y: 3.2, z: 0 });
   B.extras.push((B2, dt, t) => {
-    if (B2.emisor) { const p = new THREE.Vector3(); B2.chimenea.getWorldPosition(p); B2.emisor.pos.set(p.x, p.y + 1.5, p.z); B2.emisor.activo = !B2.muerto; }
+    if (B2.emisor) { const p = new THREE.Vector3(); B2.chimenea.getWorldPosition(p); B2.emisor.pos.x = p.x; B2.emisor.pos.y = p.y + 1.5; B2.emisor.pos.z = p.z; if (B2.muerto) B2.emisor.activo = false; }
     B2.piv[J.X0].scale.setScalar(1 + Math.sin(t * 2.2) * 0.012);
   });
   const lib = B.liberar.bind(B); B.liberar = (a) => { B.emisor?.detener?.(); B.emisor = null; lib(a); };
@@ -288,7 +288,7 @@ function paciente(B) {
   B.altura = 4.6;
   B.esqueleto({ pie: 0.15, tibia: 0.92, muslo: 0.9, cintura: 0.25, torso: 1.4, hombroX: 0.78, brazo: 1.05, cadera: 0.32, cuello: 1.4, cabR: 0.38, cabZ: 0.25 });
   Object.assign(B.P.anim, { zancada: 2.5, pierna: 0.34, rodilla: 0.5, inclina: 0.5, cabInc: 0.1, cabLado: 0.35, boca: 0.5, bI: [-0.95, 0.5, -0.9], bD: [-0.55, 0.75, -0.5], cadera: 0.2, temblor: 1.4, arrastre: 0, vref: 2.8 });
-  const piel = B.mat({ color: 0xa9b79a, rough: 0.7, rim: 0.2 }), pielO = B.mat({ color: 0x8a9a80, rough: 0.7 }), carne = B.mat({ color: 0x7a1c34, rough: 0.5, emis: 0xff3a8a, ei: 0.5 }), bata = B.mat({ color: 0x8fb6c0, rough: 0.9 });
+  const piel = B.mat({ color: 0xa9b79a, rough: 0.7, rim: 0.2 }), pielO = B.mat({ color: 0x8a9a80, rough: 0.7 }), carne = B.mat({ color: 0x7a1c34, rough: 0.5, emis: 0xff3a8a, ei: 0.3 }), bata = B.mat({ color: 0x8fb6c0, rough: 0.9 });
   const hueso = B.mat({ color: 0xd8d0b8, rough: 0.6 }), saco = B.mat({ color: 0x223000, emis: 0xb6ff3a, ei: 1.5, rough: 0.3 }), ojo = B.mat({ color: 0x200030, emis: 0xff5aff, ei: 3 }), tent = B.mat({ color: 0x6a5a7a, rough: 0.45, emis: 0x8a2aff, ei: 0.3 }), punta = B.mat({ color: 0x300040, emis: 0xe060ff, ei: 2.6 });
   miembros(B, { mPiel: piel, mRopa: piel, mPierna: piel, mBota: pielO, g: 1.25, gPD: 0.7, gD: 1.5, sinManos: false });
   // torso deformado
@@ -340,7 +340,7 @@ function omega(B) {
   B.esqueleto({ pie: 0.24, tibia: 1.0, muslo: 1.02, cintura: 0.28, torso: 1.5, hombroX: 1.0, brazo: 1.15, cadera: 0.4, cuello: 1.55, cabR: 0.36 });
   Object.assign(B.P.anim, { zancada: 3.0, pierna: 0.3, rodilla: 0.38, inclina: 0.12, cabInc: 0, bI: [-0.45, 0.45, -0.5], bD: [-0.95, 0.35, -0.2], cadera: 0.08, rebote: 0.03, vref: 3.0 });
   const cromo = B.mat({ color: 0xcfd3da, metal: 0.95, rough: 0.2, rim: 0.2 }), gun = B.mat({ color: 0x23262e, metal: 0.85, rough: 0.4 }), carne = B.mat({ color: 0x7a4a52, rough: 0.6, rim: 0.2 }), carneO = B.mat({ color: 0x5a3040, rough: 0.7 });
-  const cian = B.mat({ color: 0x021a20, emis: 0x18e6ff, ei: 2.4 }), magenta = B.mat({ color: 0x200012, emis: 0xff2a9a, ei: 2 }), nucleo = B.mat({ color: 0x102030, emis: 0x66f0ff, ei: 4.4 }), hueso = B.mat({ color: 0xd8d0b8, rough: 0.6 });
+  const cian = B.mat({ color: 0x021a20, emis: 0x18e6ff, ei: 1.5 }), magenta = B.mat({ color: 0x200012, emis: 0xff2a9a, ei: 1.3 }), nucleo = B.mat({ color: 0x102030, emis: 0x66f0ff, ei: 3 }), hueso = B.mat({ color: 0xd8d0b8, rough: 0.6 });
   miembros(B, { mPiel: carne, mPielB: gun, mRopa: gun, mPierna: gun, mBota: cromo, g: 1.35, gP: 1.1 });
   for (const s of [-1, 1]) {
     const a = s < 0 ? J.BRAZO_I : J.BRAZO_D, b = s < 0 ? J.ANTEBRAZO_I : J.ANTEBRAZO_D, m = s < 0 ? J.MUSLO_I : J.MUSLO_D, t = s < 0 ? J.TIBIA_I : J.TIBIA_D, f = s < 0 ? J.PIE_I : J.PIE_D;

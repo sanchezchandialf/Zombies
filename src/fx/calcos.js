@@ -9,7 +9,7 @@ const STRIDE = 16;
 const TIPOS = {
   //            celdas            kind  color                         vida   crece  alfa
   sangre:    { celdas: [0, 1, 2, 3, 6], kind: 0, color: [0.56, 0.008, 0.014], vida: 210, crece: 0.28, alfa: 0.97 },
-  quemadura: { celdas: [8, 9, 10], kind: 1, color: [0.02, 0.019, 0.018], vida: 150, crece: 0.18, alfa: 0.95 },
+  quemadura: { celdas: [8, 9, 10], kind: 1, color: [0.06, 0.055, 0.05], vida: 150, crece: 0.18, alfa: 0.82 },
   acido:     { celdas: [11, 12], kind: 2, color: [0.32, 0.9, 0.06], vida: 40, crece: 0.45, alfa: 0.92 },
   crater:    { celdas: [13], kind: 3, color: [0.09, 0.07, 0.055], vida: 320, crece: 0.12, alfa: 0.95 },
   aceite:    { celdas: [14], kind: 4, color: [0.012, 0.011, 0.012], vida: 160, crece: 0.8, alfa: 0.95 },

@@ -38,7 +38,7 @@
 .ez[data-era="5"] .an-dia { font-weight: 200; letter-spacing: .22em; text-shadow: 0 0 .4em var(--acento), 0 0 1em rgba(52,240,255,.6); }
 
 /* ── Día superado ─────────────────────────────────────────────────────────────────────────────────────────────── */
-.ez .mm-superado { --tx: -50%; left: 50%; top: 14%; transform: translateX(-50%); width: min(32em, 90%); text-align: center; }
+.ez .mm-superado { --tx: -50%; left: 50%; top: 19%; transform: translateX(-50%); width: min(32em, 90%); text-align: center; }
 .ez .mm-superado::before { content: ""; position: absolute; inset: -2em -6em; z-index: -1; background: radial-gradient(closest-side, rgba(0,0,0,.6), transparent); }
 .ez .su-sello { color: var(--tinta-2); letter-spacing: .3em; text-shadow: 0 .08em .2em #000; }
 .ez .su-titulo { font-size: 3.7em; letter-spacing: .1em; color: var(--acento); margin: .1em 0; text-shadow: 0 .05em 0 rgba(0,0,0,.6), 0 0 .5em rgba(var(--era-rgb), .6), 0 .1em .3em #000; }
