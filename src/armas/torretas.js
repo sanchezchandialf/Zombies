@@ -42,16 +42,14 @@ function organo() {
   // cabeza: bastidor de nogal con 7 cañones de mosquete en abanico horizontal
   cab.caja('hierro', [0.52, 0.04, 0.1], [0, -0.075, 0.0], 0.008);
   for (const s of [-1, 1]) cab.caja('hierro', [0.04, 0.13, 0.1], [s * 0.27, -0.01, 0.0], 0.008);
-  cab.caja('nogal', [0.5, 0.1, 0.26], [0, 0.0, -0.1], 0.02);
-  for (let i = 0; i < 7; i++) {
-    const x = (i - 3) * 0.062;
-    canon(cab, { mat: 'acero', x, y: 0.02, z0: -0.1, z1: 1.0, r: 0.0235, r2: 0.0205 });
-    cab.perfil('acero_c', [[0, 0], [0.014, 0], [0.012, 0.045], [0.034, 0.066], [0.03, 0.075], [0.006, 0.058], [-0.01, 0.026]], 0.008, [x, 0.04, -0.02], { suave: 0.003, bisel: 0.001 });
-    cab.caja('laton', [0.02, 0.012, 0.03], [x, 0.046, 0.04], 0.002);
+  cab.caja('nogal', [0.4, 0.16, 0.26], [0, 0.018, -0.1], 0.02);
+  for (let fila = 0; fila < 2; fila++) for (let i = 0; i < 6 - fila; i++) {
+    const x = (i - (5 - fila) / 2) * 0.052, y = -0.005 + fila * 0.046;
+    canon(cab, { mat: 'acero', x, y, z0: -0.1, z1: 1.0, r: 0.0235, r2: 0.0205 });
+    cab.perfil('acero_c', [[0, 0], [0.014, 0], [0.012, 0.045], [0.034, 0.066], [0.03, 0.075], [0.006, 0.058], [-0.01, 0.026]], 0.008, [x, y + 0.022, -0.02], { suave: 0.003, bisel: 0.001 });
   }
   for (const z of [0.25, 0.55, 0.85]) {
-    cab.caja('laton', [0.46, 0.07, 0.02], [0, 0.02, z], 0.008);
-    cab.caja('laton', [0.46, 0.012, 0.03], [0, 0.058, z], 0.004);
+    cab.caja('laton', [0.34, 0.14, 0.02], [0, 0.018, z], 0.008);
   }
   // mecanismo de relojería lateral: caja de latón con engranajes, muelle y manivela
   cab.caja('laton', [0.1, 0.2, 0.22], [0.34, 0.0, -0.08], 0.012);
@@ -105,10 +103,11 @@ function maxim() {
   base.cil('hierro', 0.1, 0.14, [0, 0.74, 0], { rot: [-PI / 2, 0, 0], seg: 14 });
   for (const a of trio(3)) base.caja('hierro', [0.04, 0.04, 0.34], [Math.sin(a + PI / 3) * 0.16, 0.5, Math.cos(a + PI / 3) * 0.16], 0.008, [0.5, a + PI / 3, 0]);
   // escudo de plancha con aspillera y remaches
-  cab.perfil('oliva', [[0.0, -0.3], [0.0, 0.3], [0.03, 0.34], [0.03, -0.34]], 0.78, [0, 0.12, 0.38], { suave: 0.01, bisel: 0.005 });
-  cab.caja('negro', [0.1, 0.07, 0.03], [0, 0.17, 0.41], 0.004);
-  for (const s of [-1, 1]) for (let i = 0; i < 5; i++) cab.cil('acero_c', 0.014, 0.01, [s * 0.34, -0.12 + i * 0.12, 0.405], { seg: 8 });
-  cab.perfil('acero', [[0.0, 0.0], [0.04, 0.0], [0.04, 0.12], [0.0, 0.12]], 0.82, [0, 0.14, 0.41], { bisel: 0.003 });
+  cab.perfil('oliva', [[0.0, -0.3], [0.0, 0.3], [0.03, 0.34], [0.03, -0.34]], 0.8, [0, 0.14, 0.4], { suave: 0.01, bisel: 0.005 });
+  cab.perfil('oliva', [[0.0, -0.3], [0.0, 0.3], [0.03, 0.3], [0.03, -0.3]], 0.2, [0.4, 0.14, 0.3], { suave: 0.01, bisel: 0.005 });
+  cab.perfil('oliva', [[0.0, -0.3], [0.0, 0.3], [0.03, 0.3], [0.03, -0.3]], 0.2, [-0.4, 0.14, 0.3], { suave: 0.01, bisel: 0.005 });
+  cab.caja('negro', [0.14, 0.09, 0.02], [0, 0.14, 0.435], 0.004);
+  for (const s of [-1, 1]) for (let i = 0; i < 5; i++) cab.cil('acero_c', 0.014, 0.01, [s * 0.36, -0.06 + i * 0.12, 0.435], { seg: 8, rot: [PI / 2, 0, 0] });
   // ametralladora de agua: manguito refrigerante, cañón, mecanismo y cinta de munición
   cab.cil('acero', 0.056, 0.62, [0, 0.14, 0.2], { seg: 18 });
   cab.cil('laton', 0.062, 0.03, [0, 0.14, 0.2], { seg: 18 });

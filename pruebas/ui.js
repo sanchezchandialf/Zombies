@@ -46,6 +46,7 @@ juego.registrar('escenarios', { actual: { limites: { minX: -45, maxX: 45, minZ: 
 const calidades = [];
 juego.audio = { desbloquear() { window.__audioDesbloqueado = true; }, volumen(...v) { window.__vol = v; } };
 juego.render.calidad = (c) => calidades.push(c);
+if (q.get('director')) { const { crearDirector } = await import('../src/oleadas/index.js'); juego.registrar('director', crearDirector(juego)); }
 juego.registrar('ui', crearUI(juego));
 window.juego = juego;
 

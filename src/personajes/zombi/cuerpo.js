@@ -147,7 +147,7 @@ function anatomia(c) {
     const dim = s < 0 ? d.brI : d.brD;
     const J1 = s < 0 ? J.BRAZO_I : J.BRAZO_D, J2 = s < 0 ? J.ANTEBRAZO_I : J.ANTEBRAZO_D;
     const g = 0.092 * Gc * dim.g, L1 = d.ua * dim.l, L2 = d.fa * dim.l;
-    p('esfera', MAT.MATE, J1, [0, 0, 0], [g * 1.2, g * 1.15, g * 1.2], piel);                       // deltoides
+    p('esfera', MAT.MATE, J1, [0, 0, 0], [g * 1.06, g * 1.04, g * 1.06], piel);                       // deltoides
     p('segmento', MAT.MATE, J1, [0, -L1 / 2, 0], [g, L1 * 1.04, g], piel);
     const falta = s === c.brazoFalta;
     if (falta) {
@@ -157,7 +157,7 @@ function anatomia(c) {
       continue;
     }
     const g2 = 0.074 * Gc * dim.g;
-    p('esfera', MAT.MATE, J2, [0, 0, 0], [g2 * 1.25, g2 * 1.2, g2 * 1.25], pielB);                      // codo
+    p('esfera', MAT.MATE, J2, [0, 0, 0], [g2 * 1.05, g2 * 1.03, g2 * 1.05], pielB);                      // codo
     p('segmento', MAT.MATE, J2, [0, -L2 / 2, 0], [g2, L2 * 1.04, g2], pielB);
     const hs = 0.085 * 1.15 * Gc * Math.min(1.6, dim.g * 0.8 + 0.2);
     p('almohada', MAT.MATE, J2, [0, -L2 - hs * 0.45, 0], [hs * 0.95, hs * 1.15, hs * 0.6], pielO);   // mano
@@ -169,7 +169,7 @@ function anatomia(c) {
     const Jm = s < 0 ? J.MUSLO_I : J.MUSLO_D, Jt = s < 0 ? J.TIBIA_I : J.TIBIA_D, Jp = s < 0 ? J.PIE_I : J.PIE_D;
     const g = 0.15 * Gc * (clase === 'apestado' ? 1.1 : 1), g2 = 0.115 * Gc * (clase === 'apestado' ? 1.1 : 1);
     p('segmento', MAT.MATE, Jm, [0, -d.muslo / 2 + 0.01, 0], [g, d.muslo * 1.06, g * 1.02], c.pelvisCol);
-    p('esfera', MAT.MATE, Jt, [0, 0, 0.005], [g2 * 1.15, g2 * 1.1, g2 * 1.15], pielB);
+    p('esfera', MAT.MATE, Jt, [0, 0, 0.005], [g2 * 1.03, g2 * 1.0, g2 * 1.03], pielB);
     p('segmento', MAT.MATE, Jt, [0, -d.tibia / 2 + 0.01, 0], [g2, d.tibia * 1.04, g2], pielB);
     // pie (se recolorea con botas en el vestuario)
     p('almohada', MAT.MATE, Jp, [0, -0.025 * d.H, 0.055 * d.H], [0.115 * Gc * 1.1, 0.085 * d.H * 1.15, 0.27 * d.H * 1.1], pielO);
@@ -236,7 +236,7 @@ function rasgosClase(c) {
     }
     p('cilindro', MAT.MATE, J.TORSO, [0, d.th * 0.52, d.td * 0.06], [0.035, d.th * 0.5, 0.035], HUESO, { lod: true });   // esternón
     // boca abierta y garganta roja
-    p('esfera', MAT.EMISIVO, J.CABEZA, [0, hr * 0.5, hr * 0.8], [hr * 0.9, hr * 0.5, hr * 0.5], [0.9, 0.12, 0.1], { pulso: 2, lod: true });
+    p('esfera', MAT.EMISIVO, J.CABEZA, [0, hr * 0.42, hr * 0.5], [hr * 0.7, hr * 0.26, hr * 0.3], [0.8, 0.1, 0.08], { pulso: 2, lod: true });
     // cabello largo y lacio
     for (let k = 0; k < 5; k++) p('segmento', MAT.MATE, J.CABEZA, [(k - 2) * hr * 0.35, hr * 1.2, -hr * 0.7], [hr * 0.5, hr * 2.2, hr * 0.28], lin(0x2a2420), { rx: 0.18 });
     // tendones del cuello

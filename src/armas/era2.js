@@ -48,9 +48,9 @@ function subfusil_trinchera(b) {
 
 function pistola_semiauto(b) {
   // armazón con su empuñadura inclinada, corredera con estrías, cañón y guardamonte
-  b.perfil('acero', [[-0.05, 0.05], [0.14, 0.05], [0.14, 0.038], [0.06, 0.034], [0.044, 0.0], [0.03, -0.12], [-0.05, -0.125], [-0.058, -0.04]], 0.024, [0, 0, 0], { suave: 0.005, bisel: 0.0018 });
-  b.perfil('madera_o', [[-0.05, 0.036], [0.034, 0.02], [0.026, -0.11], [-0.052, -0.114], [-0.055, -0.03]], 0.0315, [0, 0, 0], { suave: 0.007, bisel: 0.002 });
-  b.caja('acero', [0.026, 0.012, 0.074], [0, -0.128, -0.01], 0.003);                // base del cargador
+  b.perfil('acero', [[-0.05, 0.05], [0.14, 0.05], [0.14, 0.038], [0.06, 0.034], [0.044, 0.0], [0.03, -0.1], [-0.05, -0.105], [-0.058, -0.04]], 0.024, [0, 0, 0], { suave: 0.005, bisel: 0.0018 });
+  b.perfil('madera_o', [[-0.05, 0.036], [0.034, 0.02], [0.026, -0.092], [-0.052, -0.096], [-0.055, -0.03]], 0.0315, [0, 0, 0], { suave: 0.007, bisel: 0.002 });
+  b.caja('acero', [0.026, 0.012, 0.074], [0, -0.108, -0.01], 0.003);                // base del cargador
   b.caja('acero', [0.029, 0.04, 0.23], [0, 0.07, 0.07], 0.005);                  // corredera
   for (let i = 0; i < 7; i++) b.caja('negro', [0.031, 0.034, 0.003], [0, 0.07, -0.025 + i * 0.008], 0.0008); // estrías posteriores
   b.cil('acero_c', 0.0082, 0.02, [0, 0.07, 0.178], { seg: 10 });
@@ -85,7 +85,7 @@ function fusil_cerrojo(b) {
   b.caja('acero', [0.006, 0.02, 0.014], [0, y + 0.0235, 1.0], 0.001);
   b.cil('acero', 0.008, 0.012, [0, y, 1.04], { seg: 10 });
   // portafusil de cuero y anillas
-  b.toro('acero', 0.011, 0.0028, [0, 0.0, 0.62], { seg: 12, rad: 5, rot: [0, PI / 2, 0] });
+  b.toro('acero', 0.011, 0.0028, [0, 0.036, 0.6], { seg: 12, rad: 5, rot: [0, PI / 2, 0] });
   b.toro('acero', 0.011, 0.0028, [0, -0.055, -0.33], { seg: 12, rad: 5, rot: [0, PI / 2, 0] });
   return { boca: [0, y, 1.04], manoIzq: [0, 0.03, 0.44], pose: 'larga' };
 }

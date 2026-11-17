@@ -99,9 +99,7 @@ export function iniciarMuerte(sis, it, info) {
   b.vx += dx * sp; b.vz += dz * sp; b.vy = vuela ? 3.5 + fuerza * 2.6 : 0.3;
   const om = vuela ? 5 + fuerza * 5 : 1.4 + fuerza * 2.4;
   // eje de vuelco = Y × dir
-  b.wx = dz * om * -1 * -1; b.wy = (rnd() - 0.5) * 2 * (vuela ? 4 : 0.8); b.wz = -dx * om;
-  b.wx = dz * om; // (up × dir) = (dz, 0, -dx)
-  b.wz = -dx * om;
+  b.wx = dz * om; b.wy = (rnd() - 0.5) * 2 * (vuela ? 4 : 0.8); b.wz = -dx * om;   // eje de vuelco = Y × dir = (dz, 0, -dx)
   b.rebote = vuela ? 0.34 : 0.2;
   // resortes de las extremidades
   it.LA = new Float32Array(NJ * 3); it.LV = new Float32Array(NJ * 3);

@@ -61,6 +61,7 @@ function canon_riel(b) {
   b.caja(L, [0.06, 0.006, 0.34], [0, 0.074, 0.12], 0.001);
   // condensadores a ambos lados del cajón
   for (const s of [-1, 1]) for (let i = 0; i < 3; i++) celda(b, { x: s * 0.058, y: 0.07, z: -0.04 + i * 0.12, l: 0.1, r: 0.0235, luz: L, mat: 'composite' });
+  for (const s of [-1, 1]) celda(b, { x: s * 0.03, y: 0.14, z: 0.06, l: 0.3, r: 0.02, luz: L, mat: 'composite_n' });
   // raíles abiertos con separadores y arco de conducción entre ellos
   for (const s of [-1, 1]) {
     b.caja('cromo', [0.011, 0.032, 0.86], [s * 0.025, y, 0.74], 0.002);

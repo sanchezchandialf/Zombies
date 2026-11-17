@@ -39,15 +39,15 @@ function carabina_tactica(b) {
   cargadorCurvo(b, { mat: 'composite_n', z: 0.09, y: 0.03, largo: 0.2, w: 0.03, prof: 0.04, curva: 0.04 });
   guardamonte(b, { mat: 'composite_n', z: -0.09, y: 0.026, largo: 0.11, prof: 0.032, r: 0.0045 });
   visorPunto(b, { y: 0.136, z: 0.14 });
-  b.perfil('composite_g', [[0.0, 0.0], [0.05, 0.0], [0.05, -0.1], [0.0, -0.1]], 0.026, [0, 0.02, 0.38], { suave: 0.008, bisel: 0.003 }); // empuñadura vertical
-  b.caja('composite_n', [0.022, 0.016, 0.03], [0, 0.02, 0.405], 0.004);
+  b.perfil('composite_g', [[0.0, 0.0], [0.05, 0.0], [0.05, -0.1], [0.0, -0.1]], 0.026, [0, 0.05, 0.38], { suave: 0.008, bisel: 0.003 }); // empuñadura vertical
+  b.caja('composite_n', [0.03, 0.016, 0.06], [0, 0.05, 0.405], 0.004);
   b.caja('composite_n', [0.012, 0.012, 0.03], [0, 0.131 + 0.008, 0.52], 0.002);
   return { boca: [0, y, 0.835], manoIzq: [0, -0.04, 0.405], pose: 'larga' };
 }
 
 function pistola_tactica(b) {
   const y = 0.066;
-  b.perfil('polimero', [[-0.05, 0.05], [0.15, 0.05], [0.15, 0.026], [0.08, 0.022], [0.05, 0.02], [0.044, -0.0], [0.034, -0.125], [-0.05, -0.128], [-0.062, -0.04]], 0.03, [0, 0, 0], { suave: 0.006, bisel: 0.002 });
+  b.perfil('polimero', [[-0.05, 0.05], [0.15, 0.05], [0.15, 0.026], [0.08, 0.022], [0.05, 0.02], [0.044, -0.0], [0.034, -0.105], [-0.05, -0.108], [-0.062, -0.04]], 0.03, [0, 0, 0], { suave: 0.006, bisel: 0.002 });
   for (let i = 0; i < 4; i++) b.caja('negro', [0.0316, 0.006, 0.05], [0, -0.04 - i * 0.02, -0.012 - i * 0.002], 0.001);  // agarre acanalado
   b.caja('composite_n', [0.032, 0.014, 0.075], [0, -0.136, -0.008], 0.004);
   b.caja('acero_c', [0.026, 0.04, 0.215], [0, y, 0.06], 0.005);                       // corredera

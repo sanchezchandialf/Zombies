@@ -47,6 +47,7 @@ void main() {
     vec2 a = vec2(cos(r), sin(r));
     wp = pos + vec3(a.x * q.x - a.y * q.y, 0.0, a.y * q.x + a.x * q.y) * size * 0.5;
     gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0);
+    gl_Position.z -= 0.3 / max(gl_Position.w, 1.0);   // los quads planos se acercan ~0,4 m a cámara: sin z-fighting con el suelo
     vL = vec3(0.0, 0.0, 1.0);
   } else {
     vec4 mv = viewMatrix * vec4(pos, 1.0);

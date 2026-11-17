@@ -39,7 +39,7 @@ function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
 let mats = null;
 export function materialesZombi() {
   if (mats) return mats;
-  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.12, suciedad: 0.55 });
+  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0xd2d2d2, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.07, suciedad: 0.55 });
   const metal = parchear(new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.38, metalness: 0.85 }), { granulado: 0.55, rim: 0.06, suciedad: 0.4 });
   const emisivo = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
   mats = { mate, metal, emisivo };

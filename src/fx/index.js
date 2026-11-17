@@ -306,6 +306,7 @@ export function crearFx(juego) {
     get factor() { return ctx.factor; },
     set factor(v) { ctx.factor = v; },
     nombres: NOMBRES,
+    get motor() { return motor; }, get calcosSistema() { return calcos; },
     /** Diagnóstico: cuántas partículas/calcos/trozos/trazadoras hay vivos. */
     estado() { return asegurar() ? { particulas: motor.vivas(), calcos: calcos.cuenta(), escombros: escombros.cuenta(), trazadoras: trazadoras.cuenta(), emisores: emisores.length, luces: flashes.length } : null; },
   };

@@ -33,7 +33,12 @@ function poner(rolId, e, x, z, rot = 0, conArma = q.get('arma') !== '0') {
 }
 
 let obj = null;
-if (!rol && modo !== 'juego') {
+if (q.get('fila')) {
+  const r = q.get('fila');
+  for (let e = 0; e < 6; e++) poner(r, e, (e - 2.5) * 1.3, 0, 0.4);
+  a.mirar(0, 1.5, 9, 0, 0.95, 0);
+  juego.render.camara.fov = 34; juego.render.camara.updateProjectionMatrix();
+} else if (!rol && modo !== 'juego') {
   ids.forEach((r, i) => { for (let e = 0; e < 6; e++) poner(r, e, (e - 2.5) * 1.5, (i - 2) * 1.9, 0.5); });
   a.mirar(0, 7.5, 12.5, 0, 0.9, 0);
   juego.render.camara.fov = 38; juego.render.camara.updateProjectionMatrix();
@@ -44,8 +49,8 @@ if (!rol && modo !== 'juego') {
 } else {
   const v = poner(rol, era ?? 0, 0, 0, +(q.get('giro') ?? 25) * Math.PI / 180);
   obj = v;
-  const d = +(q.get('d') ?? 3.2), h = +(q.get('h') ?? 1.35);
-  a.mirar(0.2, h + 0.4, d, 0, h - 0.05, 0);
+  const d = +(q.get('d') ?? 4.2), h = +(q.get('h') ?? 1.0);
+  a.mirar(0.2, h + 0.5, d, 0, h, 0);
   juego.render.camara.fov = 36; juego.render.camara.updateProjectionMatrix();
 }
 const dt = 1 / 30;

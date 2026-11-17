@@ -132,7 +132,7 @@ export function crearVisualesZombis(juego) {
   function limpiar() {
     for (const it of sis.items) { it.emisor?.detener?.(); }
     sis.items.length = 0; sis.restos.length = 0; sis.cadaveres.length = 0;
-    for (const j of sis.jefes) j.liberar?.(true);
+    for (const j of [...sis.jefes]) j.liberar?.(true);
     sis.jefes.length = 0;
     granja?.limpiar(); granja = null; sis.granja = null;
   }

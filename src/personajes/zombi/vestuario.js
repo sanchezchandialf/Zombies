@@ -470,7 +470,7 @@ export function explosivoEra(c) {
   const X = J.X0;
   const mecha = (px, py, pz) => {
     p('segmento', MAT.MATE, X, [px, py + 0.05, pz], [0.02, 0.14, 0.02], lin(0x2a1e14), { rz: 0.4 });
-    p('esfera', MAT.EMISIVO, X, [px + 0.03, py + 0.13, pz], [0.1, 0.1, 0.1], [3.4, 1.4, 0.2], { pulso: 1 });
+    p('esfera', MAT.EMISIVO, X, [px + 0.03, py + 0.13, pz], [0.1, 0.1, 0.1], [2.4, 1.0, 0.15], { pulso: 1 });
     c.anclas.mecha = { j: X, x: px + 0.03, y: py + 0.13, z: pz };
   };
   if (era === 0) {        // barril de pólvora

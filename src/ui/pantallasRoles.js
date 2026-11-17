@@ -52,7 +52,7 @@ export function crearPantallaRoles(ctx, gestor) {
     </button>`).join('')}</div>
   <div class="rl-det panel orn"></div>
   <footer class="rl-pie">
-    <div class="rl-era" hidden><span class="rotulo">Era inicial</span>${ERAS.map((e) => `<button type="button" class="btn mini" data-foco data-era="${e.idx}" style="--c:${e.color}"><span>${e.anios[0]}</span></button>`).join('')}</div>
+    <div class="rl-era" hidden><span class="rotulo">Era inicial</span>${ERAS.map((e) => `<button type="button" class="btn mini" data-foco data-eraini="${e.idx}" style="--c:${e.color}"><span>${e.anios[0]}</span></button>`).join('')}</div>
     <div class="rl-dif"><span class="rotulo">Dificultad</span>${DIFICULTADES.map((d) => `<button type="button" class="btn mini" data-foco data-dif="${d.id}" title="${escapar(d.nota)}"><span>${escapar(d.nombre)}</span></button>`).join('')}</div>
     <button type="button" class="btn primario rl-jugar" data-foco data-a="jugar">${icono('jugar')}<span>¡A sobrevivir!</span></button>
   </footer>
@@ -62,7 +62,7 @@ export function crearPantallaRoles(ctx, gestor) {
   const R = {
     fichas: Array.from(el.querySelectorAll('.ficha')), det: el.querySelector('.rl-det'),
     tabs: Array.from(el.querySelectorAll('.rl-tab')), add: el.querySelector('.rl-add'), quita: el.querySelector('.rl-quita'),
-    eraBox: el.querySelector('.rl-era'), eraBtns: Array.from(el.querySelectorAll('[data-era]')), difBtns: Array.from(el.querySelectorAll('[data-dif]')),
+    eraBox: el.querySelector('.rl-era'), eraBtns: Array.from(el.querySelectorAll('[data-eraini]')), difBtns: Array.from(el.querySelectorAll('[data-dif]')),
   };
   const S = { jug: [{ rol: 'soldado' }], activo: 0, dia: 1, era: 0, practica: false };
   let claveDet = '';
@@ -144,7 +144,7 @@ export function crearPantallaRoles(ctx, gestor) {
     visible(R.add, S.jug.length < 2);
     visible(R.quita, S.jug.length > 1);
     R.difBtns.forEach((b) => clase(b, 'sel', b.dataset.dif === ctx.ajustes.dificultad));
-    R.eraBtns.forEach((b) => clase(b, 'sel', Number(b.dataset.era) === S.era));
+    R.eraBtns.forEach((b) => clase(b, 'sel', Number(b.dataset.eraini) === S.era));
     pintarDetalle();
   }
 
@@ -168,8 +168,8 @@ export function crearPantallaRoles(ctx, gestor) {
     if (f) { elegirRol(f.dataset.r); return; }
     const tab = t.closest('.rl-tab');
     if (tab) { S.activo = Number(tab.dataset.j); pintarSeleccion(); return; }
-    const era = t.closest('[data-era]');
-    if (era) { S.era = Number(era.dataset.era); S.dia = primerDiaDeEra(S.era); ctx.eraForzada = S.era; pintarSeleccion(); return; }
+    const era = t.closest('[data-eraini]');
+    if (era) { S.era = Number(era.dataset.eraini); S.dia = primerDiaDeEra(S.era); ctx.eraForzada = S.era; pintarSeleccion(); return; }
     const dif = t.closest('[data-dif]');
     if (dif) { ctx.ajustes.dificultad = dif.dataset.dif; ctx.guardarAjustes(); pintarSeleccion(); return; }
     const a = t.closest('[data-a]')?.dataset.a;
