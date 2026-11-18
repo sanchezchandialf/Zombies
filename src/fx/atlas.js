@@ -277,7 +277,7 @@ function sangre(idx, buf, o) {
     let a = ang0 + rnd() * 6.283;
     if (sesgo) a = ang0 + (rnd() - 0.5) * 1.6;
     const d = 0.3 + rnd() * rocio * 0.65;
-    M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.012 + rnd() * rnd() * 0.04);
+    M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.022 + rnd() * rnd() * 0.045);
   }
   escribirMetabola(buf, idx, M.S, o.rugosidad ?? 0.09, rnd, o);
 }
@@ -285,13 +285,13 @@ function sangre(idx, buf, o) {
 function escribirMetabola(buf, idx, S, rug, rnd, o = {}) {
   const sem = Math.floor(rnd() * 1000);
   escribirCelda(buf, idx, (u, v, out) => {
-    const s = muestra(S, u, v) + (fbm(u * 6, v * 6, sem, 3) - 0.5) * rug;
+    const s0 = muestra(S, u, v), s = s0 + (fbm(u * 6, v * 6, sem, 3) - 0.5) * rug;
     const edge = sm(1, 0.92, Math.hypot(u, v));
     const a = sm(UMBRAL - 0.035, UMBRAL + 0.035, s) * edge;
     out.a = a;
     const grosor = clamp((s - UMBRAL) / (o.grosor ?? 0.9));
     out.r = a * (0.25 + 0.75 * grosor);
-    out.h = clamp(s) * edge * 1.1;
+    out.h = clamp(s0) * edge * 1.1;     // relieve liso (sin el ruido del borde) para que el brillo no centellee
   }, { normal: o.normalFuerza ?? 6 });
 }
 
@@ -405,8 +405,8 @@ export function atlasCalcos() {
   sangre(1, buf, { semilla: 29, masa: 0.46, nRayos: 12, largoMin: 0.4, largoMax: 0.88, motas: 26, rocio: 1, ang0: 0.5 });
   sangre(2, buf, { semilla: 41, masa: 0.44, nRayos: 10, largoMin: 0.3, largoMax: 0.6, motas: 18, rocio: 0.85 });
   sangre(3, buf, { semilla: 53, masa: 0.4, nRayos: 13, largoMin: 0.3, largoMax: 0.66, motas: 20, rocio: 0.9, ang0: 1.2 });
-  sangre(4, buf, { semilla: 67, masa: 0.3, nRayos: 11, largoMin: 0.5, largoMax: 0.95, sesgo: 0.85, motas: 18, rocio: 0.9, centro: true, ang0: 0 });
-  sangre(5, buf, { semilla: 83, masa: 0.26, nRayos: 9, largoMin: 0.55, largoMax: 0.97, sesgo: 0.9, motas: 24, rocio: 0.95, centro: true, ang0: 0.05 });
+  sangre(4, buf, { semilla: 67, masa: 0.3, nRayos: 11, largoMin: 0.5, largoMax: 0.95, sesgo: 0.85, motas: 9, rocio: 0.85, centro: true, ang0: 0 });
+  sangre(5, buf, { semilla: 83, masa: 0.26, nRayos: 9, largoMin: 0.55, largoMax: 0.97, sesgo: 0.9, motas: 10, rocio: 0.9, centro: true, ang0: 0.05 });
   charco(6, buf, 97);
   gotero(7, buf, 101);
   quemadura(8, buf, 113); quemadura(9, buf, 127); quemadura(10, buf, 139);

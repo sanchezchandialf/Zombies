@@ -15,7 +15,7 @@ const ms = Math.round(performance.now() - t0);
 // Vistas: «juego» replica la cámara real (55º, 26 m); «alta» ve toda la arena; «cenit» desde arriba.
 const cx = op.cx ?? 0, cz = op.cz ?? 0, v = op.vista ?? 'juego';
 const dist = op.dist ?? (v === 'alta' ? 62 : v === 'cenit' ? 80 : 26);
-const cab = v === 'cenit' ? 89 : v === 'oblicua' ? 40 : 55;
+const cab = v === 'cenit' ? 78 : v === 'oblicua' ? 40 : 55;
 const pit = (cab * Math.PI) / 180;
 a.mirar(cx, Math.sin(pit) * dist + 0.7, cz + Math.cos(pit) * dist, cx, 0.7, cz);
 a.orbita.update?.();

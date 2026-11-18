@@ -2,3 +2,4 @@
 import './campana_iglesia.js';
 import './farol_aceite.js';
 import './carreta.js';
+import './palanca_tren.js';

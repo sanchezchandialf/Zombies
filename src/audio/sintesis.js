@@ -669,4 +669,35 @@ def('mina', 0.7, (c, t, o) => { osc(c, 'square', 2000, t, 0.06, { g: 0.1, a: 0.0
 def('alambrada', 0.6, (c, t, o) => { for (let i = 0; i < 5; i++) osc(c, 'sine', 1800 + Math.random() * 2200, t + i * 0.035, 0.12, { g: 0.07, a: 0.001, rev: 0.3 }); ruido(c, t, 0.12, { f: { t: 'bandpass', a: 4000, q: 1 }, g: 0.1, a: 0.001 }); }, { prio: 4, g: 0.85, enf: 0.2 });
 def('interactivo_usar', 0.5, (c, t, o) => { clic(c, t, 1300, 0.3, 0.04); osc(c, 'sine', 700, t + 0.04, 0.25, { g: 0.1, a: 0.003, rev: 0.4 }); }, { prio: 4, g: 0.9, enf: 0.1 });
 
+
+// ───────────────────────────── extras pedidos por mundo y vehículos ─────────────────────────────
+def('vidrio_rotura', 1.0, (c, t, o) => {
+  ruido(c, t, 0.1, { f: { t: 'highpass', a: 3000 }, g: 0.3, a: 0.001, sat: 2 });
+  for (let i = 0; i < 14; i++) osc(c, 'sine', (2800 + Math.random() * 4200) * o.p, t + Math.random() * 0.35, 0.09, { g: 0.07, a: 0.001, rev: 0.4 });
+}, { prio: 5, g: 0.85, enf: 0.1 });
+def('metal_cae', 1.2, (c, t, o) => {
+  osc(c, 'sine', 100, t, 0.15, { f1: 50, g: 0.5, a: 0.001 });
+  [[1, 0.2, 0.7], [2.76, 0.14, 0.5], [5.4, 0.08, 0.3]].forEach(([r, g, d], i) => { for (const dd of [0, 0.16, 0.26]) osc(c, 'sine', 420 * r * o.p * (1 - dd * 0.3), t + dd, d * (1 - dd), { g: g * (1 - dd * 2), a: 0.001, rev: 0.5 }); });
+}, { prio: 5, g: 0.8, enf: 0.1 });
+def('silbido', 1.2, (c, t, o) => { osc(c, 'sine', 1800 * o.p, t, 1.0, { f1: 2300 * o.p, g: 0.1, a: 0.05, s: 0.8, r: 0.3, vib: [6, 25, 0.1], rev: 0.4 }); ruido(c, t, 1.0, { f: { t: 'bandpass', a: 2000, q: 6 }, g: 0.04, a: 0.05, s: 0.8, r: 0.3 }); }, { prio: 4, g: 0.85, enf: 0.3 });
+def('derrape', 1.0, (c, t, o) => { ruido(c, t, 0.9, { f: { t: 'bandpass', a: 1900 * o.p, b: 1100, q: 3 }, g: 0.2, a: 0.08, s: 0.8, r: 0.3, rev: 0.2 }); osc(c, 'sawtooth', 700 * o.p, t, 0.8, { f1: 520, g: 0.04, a: 0.08, s: 0.8, r: 0.3, f: { t: 'bandpass', a: 1200, q: 3 } }); }, { prio: 4, g: 0.85, enf: 0.3, max: 2 });
+def('choque_vehiculo', 1.4, (c, t, o) => {
+  osc(c, 'sine', 130, t, 0.4, { f1: 32, g: 0.7, a: 0.002 });
+  ruido(c, t, 0.35, { col: 'r', f: { t: 'lowpass', a: 3000, b: 200 }, g: 0.5, a: 0.001, sat: 2.5 });
+  [[1, 0.15], [2.4, 0.12], [3.9, 0.08]].forEach(([r, g]) => osc(c, 'sine', 260 * r * o.p, t, 0.7, { g, a: 0.001, rev: 0.5 }));
+  for (let i = 0; i < 6; i++) osc(c, 'sine', 1500 + Math.random() * 3000, t + 0.1 + Math.random() * 0.4, 0.06, { g: 0.05, a: 0.001, rev: 0.4 });
+}, { prio: 8, g: 0.7, enf: 0.15, max: 3 });
+def('caballo_muerte', 1.6, (c, t, o) => {
+  formantes(c, t, 1.2, 520, 180, [[900, 8, 1, 600], [2200, 10, 0.5, 1200]], { g: 0.45, a: 0.04, s: 0.8, d: 0.4, r: 0.5, vib: [11, 60], aire: 0.4, rasp: 0.3, raspHz: 40, sat: 2, rev: 0.6 });
+  osc(c, 'sine', 90, t + 1.0, 0.4, { f1: 35, g: 0.5, a: 0.003 });
+}, { prio: 8, g: 0.8, enf: 0.5 });
+def('mecha', 1.4, (c, t, o) => {
+  ruido(c, t, 1.3, { f: { t: 'highpass', a: 4200 }, g: 0.12, a: 0.03, s: 0.8, r: 0.3 });
+  for (let i = 0; i < 14; i++) ruido(c, t + Math.random() * 1.2, 0.025, { f: { t: 'bandpass', a: 2500 + Math.random() * 4000, q: 3 }, g: 0.12, a: 0.001 });
+}, { prio: 4, g: 0.85, enf: 0.2 });
+for (let i = 0; i < 6; i++) {
+  const n = ['caballo', 'locomovil', 'autoblindado', 'muscle_car', 'blindado_tactico', 'aerodeslizador'][i];
+  def('motor_' + n, 1.2, (c, t, o) => { osc(c, 'sawtooth', 40 * o.p, t, 1.0, { g: 0.2, a: 0.1, s: 0.8, r: 0.2, sat: 3, f: { t: 'lowpass', a: 500 } }); ruido(c, t, 1.0, { col: 'm', f: { t: 'lowpass', a: 400 }, g: 0.15, a: 0.1, s: 0.8, r: 0.2 }); }, { prio: 2, g: 0.8, enf: 0.5 });
+}
+
 export const NOMBRES_EFECTOS = Object.keys(EFECTOS);

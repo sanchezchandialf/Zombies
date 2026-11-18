@@ -8,7 +8,6 @@ import { crearCombate } from '../src/combate/index.js';
 import { CAPA } from '../src/nucleo/fisica.js';
 import { ARMAS, LISTA_ARMAS } from '../src/datos/armas.js';
 import { crearModeloArma } from '../src/armas/modelos.js';
-import { crearFxPrueba } from './combate-fx.js';
 
 const a = await crearArnes({ eraIdx: 0, hora: 0.3, camara: { dist: 26, alto: 26, objetivo: [0, 0, -6] }, sistemas: { combate: crearCombate } });
 const juego = a.juego, combate = juego.combate, fisica = juego.fisica, escena = juego.render.escena;
@@ -17,13 +16,7 @@ juego.render.camaraExterna = true;
 const opciones = juego.opciones;
 let depurar = !!opciones.depurar;
 
-// FX de respaldo si el módulo real aún es provisional
-let fx = juego.fx;
-if (!fx || /\{\s*\}\s*$/.test(String(fx.emitir))) {
-  fx = crearFxPrueba(juego);
-  juego.sistemas.fx = fx; juego.fx = fx;
-  juego.registrar('fxPrueba', { actualizar: (dt) => fx.actualizar(dt) }, 85);
-}
+const fx = juego.fx;
 
 // ───────────────────────── Escenario ─────────────────────────
 const Z0 = 10; // el tirador está en z=10 y apunta hacia −Z (arriba en pantalla)
