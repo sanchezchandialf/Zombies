@@ -103,7 +103,7 @@ await import('../src/mundo/interactivos/index.js');
 // ───── Escena según tipo ─────
 const DEMO = {
   campana_iglesia: [{ x: 0, z: 0 }], farol_aceite: [{ x: 0, z: 0 }], carreta: [{ x: 0, z: 0, rot: 0.4 }],
-  palanca_tren: [{ x: 3, z: 4, via: { x1: -40, z1: 0, x2: 40, z2: 0 }, dibujarVia: true }], deposito_agua: [{ x: 0, z: -2 }], vagoneta: [{ x: -10, z: 0, rot: Math.PI / 2 }],
+  palanca_tren: [{ x: 3, z: 4, via: { x1: -40, z1: 0, x2: 40, z2: 0 }, dibujarVia: q.get('via') !== '0' }], deposito_agua: [{ x: 0, z: -2 }], vagoneta: [{ x: -10, z: 0, rot: Math.PI / 2 }],
   alambrada: [{ x: 0, z: 0, largo: 6 }], mina_terrestre: [{ x: 0, z: 0 }, { x: 3, z: 1 }], sirena_antiaerea: [{ x: 0, z: 0, rot: 0 }],
   alarma_coche: [{ x: 0, z: 0, rot: 0.5 }], surtidor_gasolina: [{ x: 0, z: 0 }], transformador: [{ x: 0, z: 0 }],
   valla_electrica: [{ x: 0, z: 0, largo: 6 }, { tipo: 'generador', x: -5, z: 2.5 }], generador: [{ x: 0, z: 0 }], dron_suministros: [{ x: 0, z: 0 }],

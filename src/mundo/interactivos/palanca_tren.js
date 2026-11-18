@@ -10,7 +10,7 @@ function dibujarVia(inst, x1, z1, x2, z2) {
   const L = Math.hypot(x2 - x1, z2 - z1), ang = Math.atan2(x2 - x1, z2 - z1);
   const g = new THREE.Group(); g.position.set(x1, 0, z1); g.rotation.y = ang;
   const m = inst.malla();
-  m.add(caja(2.6, 0.12, L, 0.05), ['gravilla_via', {}], { p: [0, 0.04, L / 2] });
+  m.add(caja(2.6, 0.12, L, 0.05), ['hormigon_bunker', { color: 0x8a8378, desgaste: 0.8 }], { p: [0, 0.04, L / 2] });
   for (let s = 0.5; s < L; s += 0.75) m.add(caja(2.1, 0.12, 0.22, 0.025), 'tablas_viejas', { p: [0, 0.16, s] });
   for (const k of [-0.72, 0.72]) m.add(caja(0.09, 0.15, L, 0.02), ['hierro_oxidado', { desgaste: 0.3 }], { p: [k, 0.29, L / 2] });
   m.construir(g, { sombra: false });

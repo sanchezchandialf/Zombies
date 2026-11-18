@@ -7,7 +7,6 @@ import { crearArnes } from './arnes.js';
 import { crearCombate } from '../src/combate/index.js';
 import { crearVehiculos, VEHICULOS } from '../src/vehiculos/index.js';
 import { CAPA } from '../src/nucleo/fisica.js';
-import { crearFxPrueba } from './combate-fx.js';
 
 const q = new URLSearchParams(location.search);
 const id = q.get('vehiculo');
@@ -15,8 +14,6 @@ const todos = ['caballo', 'locomovil', 'autoblindado', 'muscle_car', 'blindado_t
 const eraIdx = id ? VEHICULOS[id].era : (q.has('era') ? +q.get('era') : 3);
 const a = await crearArnes({ eraIdx, hora: q.has('noche') ? 0.75 : 0.3, camara: { dist: 9, alto: 4.5, objetivo: [0, 1, 0] }, sistemas: { combate: crearCombate, vehiculos: crearVehiculos } });
 const juego = a.juego, fisica = juego.fisica, escena = juego.render.escena;
-let fx = juego.fx;
-if (!fx || /\{\s*\}\s*$/.test(String(fx.emitir))) { fx = crearFxPrueba(juego); juego.sistemas.fx = fx; juego.fx = fx; juego.registrar('fxPrueba', { actualizar: (dt) => fx.actualizar(dt) }, 85); }
 const falso = () => ({ bando: 'jugadores', indice: 0, mods: {}, rol: null, pos: new THREE.Vector3(), radio: 0.4, vehiculo: null, visual: null, teletransportar() {} });
 const dianas = [];
 function diana(x, z, vida = 90, metal = false) {

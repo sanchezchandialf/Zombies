@@ -700,4 +700,7 @@ for (let i = 0; i < 6; i++) {
   def('motor_' + n, 1.2, (c, t, o) => { osc(c, 'sawtooth', 40 * o.p, t, 1.0, { g: 0.2, a: 0.1, s: 0.8, r: 0.2, sat: 3, f: { t: 'lowpass', a: 500 } }); ruido(c, t, 1.0, { col: 'm', f: { t: 'lowpass', a: 400 }, g: 0.15, a: 0.1, s: 0.8, r: 0.2 }); }, { prio: 2, g: 0.8, enf: 0.5 });
 }
 
+// Calibración de ganancias (según pruebas/audio.html: pico < 1 con y sin reverb)
+Object.entries({ lanzacohetes: 0.62, lanzallamas: 0.6, explosion_pequena: 0.42, explosion: 0.5, explosion_grande: 0.42, explosion_polvora: 0.5, explosion_dinamita: 0.5, explosion_energia: 0.45, jugador_caido: 0.4, oleada_anuncio: 0.62, tren: 0.68 }).forEach(([n, g]) => { EFECTOS[n].g = g; });
+
 export const NOMBRES_EFECTOS = Object.keys(EFECTOS);

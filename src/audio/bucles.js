@@ -14,7 +14,7 @@ function lazo(c, vol = 1) {
   const fuentes = [];
   let nivel = vol;
   const inst = {
-    ctx, out, c: { ctx, dest: out, rev: c.rev }, tono: 1, vivo: true,
+    ctx, out, k: 1, c: { ctx, dest: out, rev: c.rev }, tono: 1, vivo: true,
     fuentes,
     nodo(n) { return n; },
     ruido(col = 'r') { const s = ctx.createBufferSource(); s.buffer = bufRuido(ctx, col); s.loop = true; s.start(0, Math.random() * 1.5); fuentes.push(s); return s; },
@@ -30,7 +30,7 @@ function lazo(c, vol = 1) {
       e.f({ ctx, dest: g, rev: c.rev }, t, { p, r: Math.random() });
     },
     ajustar(p = {}) {
-      if (p.volumen !== undefined) { nivel = p.volumen; out.gain.setTargetAtTime(Math.max(0.0001, p.volumen), ctx.currentTime, 0.08); }
+      if (p.volumen !== undefined) { nivel = p.volumen; out.gain.setTargetAtTime(Math.max(0.0001, p.volumen * inst.k), ctx.currentTime, 0.08); }
       if (p.tono !== undefined) { inst.tono = p.tono; inst.alTono?.(p.tono, ctx.currentTime); }
     },
     parar() {
@@ -243,6 +243,13 @@ BUCLES.ambiente_5 = (c, o) => {
   return L;
 };
 for (let i = 0; i < 6; i++) BUCLES['ambiente_' + i] ||= BUCLES.ambiente_0;
+
+// calibración de nivel por bucle (pruebas/audio.html: pico < 1)
+const K = { lanzallamas: 0.6, motor_locomovil: 0.8, ambiente_0: 0.85, ambiente_1: 0.65 };
+for (const [n, k] of Object.entries(K)) {
+  const orig = BUCLES[n];
+  BUCLES[n] = (c, o = {}) => { const L = orig(c, o); L.k = k; L.out.gain.setTargetAtTime(Math.max(0.0001, (o.volumen ?? 1) * k), L.ctx.currentTime, 0.12); return L; };
+}
 
 /** Alias por era para el ambiente. */
 export const nombreAmbiente = (eraIdx) => 'ambiente_' + Math.max(0, Math.min(5, eraIdx | 0));

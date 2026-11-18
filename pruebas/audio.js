@@ -94,7 +94,6 @@ async function verificarBucles() {
       const g = ctx.createGain(); g.connect(ctx.destination);
       const e = ctx.createGain(); e.gain.value = 0.3; const cv = ctx.createConvolver(); cv.buffer = impulsoReverb(ctx); e.connect(cv); cv.connect(ctx.destination);
       const inst = BUCLES[nombre]({ ctx, dest: g, rev: e }, { volumen: 1 });
-      inst.out.gain.setValueAtTime(1, 0);
       inst.ajustar?.({ tono: 1.2 });
       for (let t = 0; t < 6; t += 0.1) inst.tick?.(t, 0.1);
       const b = await ctx.startRendering();
