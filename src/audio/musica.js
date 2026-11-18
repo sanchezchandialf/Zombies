@@ -376,7 +376,7 @@ export class Secuenciador {
     e.tonica = tema.tonica; e.modo = s.modo;
     const baseInt = { menu: 0.35, intermedio: 0.25, victoria: 0.55, derrota: 0.2 }[s.modo];
     e.int = baseInt ?? (s.modo === 'jefe' ? Math.max(0.9, s.int ?? 0.9) : (s.int ?? 0.3));
-    e.v = 0.78 + 0.22 * e.int;
+    e.v = (0.78 + 0.22 * e.int) * (s.modo === 'jefe' ? 0.66 : 1);
     return true;
   }
   _paso() {
