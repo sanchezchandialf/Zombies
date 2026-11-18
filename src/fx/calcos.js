@@ -112,6 +112,7 @@ export function crearCalcos(juego, escena, uniformes, opciones = {}) {
   /** Crea un calco. Devuelve su índice. opciones: { rot, dirX, dirZ, alfa, color:[r,g,b], celda, vida, crece, aspecto } */
   function calco(tipo, x, z, tam, o) {
     const T = TIPOS[tipo] ?? TIPOS.sangre;
+    if (tipo === 'sangre') tam *= 1.45;   // la masa útil de la textura ocupa ~la mitad del cuadro
     const r = rng();
     let celda;
     if (o?.celda !== undefined) celda = o.celda;

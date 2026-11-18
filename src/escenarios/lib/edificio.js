@@ -21,7 +21,7 @@ export const ESTILOS = {
 
 const mezcla = (a, b) => {
   const r = { ...a };
-  for (const k of Object.keys(b || {})) r[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a?.[k] && typeof a[k] === 'object') ? mezcla(a[k], b[k]) : b[k];
+  for (const k of Object.keys(b || {})) if (b[k] !== undefined) r[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a?.[k] && typeof a[k] === 'object') ? mezcla(a[k], b[k]) : b[k];
   return r;
 };
 

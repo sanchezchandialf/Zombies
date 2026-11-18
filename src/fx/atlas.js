@@ -265,7 +265,7 @@ function sangre(idx, buf, o) {
     let a = ang0 + (i / nRayos) * 6.283 + (rnd() - 0.5) * 0.5;
     if (sesgo) a = ang0 + (rnd() - 0.5) * (6.283 * (1 - sesgo) + 0.6);
     const L = largoMin + (largoMax - largoMin) * rnd() * (sesgo ? 0.6 + 0.6 * rnd() : 1);
-    const gr = 0.05 + rnd() * 0.07;
+    const gr = 0.06 + rnd() * 0.08;
     const ax = Math.cos(a) * masa * 0.6, ay = Math.sin(a) * masa * 0.6;
     const bx = Math.cos(a + (rnd() - 0.5) * 0.18) * L, by = Math.sin(a + (rnd() - 0.5) * 0.18) * L;
     M.hilo(ax, ay, bx, by, gr, gr * 0.28, 0.04);
@@ -297,7 +297,7 @@ function escribirMetabola(buf, idx, S, rug, rnd, o = {}) {
 
 function charco(idx, buf, semilla) {
   const rnd = rngSemilla(semilla), M = nuevoCampoMetabola();
-  for (let i = 0; i < 7; i++) { const a = rnd() * 6.283, d = rnd() * 0.3; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.26 + rnd() * 0.2); }
+  for (let i = 0; i < 7; i++) { const a = rnd() * 6.283, d = rnd() * 0.4; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.34 + rnd() * 0.22); }
   for (let i = 0; i < 5; i++) { const a = rnd() * 6.283; const d = 0.35 + rnd() * 0.25; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.07 + rnd() * 0.08); }
   for (let i = 0; i < 6; i++) { const a = rnd() * 6.283, d = 0.6 + rnd() * 0.3; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.015 + rnd() * 0.03); }
   escribirMetabola(buf, idx, M.S, 0.07, rnd, { grosor: 0.7, normalFuerza: 4 });
@@ -401,12 +401,12 @@ let _atlasCalcos = null;
 export function atlasCalcos() {
   if (_atlasCalcos) return _atlasCalcos;
   const buf = crearBuffer();
-  sangre(0, buf, { semilla: 11, masa: 0.34, nRayos: 16, largoMin: 0.45, largoMax: 0.92, motas: 22, rocio: 1 });
-  sangre(1, buf, { semilla: 29, masa: 0.3, nRayos: 12, largoMin: 0.4, largoMax: 0.88, motas: 26, rocio: 1, ang0: 0.5 });
-  sangre(2, buf, { semilla: 41, masa: 0.3, nRayos: 10, largoMin: 0.3, largoMax: 0.6, motas: 18, rocio: 0.85 });
-  sangre(3, buf, { semilla: 53, masa: 0.26, nRayos: 13, largoMin: 0.3, largoMax: 0.66, motas: 20, rocio: 0.9, ang0: 1.2 });
-  sangre(4, buf, { semilla: 67, masa: 0.2, nRayos: 11, largoMin: 0.5, largoMax: 0.95, sesgo: 0.85, motas: 18, rocio: 0.9, centro: true, ang0: 0 });
-  sangre(5, buf, { semilla: 83, masa: 0.17, nRayos: 9, largoMin: 0.55, largoMax: 0.97, sesgo: 0.9, motas: 24, rocio: 0.95, centro: true, ang0: 0.05 });
+  sangre(0, buf, { semilla: 11, masa: 0.5, nRayos: 16, largoMin: 0.45, largoMax: 0.92, motas: 22, rocio: 1 });
+  sangre(1, buf, { semilla: 29, masa: 0.46, nRayos: 12, largoMin: 0.4, largoMax: 0.88, motas: 26, rocio: 1, ang0: 0.5 });
+  sangre(2, buf, { semilla: 41, masa: 0.44, nRayos: 10, largoMin: 0.3, largoMax: 0.6, motas: 18, rocio: 0.85 });
+  sangre(3, buf, { semilla: 53, masa: 0.4, nRayos: 13, largoMin: 0.3, largoMax: 0.66, motas: 20, rocio: 0.9, ang0: 1.2 });
+  sangre(4, buf, { semilla: 67, masa: 0.3, nRayos: 11, largoMin: 0.5, largoMax: 0.95, sesgo: 0.85, motas: 18, rocio: 0.9, centro: true, ang0: 0 });
+  sangre(5, buf, { semilla: 83, masa: 0.26, nRayos: 9, largoMin: 0.55, largoMax: 0.97, sesgo: 0.9, motas: 24, rocio: 0.95, centro: true, ang0: 0.05 });
   charco(6, buf, 97);
   gotero(7, buf, 101);
   quemadura(8, buf, 113); quemadura(9, buf, 127); quemadura(10, buf, 139);

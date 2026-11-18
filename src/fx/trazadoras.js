@@ -13,9 +13,9 @@ const FS = /* glsl */`
 varying vec4 vCol; varying float vAcross;
 void main() {
   float x = abs(vAcross);
-  float nucleo = pow(max(0.0, 1.0 - x), 2.6);
-  float halo = exp(-x * x * 3.4) * (1.0 - smoothstep(0.7, 1.0, x));
-  vec3 c = vCol.rgb * (nucleo * 1.35 + halo * 0.5) + vec3(nucleo * nucleo * 0.7) * vCol.a;
+  float nucleo = pow(max(0.0, 1.0 - x * 2.5), 2.0);
+  float halo = exp(-x * x * 7.0) * (1.0 - smoothstep(0.7, 1.0, x));
+  vec3 c = vCol.rgb * (nucleo * 1.2 + halo * 0.95) + vec3(nucleo * nucleo * 0.45) * vCol.a;
   gl_FragColor = vec4(c * vCol.a, 0.0);
 }
 `;
@@ -133,7 +133,7 @@ export function crearTrazadoras(juego, escena) {
         // base ortonormal alrededor del eje
         let ux = -dz, uy = 0, uz = dx; let ul = Math.hypot(ux, uz); if (ul < 1e-4) { ux = 1; uz = 0; ul = 1; } ux /= ul; uz /= ul;
         const vx = dy * uz - dz * uy, vy = dz * ux - dx * uz, vz = dx * uy - dy * ux;
-        const vueltas = L * 0.55;
+        const vueltas = L * 0.28;
         for (let k = 0; k < n; k++) {
           const s = k / (n - 1), ang = s * vueltas * 6.2832 + t * 9 + semilla[i];
           const rad = (0.2 + 0.5 * f) * (0.35 + 0.65 * Math.sin(s * 3.1416)) * (1 - f * 0.4);
@@ -190,7 +190,7 @@ export function crearTrazadoras(juego, escena) {
       haz.copy(camPos).sub(pt);
       lado.crossVectors(tan, haz);
       const l = lado.length(); if (l < 1e-6) lado.set(0, 1, 0); else lado.divideScalar(l);
-      const w = PW[k] * 0.5;
+      const w = PW[k] * 1.2;
       for (let h = 0; h < 2; h++) {
         const sg = h === 0 ? -1 : 1, o = (v + h) * 3;
         pos[o] = pt.x + lado.x * w * sg; pos[o + 1] = pt.y + lado.y * w * sg; pos[o + 2] = pt.z + lado.z * w * sg;

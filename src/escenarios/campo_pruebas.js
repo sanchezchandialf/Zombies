@@ -26,21 +26,21 @@ export async function construir(juego, kit) {
   // ───────────── 1. SUELO ─────────────
   // Mezcla de dos suelos pintada a mano: 0 = base, 1 = mezcla. Una cruz de caminos y la plaza central quedan limpias de hierba.
   kit.suelo({
-    tam: 160, material: P.base, mezcla: P.mezcla, mojado: P.mojado, semilla: 3,
+    tam: 160, material: P.base, mezcla: P.mezcla, mojado: P.mojado, semilla: 3, contraste: 1.9,
     relieve: { amp: 0.06, escala: 16, centroPlano: 55 },
     pintura: (p) => {
       p.fondo(0.0);
       p.rect(-80, -80, 80, -49, 1, 4).rect(-80, 49, 80, 80, 1, 4).rect(-80, -80, -49, 80, 1, 4).rect(49, -80, 80, 80, 1, 4);   // periferia
-      p.salpicar(-48, -48, 48, 48, 26, 2, 5, 1, 1.4);                                    // matas dispersas
+      p.salpicar(-48, -48, 48, 48, 46, 1.8, 5, 1, 2.2);                                    // matas dispersas
       p.circulo(0, 0, 17, 0, 3).camino([[-48, 0], [0, 0], [48, 0]], 8, 0, 2).camino([[0, -48], [0, 0], [0, 48]], 7, 0, 2);   // plaza y cruz de caminos despejados
-      p.romper(6, 0.32);
+      p.romper(3.2, 0.5);
     },
   });
   // Plaza central elevada con borde de piedra.
   kit.zona({ circulo: { x: 0, z: 0, r: 13 }, material: P.plaza, alto: 0.03, borde: { material: 'silleria', ancho: 0.4, alto: 0.12 }, mojado: P.mojado });
 
   // ───────────── 2. EDIFICIOS (3-5 volúmenes grandes que crean calles) ─────────────
-  const casa = kit.edificio({ x: -28, z: -23, ancho: 14, fondo: 9, pisos: 2, estilo: P.estilo, colorMuro: P.tinte, tejado: { chimenea: true }, balcon: eraIdx < 2, puertas: [{ cara: 'sur', u: -2.5, arco: eraIdx === 0 }], luzPuertas: true, semilla: 1, nombre: 'casa_norte' });
+  const casa = kit.edificio({ x: -28, z: -23, ancho: 14, fondo: 9, pisos: 2, estilo: P.estilo, colorMuro: P.tinte, muro: eraIdx === 0 ? 'ladrillo_encalado' : undefined, tejado: { chimenea: true }, balcon: eraIdx < 2 ? { ancho: 4.6, u: 3.6 } : false, puertas: [{ cara: 'sur', u: -2.5, arco: eraIdx === 0 }], luzPuertas: true, semilla: 1, nombre: 'casa_norte' });
   kit.edificio({ x: 26, z: -26, ancho: 13, fondo: 9, pisos: 1, alto: 5.2, estilo: eraIdx >= 3 ? P.estilo : 'industrial', puertas: [{ cara: 'sur', u: 0, ancho: 2.6, alto: 3.2 }], ventanas: { sep: 3.6, luz: 0.35 }, semilla: 2, nombre: 'almacen' });
   kit.edificio({ x: -31, z: 20, ancho: 9, fondo: 7, pisos: 1, estilo: eraIdx === 0 ? 'encalado' : P.estilo, rot: 0.1, tejado: { chimenea: eraIdx < 3 }, puertas: [{ cara: 'sur', u: 1 }], semilla: 3, nombre: 'casa_oeste' });
   kit.edificio({ x: 31, z: 23, ancho: 8, fondo: 11, pisos: 1, alto: 5.6, estilo: eraIdx < 2 ? 'piedra' : P.estilo, tejado: { eje: 'z', pendiente: 0.7 }, puertas: [{ cara: 'oeste', u: 0, arco: true }], semilla: 4, nombre: 'capilla' });
@@ -69,6 +69,7 @@ export async function construir(juego, kit) {
   // ───────────── 4. DETALLES DE SUELO ─────────────
   const evitar = kit._edificios.map((e) => ({ x: e.x, z: e.z, hx: e.ancho / 2, hz: e.fondo / 2, rot: e.rot, margen: 1 }));
   kit.parches({ tipo: 'charco', area: { x0: -40, z0: -40, x1: 40, z1: 40 }, cantidad: P.mojado > 0 ? 12 : 5, radio: [0.9, 2.4], evitar, semilla: 7 });
+  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 12, radio: [2.5, 5.5], evitar, color: 0x3a2b1c, opacidad: 0.22, semilla: 31 });
   kit.parches({ tipo: 'mancha', area: { x0: -40, z0: -40, x1: 40, z1: 40 }, cantidad: 14, radio: [0.7, 1.8], evitar, color: 0x2b2118, opacidad: 0.55, semilla: 8 });
   for (let i = 0; i < 7; i++) kit.parche({ tipo: 'hojas', x: rng.rango(-38, 38), z: rng.rango(-38, 38), radio: rng.rango(2, 4), cantidad: 26, semilla: i });
 

@@ -1,6 +1,7 @@
 // ERA Z · Estructuras auxiliares del kit: vallas, postes, catenarias, farolas, escaleras, bloques, rocas y árboles.
 // Convención de segmentos: el eje X local de la pieza va a lo largo del segmento (rot = atan2(-dz, dx)), igual que los cuerpos de la física.
 import * as THREE from 'three';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { materiales } from '../../render/materiales/index.js';
 import { cajaRedondeada, cilindro, matriz, extruir } from './geometria.js';
 import { crearRng } from '../../nucleo/util.js';
@@ -190,10 +191,13 @@ export function construirBloque(kit, o = {}) {
   return null;
 }
 
+/** Icosfera con vértices soldados (sombreado suave al deformarla). */
+function suave(g) { g.deleteAttribute('normal'); g.deleteAttribute('uv'); return mergeVertices(g, 1e-4); }
+
 export function construirRoca(kit, o = {}) {
   const { x = 0, z = 0, radio = 1.2 } = o;
   const rng = crearRng((o.semilla ?? 1) * 17 + Math.floor(x * 5 + z * 3));
-  const g = new THREE.IcosahedronGeometry(1, 2);
+  const g = suave(new THREE.IcosahedronGeometry(1, 3));
   const p = g.attributes.position;
   const sx = rng.rango(0.8, 1.2), sy = rng.rango(0.55, 0.85), sz = rng.rango(0.8, 1.2);
   for (let i = 0; i < p.count; i++) {
@@ -225,7 +229,7 @@ export function construirArbol(kit, o = {}) {
     const mF = materiales.obtener('hierba', { color: o.colorHojas ?? (tipo === 'pino' ? 0x2e4a2a : 0x5a7a2c), desgaste: 0.5 });
     const n = tipo === 'pino' ? 4 : 5;
     for (let i = 0; i < n; i++) {
-      const g = new THREE.IcosahedronGeometry(1, 2);
+      const g = suave(new THREE.IcosahedronGeometry(1, 3));
       const p = g.attributes.position;
       for (let k = 0; k < p.count; k++) { const f = 1 + 0.14 * Math.sin(p.getX(k) * 5 + i) * Math.cos(p.getZ(k) * 4 + i * 2); p.setXYZ(k, p.getX(k) * f, p.getY(k) * f * (tipo === 'pino' ? 1.25 : 0.85), p.getZ(k) * f); }
       g.computeVertexNormals();
