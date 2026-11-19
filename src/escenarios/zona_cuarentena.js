@@ -32,7 +32,7 @@ export async function construir(juego, kit) {
       p.rect(-80, -80, 80, -46, 1, 3).rect(-80, 46, 80, 80, 1, 3).rect(-80, -80, -46, 80, 1, 3).rect(46, -80, 80, 80, 1, 3);   // periferia: aceras
       p.rect(-42, -46, -7, -22, 1, 1.5).rect(8, -46, 40, -23, 1, 1.5);                                                         // plazas de las torres
       p.rect(-46, -46, -40, 46, 1, 2.5).rect(40, -46, 46, 46, 1, 2.5);                                                         // aceras laterales
-      p.salpicar(-44, -22, 44, 46, 34, 0.9, 3.2, 1);                                                                           // parches de acera/reparaciones
+      p.salpicar(-44, -22, 44, 46, 14, 0.5, 1.6, 1);                                                                           // parches de acera/reparaciones
       p.camino([[-44, 6], [-16, 6], [0, 8]], 2.2, 1, 1.5);                                                                     // acera junto al hospital
       p.romper(3.4, 0.55);
     },
@@ -133,7 +133,6 @@ export async function construir(juego, kit) {
   luz({ x: -30, y: 3.6, z: -1.6, color: 0xa8d8ff, intensidad: 80, distancia: 15 });
 
   // ───────────── 5. ESTE: HELIPUERTO ─────────────
-  anillo(0, 0, M.pintAmarilla); // (sin efecto, reserva del helper)
   const aro = (cx, cz, r0, r1, m, y) => L0.anadir(kit.extruir(Array.from({ length: 56 }, (_, i) => [Math.cos((i / 56) * PI * 2) * r1, Math.sin((i / 56) * PI * 2) * r1]), 0.02, { bisel: 0.004, huecos: [Array.from({ length: 56 }, (_, i) => [Math.cos((i / 56) * PI * 2) * r0, Math.sin((i / 56) * PI * 2) * r0])] }), m, mx(cx, y, cz), { uv: false });
   aro(30, 4, 7.4, 7.9, M.pintAmarilla, 0.07);
   aro(30, 4, 8.6, 8.7, M.pintBlanca, 0.07);
@@ -210,7 +209,7 @@ export async function construir(juego, kit) {
   // empujables, explosivos y cajas colocados a mano
   // ───────────── 8. DETALLES DE SUELO ─────────────
   const evitar = kit._edificios.filter((e) => Math.abs(e.x) < 46 && Math.abs(e.z) < 46).map((e) => ({ x: e.x, z: e.z, hx: e.ancho / 2, hz: e.fondo / 2, rot: e.rot, margen: 1 }));
-  kit.parches({ tipo: 'charco', area: { x0: -42, z0: -20, x1: 42, z1: 42 }, cantidad: 11, radio: [0.9, 2.6], evitar, semilla: 9 });
+  kit.parches({ tipo: 'charco', area: { x0: -42, z0: -20, x1: 42, z1: 42 }, cantidad: 7, radio: [0.8, 2.0], evitar, color: 0x0a1016, semilla: 9 });
   kit.parches({ tipo: 'mancha', area: { x0: -43, z0: -42, x1: 43, z1: 43 }, cantidad: 14, radio: [2.5, 5.5], evitar, color: 0x1d2227, opacidad: 0.2, semilla: 31 });
   kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -40, x1: 42, z1: 42 }, cantidad: 16, radio: [0.6, 1.5], evitar, color: 0x15181b, opacidad: 0.5, semilla: 8 });
   // papeles y cristales rotos dispersos

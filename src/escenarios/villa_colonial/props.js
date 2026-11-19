@@ -421,7 +421,7 @@ export function niebla(kit, { cuantos = 9, area = [-42, -42, 42, 42], semilla = 
   gr.addColorStop(0, 'rgba(255,255,255,0.95)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
   g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
   const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
-  const mat = new THREE.MeshBasicMaterial({ map: tex, color: 0x9fb6d6, transparent: true, opacity: 0.2, depthWrite: false, fog: false });
+  const mat = new THREE.MeshBasicMaterial({ map: tex, color: 0x9fb6d6, transparent: true, opacity: 0.11, depthWrite: false, fog: false });
   const geo = new THREE.PlaneGeometry(1, 1); geo.rotateX(-Math.PI / 2);
   const planos = [];
   for (let i = 0; i < cuantos; i++) {

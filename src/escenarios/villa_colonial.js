@@ -111,7 +111,6 @@ export async function construir(juego, kit) {
   P.volcarMercado(kit, ctx);
   const palA = P.mastil(kit, 15, -7.5), palB = P.mastil(kit, 41, -7.5);
   P.banderines(kit, [15, palA, -7.5], [41, palB, -7.5], 0.9, 22, 4);
-  P.banderines(kit, [15, palA, -7.5], [41, palB, -7.5], 0.9, 0, 4);
 
   P.grupoBarriles(kit, 16.2, -15.4, 0.3, 'trio'); P.grupoBarriles(kit, 41.5, -16.2, 1.4, 'par'); P.grupoBarriles(kit, -26.2, -22, 0.2, 'par');
   P.grupoBarriles(kit, -28.2, 2.4, 1.5, 'trio'); P.grupoBarriles(kit, -26.5, 21, 0.5, 'par'); P.grupoBarriles(kit, 26.5, 20.5, 2.0, 'par');
@@ -145,7 +144,7 @@ export async function construir(juego, kit) {
   kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 12, radio: [0.7, 1.7], evitar, color: 0x2b2118, opacidad: 0.5, semilla: 8 });
   // musgo y hierba en los bordes, paja suelta cerca de los carros y puestos
   kit.parches({ tipo: 'mancha', area: [{ x0: -45, z0: -45, x1: -36, z1: 45 }, { x0: 36, z0: -20, x1: 45, z1: 45 }, { x0: -45, z0: 36, x1: 45, z1: 45 }], cantidad: 20, radio: [2.0, 4.5], evitar, color: 0x55703a, opacidad: 0.42, semilla: 41 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -30, x1: 42, z1: 38 }, cantidad: 12, radio: [0.8, 2.0], evitar, color: 0xb9a15e, opacidad: 0.4, semilla: 42 });
+  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -30, x1: 42, z1: 38 }, cantidad: 8, radio: [0.8, 2.0], evitar, color: 0x9a8f68, opacidad: 0.22, semilla: 42 });
   for (let i = 0; i < 8; i++) kit.parche({ tipo: 'hojas', x: rng.rango(-38, 38), z: rng.rango(-36, 38), radio: rng.rango(1.6, 3.4), cantidad: 22, semilla: i });
   // matas de hierba instanciadas (cementerio, bordes y pies de muro)
   const matasMat = P.propio(kit, 'matas', { color: 0xffffff, roughness: 0.9, metalness: 0, side: THREE.DoubleSide });
@@ -187,9 +186,9 @@ export async function construir(juego, kit) {
     puntosAparicion: [
       { x: -43, z: -30, tipo: 'borde' }, { x: -43, z: -5, tipo: 'borde' }, { x: -43, z: 28, tipo: 'borde' },
       { x: -20, z: -43, tipo: 'borde' }, { x: 2, z: -43, tipo: 'borde' }, { x: 26, z: -43, tipo: 'borde' },
-      { x: 43, z: -26, tipo: 'borde' }, { x: 43, z: 0, tipo: 'borde' }, { x: 43, z: 24, tipo: 'borde' },
+      { x: 43, z: -20, tipo: 'borde' }, { x: 43, z: 0, tipo: 'borde' }, { x: 43, z: 24, tipo: 'borde' },
       { x: -24, z: 43, tipo: 'borde' }, { x: -2, z: 43, tipo: 'borde' }, { x: 22, z: 43, tipo: 'borde' },
-      { x: 20.5, z: -32.5, tipo: 'interior', peso: 0.7 }, { x: 29.5, z: -29, tipo: 'interior', peso: 0.7 }, { x: 35.5, z: -24.5, tipo: 'interior', peso: 0.7 },
+      { x: 20.5, z: -30.8, tipo: 'interior', peso: 0.7 }, { x: 29.5, z: -27, tipo: 'interior', peso: 0.7 }, { x: 35.5, z: -22.6, tipo: 'interior', peso: 0.7 },
       { x: 0, z: -23.6, tipo: 'interior', peso: 0.5 },
     ],
     zonas: [{ id: 'plaza', x: 0, z: 0, r: 13 }, { id: 'mercado', x: 29, z: -7.5, r: 13 }, { id: 'cementerio', x: 27, z: -29, r: 13 }, { id: 'iglesia', x: 0, z: -26, r: 8 }],

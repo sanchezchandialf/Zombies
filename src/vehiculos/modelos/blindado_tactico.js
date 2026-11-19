@@ -7,7 +7,7 @@ export function crearBlindado() {
   const { grupo, chasis } = base();
   const M = {
     pintura: lib('acero_pintado', { color: 0x4a5560, desgaste: 0.25 }), pinturaB: lib('acero_pintado', { color: 0x2c333a, desgaste: 0.3 }),
-    hierro: lib('hierro_forjado'), neg: est('bt_neg', { color: 0x0e1012, roughness: 0.5, metalness: 0.4 }), acero: lib('acero_cepillado'),
+    cromo: lib('cromo'), hierro: lib('hierro_forjado'), neg: est('bt_neg', { color: 0x0e1012, roughness: 0.5, metalness: 0.4 }), acero: lib('acero_cepillado'),
     cristal: cristal(0x16262e), faro: faroMat(0xe8f4ff, 4), luzR: est('bt_rojo', { color: 0x300000, emissive: 0xff2020, emissiveIntensity: 3 }),
     luzA: est('bt_azul', { color: 0x001030, emissive: 0x2a6bff, emissiveIntensity: 3 }), lente: est('bt_lente', { color: 0x001018, emissive: 0x2cd8ff, emissiveIntensity: 2.8 }),
     naranja: est('bt_nar', { color: 0xff7a14, roughness: 0.5, metalness: 0.2 }), goma: est('bt_goma', { color: 0x111214, roughness: 0.8 }),

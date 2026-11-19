@@ -11,7 +11,7 @@ import { CAPA } from '../src/nucleo/fisica.js';
 const q = new URLSearchParams(location.search);
 const id = q.get('vehiculo');
 const todos = ['caballo', 'locomovil', 'autoblindado', 'muscle_car', 'blindado_tactico', 'aerodeslizador'];
-const eraIdx = id ? VEHICULOS[id].era : (q.has('era') ? +q.get('era') : 3);
+const eraIdx = q.has('expo') ? 3 : id ? VEHICULOS[id].era : (q.has('era') ? +q.get('era') : 3);
 const a = await crearArnes({ eraIdx, hora: q.has('noche') ? 0.75 : 0.3, camara: { dist: 9, alto: 4.5, objetivo: [0, 1, 0] }, sistemas: { combate: crearCombate, vehiculos: crearVehiculos } });
 const juego = a.juego, fisica = juego.fisica, escena = juego.render.escena;
 const falso = () => ({ bando: 'jugadores', indice: 0, mods: {}, rol: null, pos: new THREE.Vector3(), radio: 0.4, vehiculo: null, visual: null, teletransportar() {} });
@@ -29,7 +29,14 @@ juego.registrar('dianas', { posFisica() { for (const d of dianas) { if (!d.vivo)
 
 const v = juego.vehiculos;
 let principal = null;
-if (id && !q.has('circuito')) {
+if (q.has('expo')) {
+  // los seis en fila, mirando a la cámara en diagonal
+  todos.forEach((t, i) => { const ve = v.crear(t, { x: (i - 2.5) * 7.4, z: 0, rot: 0.5 }); if (t === 'caballo' || t === 'aerodeslizador') ve.subir(falso()); });
+  principal = v.lista[0];
+  a.camaraJuego(false);
+  const cx = +(q.get('cx') ?? 0), zoom = +(q.get('zoom') ?? 1);
+  a.mirar(cx, 14 * zoom, 30 * zoom, cx, 0.5, 0);
+} else if (id && !q.has('circuito')) {
   // exposición
   const ve = v.crear(id, { x: 0, z: 0, rot: 0 });
   principal = ve;

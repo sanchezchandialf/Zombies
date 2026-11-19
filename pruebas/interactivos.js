@@ -9,6 +9,9 @@ import { CAPA } from '../src/nucleo/fisica.js';
 import { ERAS } from '../src/datos/eras.js';
 import { fabricas } from '../src/mundo/registro.js';
 
+window.__err = [];
+addEventListener('error', (e) => window.__err.push(String(e.message)));
+const _ce = console.error; console.error = (...a) => { window.__err.push(a.map(String).join(' ').slice(0, 300)); _ce(...a); };
 const q = new URLSearchParams(location.search);
 const tipoPedido = q.get('tipo');
 const eraPedida = q.get('era') !== null ? +q.get('era') : null;

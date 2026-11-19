@@ -177,7 +177,7 @@ export async function construir(juego, kit) {
   }
   for (const sx of [-3.6, 3.6]) Lneon.caja(eC, sx, 0.06, -16.6, 0.1, 0.02, 15, Y({ radio: 0.005 }));
   Lneon.caja(eM, 0, 0.06, -9.9, 6.8, 0.02, 0.12, Y({ radio: 0.005 }));
-  Lneon.caja(eM, 25.75, 0.07, -11.9, 30.5, 0.03, 0.12, Y({ radio: 0.005 }));      // borde luminoso del andén
+  Lneon.caja(eMsuave, 25.75, 0.07, -11.9, 30.5, 0.03, 0.07, Y({ radio: 0.005 }));      // borde luminoso del andén
   // marcas de luz empotradas (baldosas luminosas) alineadas
   const marcas = [];
   for (let i = 0; i < 12; i++) { marcas.push({ x: -2.2, z: -11 - i * 1.1, color: CIAN }, { x: 2.2, z: -11 - i * 1.1, color: CIAN }); }
@@ -252,7 +252,7 @@ export async function construir(juego, kit) {
       L.anadir(cajaRedondeada(80, 0.14, 0.2, 0.03, 1), mAcero, matriz(26, 0.13, z0 + dz), { uv: 'acero_cepillado' });
       Lneon.caja(eCsuave, 26, 0.21, z0 + dz * 1.12, 80, 0.03, 0.04, Y({ radio: 0.005 }));
     }
-    Lneon.caja(eM, 26, 0.12, z0, 80, 0.04, 0.34, Y({ radio: 0.01 }));
+    Lneon.caja(eMsuave, 26, 0.12, z0, 80, 0.04, 0.16, Y({ radio: 0.01 }));
     for (let x = 8; x < 46; x += 1.9) L.caja(mAceroOsc, x, 0.09, z0, 0.32, 0.1, 3.4, { radio: 0.02 });
     // viaducto que continúa más allá del borde: durmientes y balizas hasta el horizonte
     for (let x = 48; x < 90; x += 6) {

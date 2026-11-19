@@ -34,11 +34,11 @@ export async function construir(juego, kit) {
     pintura: (p) => {
       p.fondo(0.0);
       p.rect(-80, -80, 80, -49, 1, 5).rect(-80, 49, 80, 80, 1, 5).rect(-80, -80, -49, 80, 1, 5).rect(49, -80, 80, 80, 1, 5);   // periferia arenosa
-      p.salpicar(-48, -46, 48, 48, 60, 1.6, 5, 1, 2).salpicar(-48, -46, 48, 48, 30, 1.2, 3.5, 0, 1.5);
-      p.camino([[-50, 0.5], [-20, 0], [0, 0.5], [22, 0], [50, 1]], 13, 1, 3.5);                       // calle principal arenosa
-      p.circulo(0, 1, 15, 1, 4);                                                                      // plaza de la calle
-      p.camino([[-4, -12], [-4, -34]], 7, 1, 2.5).camino([[9, -12], [9, -36]], 7, 1, 2.5);             // callejones hacia la vía
-      p.camino([[0, 12], [0, 48]], 6, 1, 2.5).camino([[-30, 14], [-30, 20]], 8, 1, 2).camino([[28, 12], [28, 20]], 8, 1, 2);
+      p.salpicar(-48, -46, 48, 48, 85, 1.6, 5.5, 1, 2).salpicar(-48, -46, 48, 48, 30, 1.2, 3.5, 0, 1.5);
+      p.camino([[-50, 0.5], [-20, 0], [0, 0.5], [22, 0], [50, 1]], 13, 0, 3.5);                       // calle principal arenosa
+      p.circulo(0, 1, 15, 0, 4);                                                                      // plaza de la calle
+      p.camino([[-4, -12], [-4, -34]], 7, 0, 2.5).camino([[9, -12], [9, -36]], 7, 0, 2.5);             // callejones hacia la vía
+      p.camino([[0, 12], [0, 48]], 6, 0, 2.5).camino([[-30, 14], [-30, 20]], 8, 0, 2).camino([[28, 12], [28, 20]], 8, 0, 2);
       p.camino([[-46, -40], [46, -40]], 6, 0, 2);                                                      // tierra oscura bajo la vía
       p.romper(3.4, 0.55);
     },

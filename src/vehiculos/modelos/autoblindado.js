@@ -6,7 +6,7 @@ import { cil } from '../geo.js';
 export function crearAutoblindado() {
   const { grupo, chasis } = base();
   const M = {
-    pintura: lib('acero_pintado', { color: 0x6b7242, desgaste: 0.55 }), pinturaO: lib('acero_pintado', { color: 0x4b5130, desgaste: 0.6 }),
+    pintura: lib('acero_pintado', { color: 0x6b7242, desgaste: 0.25 }), pinturaO: lib('acero_pintado', { color: 0x4b5130, desgaste: 0.3 }),
     hierro: lib('hierro_forjado'), laton: lib('laton_bronce'), madera: lib('tablas_viejas'), neg: est('ab_neg', { color: 0x111111, roughness: 0.6, metalness: 0.4 }),
     faro: faroMat(0xffe2a0, 3), cuero: lib('cuero', { color: 0x3a2a1a }), acero: lib('acero_cepillado'), herrumbre: lib('hierro_oxidado'),
   };
