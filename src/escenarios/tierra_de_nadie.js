@@ -44,12 +44,12 @@ export async function construir(juego, kit) {
     return (h + ruido) * Math.min(1, d / 2.5);
   };
   kit.suelo({
-    tam: 160, material: 'tierra', mezcla: 'hierba', mojado: 0.25, contraste: 2.2, semilla: 4, desgaste: 0.5, relieve,
+    tam: 160, material: 'tierra', mezcla: 'hierba', mojado: 0.4, contraste: 1.7, semilla: 4, desgaste: 0.5, relieve,
     pintura: (p) => {
       p.fondo(0.0);
       
       p.rect(-80, -80, 80, -52, 1, 6).rect(-80, 52, 80, 80, 1, 6).rect(-80, -80, -52, 80, 1, 6).rect(52, -80, 80, 80, 1, 6);
-      p.salpicar(-50, -50, 50, 50, 40, 0.9, 2.4, 1, 3);
+      p.salpicar(-50, -50, 50, 50, 22, 0.6, 1.4, 0.7, 2.5);
       for (const c of CRATERES) p.circulo(c.x, c.z, c.r * 0.9, 0, 2.5);
       p.rect(-38, -41, 38, -34, 0, 2).rect(-24, 20, 28, 28, 0, 2);
       p.romper(3.4, 0.55);
@@ -262,7 +262,9 @@ export async function construir(juego, kit) {
   const matBengala = new THREE.MeshBasicMaterial({ color: new THREE.Color(4, 4, 3.4), toneMapped: false });
   const malla = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), matBengala);
   malla.frustumCulled = false; malla.visible = false; kit.anadir(malla); kit._propios.push(matBengala);
-  const estado = { t: 0, dur: 13, espera: 3, x0: 0, z0: -20, vx: 1.2, rnd: kit.rng(77) };
+  const estado = { t: 1, dur: 22, espera: 4, x0: 0, z0: -20, vx: 1.2, rnd: kit.rng(77) };
+
+  bengala.pos.set(3, 17, -14); bengala.intensidad = 650; malla.position.copy(bengala.pos); malla.visible = true;
 
   // ───────────── 8. JUGABILIDAD ─────────────
   const m = juego.mundo, vh = juego.vehiculos;
@@ -306,12 +308,12 @@ export async function construir(juego, kit) {
       e.t += dt;
       if (e.t < 0) { malla.visible = false; bengala.intensidad = 0; return; }
       const k = e.t / e.dur;
-      if (k >= 1) { e.t = -e.espera; e.x0 = e.rnd.rango(-24, 24); e.z0 = e.rnd.rango(-34, -6); e.vx = e.rnd.rango(-1.6, 1.6); return; }
-      const y = 27 - 15 * k - 2 * Math.sin(k * 3);
+      if (k >= 1) { e.t = -e.espera; e.x0 = e.rnd.rango(-24, 24); e.z0 = e.rnd.rango(-30, -4); e.vx = e.rnd.rango(-1.6, 1.6); return; }
+      const y = 19 - 10 * k - 1.5 * Math.sin(k * 3);
       bengala.pos.set(e.x0 + e.vx * e.t, y, e.z0 + Math.sin(e.t * 0.5) * 1.5);
       const sube = Math.min(1, e.t / 0.6), baja = Math.min(1, (e.dur - e.t) / 2.0);
       const parpadeo = 0.88 + 0.12 * Math.sin(e.t * 23) * Math.sin(e.t * 7.3);
-      bengala.intensidad = 260 * sube * baja * parpadeo;
+      bengala.intensidad = 700 * sube * baja * parpadeo;
       malla.position.copy(bengala.pos); malla.visible = true; malla.scale.setScalar(0.6 + 0.4 * baja);
     },
   };
