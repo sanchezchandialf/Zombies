@@ -24,7 +24,7 @@ const distRect = (x, z, [x0, z0, x1, z1]) => Math.hypot(Math.max(x0 - x, 0, x - 
 export async function construir(juego, kit) {
   const eraIdx = kit.eraIdx, era = ERAS[2];
   const rng = kit.rng(2202);
-  await kit.precargar(['barro', 'hierba', 'tablones', 'empedrado', 'hormigon', 'saco_arena', 'tablas_viejas', 'ladrillo_rojo', 'ladrillo_encalado', 'silleria',
+  await kit.precargar(['barro', 'hierba', 'tierra', 'tablones', 'empedrado', 'hormigon', 'saco_arena', 'tablas_viejas', 'ladrillo_rojo', 'ladrillo_encalado', 'silleria',
     'hormigon_bunker', 'hierro_oxidado', 'hierro_forjado', 'acero_pintado', 'troncos', 'lona', 'goma', 'rayas_peligro', 'cristal', 'estuco_desconchado']);
   const M = (n, o) => kit.mat(n, o);
   const P = crearPiezas(kit);
@@ -44,11 +44,11 @@ export async function construir(juego, kit) {
     return (h + ruido) * Math.min(1, d / 2.5);
   };
   kit.suelo({
-    tam: 160, material: 'barro', mezcla: 'hierba', mojado: 0.35, contraste: 2.8, semilla: 4, desgaste: 0.5, relieve,
+    tam: 160, material: 'barro', mezcla: 'tierra', mojado: 0.12, contraste: 2.8, semilla: 4, desgaste: 0.5, relieve,
     pintura: (p) => {
       p.fondo(0.0);
       p.rect(-80, -80, 80, -52, 1, 6).rect(-80, 52, 80, 80, 1, 6).rect(-80, -80, -52, 80, 1, 6).rect(52, -80, 80, 80, 1, 6);
-      p.salpicar(-50, -50, 50, 50, 34, 0.9, 2.2, 1, 1.6);
+      p.salpicar(-50, -50, 50, 50, 90, 1.2, 3.2, 1, 2.0);
       for (const c of CRATERES) p.circulo(c.x, c.z, c.r * 0.9, 0, 2.5);
       p.rect(-38, -41, 38, -34, 0, 2).rect(-24, 20, 28, 28, 0, 2);
       p.romper(3.4, 0.55);

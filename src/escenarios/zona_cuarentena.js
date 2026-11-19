@@ -66,7 +66,7 @@ export async function construir(juego, kit) {
   // ───────────── 3. NORTE: LAS TORRES ─────────────
   const oscuro = (c) => { const k = new THREE.Color(c); k.multiplyScalar(0.42); return k.getHex(); };
   const cristal = (col, em = 0.9) => kit.mat('cristal_rascacielos', { color: oscuro(col), emisivo: em * 0.4 });
-  const zocaloTorre = { muro: kit.mat('panel_prefabricado', { color: 0x8c9fb0 }), zocalo: 'acero_cepillado', estilo: 'prefabricado', cornisa: true, pisos: 2, alto: 6.2, colorLuz: 0xbfe4ff,
+  const zocaloTorre = { muro: kit.mat('panel_prefabricado', { color: 0x8c9fb0 }), zocalo: 'acero_cepillado', estilo: 'prefabricado', cornisa: true, pisos: 2, alto: 6.2, colorLuz: 0x7fa6c4,
     ventanas: { ancho: 2.3, alto: 1.6, sep: 4.2, luz: 0.55, marcoColor: 0x20303c, marcoMaterial: 'acero_pintado', travesanos: false }, tejado: { tipo: 'plano', material: 'tela_asfaltica', equipos: 2 } };
   const fuste = (o) => kit.edificio({ estilo: 'cristal', colision: false, ventanas: false, cornisa: false, puertas: [], tejado: { tipo: 'plano', material: 'hormigon', equipos: 3, parapetoAlto: 0.4 }, ...o });
   // Torre A (noroeste): dos alas y un cuerpo trasero que dejan el vestíbulo abierto al sur
@@ -89,7 +89,7 @@ export async function construir(juego, kit) {
   for (const [bx, bz, r] of [[-20.6, -28.5, 0.4], [-21.4, -27.4, -0.5]]) { L0.anadir(caja(1.5, 0.4, 0.5, 0.08, 1), M.lonaNegra, mx(bx, 0.22, bz, r)); }
   luz({ x: -23.2, y: 3.6, z: -28, color: 0xbfe6ff, intensidad: 70, distancia: 15 });
   // Torre B (noreste)
-  const pB = kit.edificio({ ...zocaloTorre, x: 22.5, z: -35.5, ancho: 25, fondo: 17, puertas: [{ cara: 'sur', u: 3.2, ancho: 3.4, alto: 2.9, escalones: 2, arco: false, material: 'acero_cepillado' }], semilla: 21, luzPuertas: false, colorLuz: 0xbfe4ff, nombre: 'torreB' });
+  const pB = kit.edificio({ ...zocaloTorre, x: 22.5, z: -35.5, ancho: 25, fondo: 17, puertas: [{ cara: 'sur', u: 3.2, ancho: 3.4, alto: 2.9, escalones: 2, arco: false, material: 'acero_cepillado' }], semilla: 21, luzPuertas: false, colorLuz: 0x7fa6c4, nombre: 'torreB' });
   fuste({ x: 22.5, z: -36.5, ancho: 22.6, fondo: 14.4, pisos: 6, alto: 24, muro: cristal(0x75a9d4, 1.0), semilla: 4 });
   fuste({ x: 31, z: -37, ancho: 6.5, fondo: 9, pisos: 8, alto: 33, muro: cristal(0x5f96c2), semilla: 5 });
   luz({ x: pB.puertas[0].x, y: 3.3, z: pB.puertas[0].z + 0.2, color: 0xff3a2a, intensidad: 50, distancia: 11 });

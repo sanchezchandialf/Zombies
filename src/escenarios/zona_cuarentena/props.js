@@ -55,7 +55,7 @@ export function crearProps(kit) {
     rojo: mat('chapa_ondulada', { color: 0x9c3028 }), blanco: mat('chapa_ondulada', { color: 0xcdd3d6 }), verde: mat('chapa_ondulada', { color: 0x56654f }),
   };
   const PINT = {
-    blanco: mat('acero_pintado', { color: 0xd8dcdf }), plata: mat('acero_pintado', { color: 0x9aa4ab }), azul: mat('acero_pintado', { color: 0x2b4f7e }),
+    blanco: mat('acero_pintado', { color: 0xb4bec4 }), plata: mat('acero_pintado', { color: 0x9aa4ab }), azul: mat('acero_pintado', { color: 0x2b4f7e }),
     negro: mat('acero_pintado', { color: 0x2a2e33 }), taxi: mat('acero_pintado', { color: 0xd6a416 }), verdeOsc: mat('acero_pintado', { color: 0x38503f }),
     rojo: mat('acero_pintado', { color: 0x8c2328 }), militar: mat('acero_pintado', { color: 0x55614a }),
   };
