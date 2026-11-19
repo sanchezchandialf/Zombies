@@ -174,7 +174,7 @@ export async function construir(juego, kit) {
   luz({ x: tB.lampX, y: tB.lampY, z: tB.lampZ + 0.3, color: 0xf2f8ff, intensidad: 120, distancia: 26 });
   luz({ x: 0, y: 5.0, z: 22.5, color: 0xdfeeff, intensidad: 80, distancia: 18 });
   // haces de foco (conos aditivos suaves)
-  const matHaz = new THREE.MeshBasicMaterial({ color: 0xcfe6ff, transparent: true, opacity: 0.075, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  const matHaz = new THREE.MeshBasicMaterial({ color: 0xcfe6ff, transparent: true, opacity: 0.035, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
   kit._propios.push(matHaz);
   const haz = (o, d, largo = 24, r = 3.4) => {
     const g = new THREE.ConeGeometry(r, largo, 20, 1, true); g.translate(0, -largo / 2, 0);
@@ -183,7 +183,7 @@ export async function construir(juego, kit) {
     m.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), v); m.renderOrder = 5; m.name = 'haz'; m.frustumCulled = false;
     kit.anadir(m); return m;
   };
-  haz(tA, [0.35, -0.55, 0.8]); haz(tB, [-0.35, -0.55, 0.8]);
+  haz(tA, [0.4, -0.6, -0.7]); haz(tB, [-0.4, -0.6, -0.7]);
   // conos, cinta y focos del control
   P.conos([{ x: -19, z: 28.4 }, { x: -13, z: 28.4 }, { x: -8.4, z: 28.4 }, { x: 8.4, z: 28.4 }, { x: 13, z: 28.4 }, { x: 19, z: 28.4 }, { x: -3.8, z: 28.0 }, { x: 3.8, z: 28.0 }, { x: -6, z: 17.4 }, { x: 6.2, z: 17.6 }]);
   P.foco({ x: -14, z: -17.5, rot: 0.6 }); const fB = P.foco({ x: 15.5, z: 15.5, rot: -0.6 });
