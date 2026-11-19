@@ -172,7 +172,7 @@ export async function construir(juego, kit) {
   const tA = P.torre({ x: -25, z: 19.2, rot: 0.0 }), tB = P.torre({ x: 25, z: 19.2, rot: 0.0 });
   luz({ x: tA.lampX, y: tA.lampY, z: tA.lampZ + 0.3, color: 0xf2f8ff, intensidad: 120, distancia: 26 });
   luz({ x: tB.lampX, y: tB.lampY, z: tB.lampZ + 0.3, color: 0xf2f8ff, intensidad: 120, distancia: 26 });
-  luz({ x: 0, y: 5.0, z: 22.5, color: 0xdfeeff, intensidad: 80, distancia: 18 });
+  luz({ x: 0, y: 4.2, z: 18.5, color: 0xdfeeff, intensidad: 55, distancia: 18 });
   // haces de foco (conos aditivos suaves)
   const matHaz = new THREE.MeshBasicMaterial({ color: 0xcfe6ff, transparent: true, opacity: 0.035, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
   kit._propios.push(matHaz);
