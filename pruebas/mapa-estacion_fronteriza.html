@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Prueba · Estación Cruz del Diablo</title></head>
+<body><script type="module">
+// Fija era=1 (Vapor) por defecto y reutiliza la prueba común de escenarios.
+const u = new URL(location.href);
+if (!u.searchParams.has('era')) { u.searchParams.set('era', '1'); history.replaceState(null, '', u); }
+await import('./escenarios.js');
+</script></body></html>

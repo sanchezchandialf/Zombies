@@ -33,17 +33,27 @@ function diana(x, z, vida = 400) {
 const dianas = [];
 
 function limpiarTodo() { mundo.limpiar(); for (const d of dianas) { d.malla.parent?.remove(d.malla); if (d.cuerpo) fisica.eliminarCuerpo(d.cuerpo); } dianas.length = 0; juego.zombis.length = 0; juego.combate?.limpiar?.(); }
-function avanzar(seg, paso = 1 / 30) { for (let t = 0; t < seg; t += paso) { juego.tiempo.dt = paso; juego.tiempo.ahora += paso; juego.tiempo.real += paso; juego.tiempo.cuadro++; for (const s of juego._orden) { try { s.sis.actualizar?.(paso); } catch (e) { console.error(e); } } fisica.paso?.(paso); fisica.actualizar?.(paso); for (const s of juego._orden) { try { s.sis.posFisica?.(paso); } catch (e) { console.error(e); } } } }
+// Avanza la simulación a mano (sin renderizar): mundo, combate, fx y física.
+function avanzar(seg, paso = 1 / 30) {
+  const nombres = new Set(['mundo', 'combate', 'fx']);
+  const sis = juego._orden.filter((s) => nombres.has(s.nombre));
+  for (let t = 0; t < seg; t += paso) {
+    juego.tiempo.dt = paso; juego.tiempo.ahora += paso; juego.tiempo.real += paso; juego.tiempo.cuadro++;
+    for (const s of sis) if (s.nombre !== 'fx') { try { s.sis.actualizar?.(paso); } catch (e) { console.error(e); } }
+    fisica.paso(paso);
+    for (const s of sis) { try { s.sis.posFisica?.(paso); } catch (e) { console.error(e); } }
+  }
+}
 
-function exposicion(e = era) {
+function exposicion(g = juego.opciones.grupo || 'explosivos') {
   limpiarTodo();
   const tipos = ['barril_polvora', 'caja_dinamita', 'bidon_combustible', 'surtidor_gasolina', 'bombona_gas', 'celula_plasma'];
-  tipos.forEach((v, i) => gen.push(mundo.crear('explosivo', { x: -7.5 + i * 3, z: -6, variante: v, rot: 0.4 * i })));
-  for (let i = 0; i < 6; i++) mundo.crear('caja', { x: -7.5 + i * 3, z: -2.5, eraIdx: i, escala: 1, rot: 0.3 });
-  for (let i = 0; i < 6; i++) mundo.crear('empujable', { x: -7.5 + i * 3, z: 1, eraIdx: i });
-  for (let i = 0; i < 6; i++) { mundo.crear('botiquin', { x: -7.5 + i * 3, z: 4.5, eraIdx: i, duracion: 999, vx: 0, vz: 0 }); }
-  for (let i = 0; i < 6; i++) mundo.crear('municion', { x: -7.5 + i * 3, z: 7.5, eraIdx: i, duracion: 999, vx: 0, vz: 0 });
-  for (let i = 0; i < 6; i++) mundo.crear('potenciador', { x: -7.5 + i * 3, z: 10.5, eraIdx: i, duracion: 999, vx: 0, vz: 0 });
+  const fila = (z, fn) => { for (let i = 0; i < 6; i++) fn(i, -7.5 + i * 3, z); };
+  if (g === 'explosivos') fila(0, (i, x, z) => gen.push(mundo.crear('explosivo', { x, z, variante: tipos[i], rot: 0.4 * i })));
+  if (g === 'cajas') { fila(-2, (i, x, z) => mundo.crear('caja', { x, z, eraIdx: i, escala: 1, rot: 0.3 })); fila(2, (i, x, z) => mundo.crear('empujable', { x, z, eraIdx: i })); }
+  if (g === 'recogidas') for (const [t, z] of [['botiquin', -2.5], ['municion', 1], ['potenciador', 4.5]]) fila(z, (i, x, zz) => mundo.crear(t, { x, z: zz, eraIdx: i, duracion: 999, vx: 0, vz: 0 }));
+  if (g === 'barricadas') barricadas();
+  if (g === 'emplaz') emplazamiento(juego.estado.eraIdx);
   jugador.pos.set(40, 0, 40); jugador.cuerpo.x = 40;
 }
 function barricadas() { limpiarTodo(); for (let i = 0; i < 6; i++) mundo.crear('barricada', { x: -7.5 + i * 3.3 * 1.0, z: 0, rot: 0, eraIdx: i, jugador }); }

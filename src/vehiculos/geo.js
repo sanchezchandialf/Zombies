@@ -86,7 +86,7 @@ function hermite(p0, p1, p2, p3, t) {
  * Interpola con Catmull-Rom entre estaciones. Devuelve geometría indexada con normales suaves y tapas planas.
  */
 export function loft(est, { aro = 32, pasos = 8, tapas = true } = {}) {
-  const E = est.map((s) => ({ z: s.z, w: s.w, yb: s.yb, yt: s.yt, e: s.e ?? 3, eb: s.eb ?? s.e ?? 3, cx: s.cx ?? 0, cy: 0 }));
+  const E = [...est].sort((p, q) => p.z - q.z).map((s) => ({ z: s.z, w: s.w, yb: s.yb, yt: s.yt, e: s.e ?? 3, eb: s.eb ?? s.e ?? 3, cx: s.cx ?? 0, cy: 0 }));
   const n = E.length, anillos = (n - 1) * pasos + 1;
   const pos = [], idx = [];
   const val = (campo, i, t) => {
@@ -127,9 +127,6 @@ export function loft(est, { aro = 32, pasos = 8, tapas = true } = {}) {
 
 /** Guardabarros: medio toro-arco alrededor de la rueda (eje X). `a0`..`a1` en rad medidos desde +Z hacia arriba. */
 export function guardabarros(radio, ancho, grosor = 0.035, a0 = -0.35, a1 = Math.PI + 0.35, seg = 18) {
-  const pts = [];
-  const g = new THREE.CylinderGeometry(radio, radio, ancho, seg, 1, true, 0, 1);
-  g.dispose();
   // Perfil en forma de arco hueco con borde redondeado (extrusión de un anillo parcial)
   const sh = new THREE.Shape();
   const ri = radio, ro = radio + grosor;

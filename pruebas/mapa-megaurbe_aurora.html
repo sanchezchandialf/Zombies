@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Prueba · mapa Megaurbe Aurora (era 5)</title></head>
+<body>
+<script>
+  // Esta página carga siempre la era 5; admite el resto de parámetros de escenarios.html (vista, cx, cz, dist, hora, depurar, calidad…).
+  const u = new URL(location.href);
+  if (!u.searchParams.has('era')) { u.searchParams.set('era', '5'); history.replaceState(null, '', u); }
+</script>
+<script type="module" src="./escenarios.js"></script>
+</body></html>

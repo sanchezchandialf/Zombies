@@ -6,7 +6,7 @@ import { quemado } from '../mats.js';
 export function crearMuscleCar() {
   const { grupo, chasis } = base();
   const M = {
-    pintura: lib('acero_pintado', { color: 0x12b5c2, desgaste: 0.15 }),
+    pintura: lib('acero_pintado', { color: 0x12b5c2, desgaste: 0 }),
     blanco: est('mc_blanco', { color: 0xf1f0ea, roughness: 0.35, metalness: 0.3, envMapIntensity: 1.2 }),
     cromo: lib('cromo'), hierro: lib('hierro_forjado'), negro: est('mc_negro', { color: 0x101114, roughness: 0.55, metalness: 0.3 }),
     cristal: cristal(0x15222a), faro: faroMat(0xfff2d0, 3.4), luzRoja: luzRoja(2.4), goma: est('mc_goma', { color: 0x1a1a1a, roughness: 0.8 }),
@@ -43,11 +43,11 @@ export function crearMuscleCar() {
   ];
   a.add(loft(EC, { aro: 40, pasos: 10 }), M.pintura);
   const EG = [
-    { z: 0.78, w: 0.79, yb: 1.0, yt: 1.12, e: 3.2 },
-    { z: 0.50, w: 0.785, yb: 1.0, yt: 1.30, e: 3.4 },
-    { z: -0.2, w: 0.765, yb: 1.0, yt: 1.40, e: 4 },
-    { z: -0.9, w: 0.765, yb: 1.0, yt: 1.36, e: 4 },
-    { z: -1.35, w: 0.8, yb: 1.0, yt: 1.2, e: 3.4 },
+    { z: 0.74, w: 0.815, yb: 1.02, yt: 1.10, e: 3.2 },
+    { z: 0.45, w: 0.80, yb: 1.02, yt: 1.25, e: 3.4 },
+    { z: -0.2, w: 0.785, yb: 1.02, yt: 1.34, e: 4 },
+    { z: -0.9, w: 0.785, yb: 1.02, yt: 1.31, e: 4 },
+    { z: -1.4, w: 0.815, yb: 1.02, yt: 1.14, e: 3.4 },
   ];
   a.add(loft(EG, { aro: 40, pasos: 10 }), M.cristal);
   // franjas de carrera blancas (capó, techo, maletero)

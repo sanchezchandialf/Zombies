@@ -701,6 +701,6 @@ for (let i = 0; i < 6; i++) {
 }
 
 // Calibración de ganancias (según pruebas/audio.html: pico < 1 con y sin reverb)
-Object.entries({ lanzacohetes: 0.62, lanzallamas: 0.6, explosion_pequena: 0.42, explosion: 0.5, explosion_grande: 0.42, explosion_polvora: 0.5, explosion_dinamita: 0.5, explosion_energia: 0.45, jugador_caido: 0.4, oleada_anuncio: 0.5, canon_riel: 0.52, tren: 0.68 }).forEach(([n, g]) => { EFECTOS[n].g = g; });
+Object.entries({ lanzacohetes: 0.62, lanzallamas: 0.6, explosion_pequena: 0.42, explosion: 0.5, explosion_grande: 0.42, explosion_polvora: 0.5, explosion_dinamita: 0.5, explosion_energia: 0.45, jugador_caido: 0.4, oleada_anuncio: 0.5, canon_riel: 0.52, tren: 0.68, atropello: 0.55, choque_vehiculo: 0.55, molotov: 0.6, proyector_ondas: 0.6, impacto_suelo: 0.5 }).forEach(([n, g]) => { EFECTOS[n].g = g; });
 
 export const NOMBRES_EFECTOS = Object.keys(EFECTOS);
