@@ -282,7 +282,7 @@ export async function construir(juego, kit) {
     inicioJugadores: [{ x: -1.5, z: 4 }, { x: 1.5, z: 4 }],
     puntosAparicion: [
       { x: -42, z: -22, tipo: 'borde' }, { x: -42, z: 6, tipo: 'borde' }, { x: -42, z: 32, tipo: 'borde' },
-      { x: 42, z: -2, tipo: 'borde' }, { x: 42, z: 14, tipo: 'borde' }, { x: 42, z: 34, tipo: 'borde' },
+      { x: 42, z: -2, tipo: 'borde' }, { x: 42, z: 22, tipo: 'borde' }, { x: 42, z: 34, tipo: 'borde' },
       { x: -34, z: -41, tipo: 'borde' }, { x: 0, z: -41, tipo: 'borde' }, { x: 34, z: -41, tipo: 'borde' },
       { x: -22, z: 42, tipo: 'borde' }, { x: 2, z: 42, tipo: 'borde' }, { x: 22, z: 42, tipo: 'borde' },
       { x: -24, z: -9.4, tipo: 'interior', peso: 0.6 },        // puertas batientes del saloon

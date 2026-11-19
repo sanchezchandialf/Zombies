@@ -50,4 +50,13 @@ export function placa(a, M, x, y, z, rotY = 0, w = 0.36, h = 0.18) {
   a.add(caja(w, h, 0.012, 0.004, 1), est('placa', { color: 0xe8e0c0, roughness: 0.5, metalness: 0.1 }), mat4(x, y, z, 0, rotY, 0));
 }
 
+/** Convierte el modelo en un resto calcinado (materiales quemados, cristales fuera, torreta ladeada). */
+export function restosMetal(m, extra) {
+  m.chasis.traverse((o) => { if (o.isMesh) { if (o.material.transparent) o.visible = false; else if (!o.userData.conservar) o.material = quemado(); } });
+  m.chasis.rotation.z = 0.06; m.chasis.position.y = -0.05;
+  if (m.arma) { m.arma.yaw.rotation.y = 0.7; m.arma.yaw.rotation.z = 0.12; }
+  for (const r of m.ruedas) if (r.virar) r.virar.rotation.y = (Math.random() - 0.5) * 0.4;
+  extra?.();
+}
+
 export { THREE, Acum, loft, caja, cilX, cilZ, T, tubo, torno, esfera, barra, lib, est, cristal, faroMat, luzRoja, neum, quemado, brasa };
