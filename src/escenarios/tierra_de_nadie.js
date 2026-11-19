@@ -44,9 +44,10 @@ export async function construir(juego, kit) {
     return (h + ruido) * Math.min(1, d / 2.5);
   };
   kit.suelo({
-    tam: 160, material: 'barro', mezcla: 'tierra', mojado: 0.12, contraste: 2.8, semilla: 4, desgaste: 0.5, relieve,
+    tam: 160, material: 'tierra', mezcla: 'barro', mojado: 0.2, contraste: 2.8, semilla: 4, desgaste: 0.5, relieve,
     pintura: (p) => {
       p.fondo(0.0);
+      p.salpicar(-52, -52, 52, 52, 110, 2.5, 6, 1, 2.5);
       p.rect(-80, -80, 80, -52, 1, 6).rect(-80, 52, 80, 80, 1, 6).rect(-80, -80, -52, 80, 1, 6).rect(52, -80, 80, 80, 1, 6);
       p.salpicar(-50, -50, 50, 50, 90, 1.2, 3.2, 1, 2.0);
       for (const c of CRATERES) p.circulo(c.x, c.z, c.r * 0.9, 0, 2.5);
