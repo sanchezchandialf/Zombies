@@ -5,11 +5,13 @@
 // Devuelve un resumen: eventos contados, errores capturados, estado final, rendimiento de la simulación.
 
 const PASO = 1 / 30;
+const BOT = { pasivo: false };
 
 export async function correr(o = {}) {
   const juego = window.juego;
   const segundos = o.segundos ?? 60;
   const dibujar = !!o.dibujar;
+  BOT.pasivo = !!o.pasivo; // no dispara: deja que la horda se acerque (fotos)
   const errores = [];
   const contar = {};
   const t0 = performance.now();
@@ -105,10 +107,10 @@ function intencionBot(juego, j, t) {
     // ametrallar en círculo
     out.moverX = -dz / l * 0.7; out.moverZ = dx / l * 0.7;
   }
-  out.disparar = md < 30 && (Math.floor(t * 8) % 2 === 0 || j.arma?.def?.auto);
+  out.disparar = !BOT.pasivo && md < 30 && (Math.floor(t * 8) % 2 === 0 || j.arma?.def?.auto);
   if (j.arma && j.arma.municion === 0 && !j.arma.recargando) out.recargar = true;
   if (md < 2.2) { out.esquivar = true; out.cuerpo = true; }
-  if (md < 9 && juego.zombis.length > 6) out.habilidad = true;
-  if (md < 14 && juego.zombis.length > 10 && Math.floor(t) % 7 === 0) out.lanzar = true;
+  if (!BOT.pasivo && md < 9 && juego.zombis.length > 6) out.habilidad = true;
+  if (!BOT.pasivo && md < 14 && juego.zombis.length > 10 && Math.floor(t) % 7 === 0) out.lanzar = true;
   return out;
 }
