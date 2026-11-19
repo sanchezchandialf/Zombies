@@ -183,8 +183,12 @@ export function crearEdificios(kit, U) {
     const x0 = mx - MW / 2, zS2 = mz + MD / 2, zN2 = mz - MD / 2;
     const blanco = pint(0xf3f3ee, { desgaste: 0.2 }), turq = pint(0x2fc9bd);
     base(blanco, mx, alto - 0.5, mz, MW, 0.5, MD, { radio: 0.05 });
-    base(turq, mx, alto - 0.12, mz, MW + 0.3, 0.52, MD + 0.3, { radio: 0.05 });
-    for (let i = 0; i < 9; i++) base(i % 2 ? pint(0xff7ac0) : pint(0xf3f3ee), x0 + 0.9 + i * (MW - 1.8) / 8, alto + 0.4, mz, 0.9, 0.04, MD - 0.4, { radio: 0.01, uv: false });
+    for (const s of [-1, 1]) {
+      base(turq, mx, alto - 0.55, mz + s * (MD / 2 + 0.1), MW + 0.3, 0.8, 0.2, { radio: 0.04 });
+      base(turq, mx + s * (MW / 2 + 0.1), alto - 0.55, mz, 0.2, 0.8, MD, { radio: 0.04 });
+    }
+    base(blanco, mx, alto - 0.05, mz, MW + 0.1, 0.12, MD + 0.1, { radio: 0.03 });
+    for (const dz of [-2.1, 2.1]) base(pint(0xff7ac0), mx, alto + 0.07, mz + dz, MW - 1.2, 0.04, 0.35, { radio: 0.01, uv: false });
     base(cepillado, mx, alto + 0.42, mz, 2.2, 0.35, 1.5, { radio: 0.04 });
     for (const s of [-1, 1]) caja(kit.emisivo(TURQUESA, 2.8), mx, alto - 0.12 + 0.0, mz + s * (MD / 2 + 0.17), MW + 0.3, 0.08, 0.04, { uv: false, radio: 0.01 });
     for (const s of [-1, 1]) caja(kit.emisivo(ROSA, 2.6), mx + s * (MW / 2 + 0.17), alto - 0.12, mz, 0.04, 0.08, MD + 0.3, { uv: false, radio: 0.01 });

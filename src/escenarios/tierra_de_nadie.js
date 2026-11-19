@@ -44,12 +44,12 @@ export async function construir(juego, kit) {
     return (h + ruido) * Math.min(1, d / 2.5);
   };
   kit.suelo({
-    tam: 160, material: 'tierra', mezcla: 'barro', mojado: 0.2, contraste: 2.8, semilla: 4, desgaste: 0.5, relieve,
+    tam: 160, material: 'tierra', mezcla: 'hierba', mojado: 0.25, contraste: 2.2, semilla: 4, desgaste: 0.5, relieve,
     pintura: (p) => {
       p.fondo(0.0);
-      p.salpicar(-52, -52, 52, 52, 110, 2.5, 6, 1, 2.5);
+      
       p.rect(-80, -80, 80, -52, 1, 6).rect(-80, 52, 80, 80, 1, 6).rect(-80, -80, -52, 80, 1, 6).rect(52, -80, 80, 80, 1, 6);
-      p.salpicar(-50, -50, 50, 50, 90, 1.2, 3.2, 1, 2.0);
+      p.salpicar(-50, -50, 50, 50, 40, 0.9, 2.4, 1, 3);
       for (const c of CRATERES) p.circulo(c.x, c.z, c.r * 0.9, 0, 2.5);
       p.rect(-38, -41, 38, -34, 0, 2).rect(-24, 20, 28, 28, 0, 2);
       p.romper(3.4, 0.55);
