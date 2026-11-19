@@ -657,8 +657,9 @@ export function crearDirector(juego) {
   /** Mata a todos los zombis de la oleada y cancela lo que quede por aparecer (la oleada termina sola). */
   function mataEsbirros() {
     if (!W) return;
+    // Lo que ya estaba en la cola de aparición también cuenta en porGenerar: hay que descontarlo.
+    let descartados = W.cola.length;
     W.cola.length = 0;
-    let descartados = 0;
     for (let i = W.idx; i < W.pulsos.length; i++) { for (const u of W.pulsos[i].unidades) descartados += u.length; W.pulsos[i].unidades.length = 0; }
     W.idx = W.pulsos.length;
     const noJefe = W.jefeId && !W.jefeSpawned ? 1 : 0;
@@ -668,10 +669,16 @@ export function crearDirector(juego) {
     const combate = sis('combate');
     for (const z of [...W.vivos]) {
       try {
-        const info = { cantidad: 1e7, tipo: 'energia', atacante: null, arma: null, x: z.pos?.x ?? 0, z: z.pos?.z ?? 0, dirX: 0, dirZ: 0, empuje: 0, critico: false };
+        // ignorarInvulnerable: los que aún están emergiendo del suelo también deben morir.
+        const info = { cantidad: 1e7, tipo: 'energia', atacante: null, arma: null, x: z.pos?.x ?? 0, z: z.pos?.z ?? 0, dirX: 0, dirZ: 0, empuje: 0, critico: false, ignorarInvulnerable: true };
         if (combate?.aplicarDanio) combate.aplicarDanio(z, info); else z.recibirDanio?.(info);
       } catch (e) { console.error('[director] matarTodos', e); }
-      if (z.vivo !== false) { W.vivos.delete(z); try { z.visual?.liberar?.(); } catch { /* sin visual */ } }
+      if (z.vivo !== false) {
+        // No murió (inmune): se retira del todo, también de juego.zombis, para que no quede un zombi fantasma.
+        W.vivos.delete(z);
+        try { if (z.liberar) z.liberar(); else z.visual?.liberar?.(); } catch { /* sin visual */ }
+        const i = juego.zombis.indexOf(z); if (i >= 0) juego.zombis.splice(i, 1);
+      }
     }
     sincronizar();
   }
