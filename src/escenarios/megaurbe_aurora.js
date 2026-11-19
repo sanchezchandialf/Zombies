@@ -222,11 +222,11 @@ export async function construir(juego, kit) {
   // ═════════════ 4. EDIFICIOS ═════════════
   const lucesTorre = { luzPuertas: false, colorLuz: CIAN };
   const torreNW = kit.edificio({ x: -29, z: -24, ancho: 13, fondo: 10, pisos: 3, alto: 10, estilo: 'futurista', colorMuro: MAGENTA, ...lucesTorre,
-    puertas: [{ cara: 'sur', u: -2.5, ancho: 2.4, alto: 2.8 }], ventanas: { ancho: 1.8, alto: 1.2, sep: 3.2, luz: 0.85, marcoColor: 0x1a2430 }, semilla: 11, nombre: 'torre_nw' });
+    puertas: [{ cara: 'sur', u: -2.5, ancho: 2.4, alto: 2.8, material: 'casco_nave', color: 0x1d2433 }], ventanas: { ancho: 1.8, alto: 1.2, sep: 3.2, luz: 0.85, marcoColor: 0x1a2430 }, semilla: 11, nombre: 'torre_nw' });
   const torreNE = kit.edificio({ x: 34, z: -33, ancho: 12, fondo: 10, pisos: 3, alto: 12, estilo: 'futurista', colorMuro: CIAN, ...lucesTorre,
-    puertas: [{ cara: 'sur', u: 2, ancho: 2.4, alto: 2.8 }], ventanas: { ancho: 1.8, alto: 1.2, sep: 3.4, luz: 0.8, marcoColor: 0x1a2430 }, semilla: 12, nombre: 'torre_ne' });
+    puertas: [{ cara: 'sur', u: 2, ancho: 2.4, alto: 2.8, material: 'casco_nave', color: 0x1d2433 }], ventanas: { ancho: 1.8, alto: 1.2, sep: 3.4, luz: 0.8, marcoColor: 0x1a2430 }, semilla: 12, nombre: 'torre_ne' });
   const terminal = kit.edificio({ x: -30, z: 25, ancho: 14, fondo: 8, pisos: 1, alto: 4.8, estilo: 'futurista', colorMuro: VIOLETA, ...lucesTorre,
-    puertas: [{ cara: 'sur', u: -3, ancho: 3, alto: 3.2 }, { cara: 'sur', u: 3.2, ancho: 3, alto: 3.2 }], ventanas: { ancho: 2.2, alto: 1.1, sep: 3.8, luz: 0.9 }, semilla: 13, nombre: 'terminal' });
+    puertas: [{ cara: 'sur', u: -3, ancho: 3, alto: 3.2, material: 'casco_nave', color: 0x1d2433 }, { cara: 'sur', u: 3.2, ancho: 3, alto: 3.2, material: 'casco_nave', color: 0x1d2433 }], ventanas: { ancho: 2.2, alto: 1.1, sep: 3.8, luz: 0.9 }, semilla: 13, nombre: 'terminal' });
   for (const b of [torreNW, torreNE, terminal]) {
     const y = b.techoY, P = (lx, lz) => b.aMundo(lx, lz);
     // luz de borde en la azotea (los parapetos brillan)

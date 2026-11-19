@@ -64,7 +64,8 @@ export async function construir(juego, kit) {
   for (const [x0, x1] of [[-20, -12.3], [-8.7, 8.7], [12.3, 20]]) marca(M.pintBlanca, (x0 + x1) / 2, 28.3, x1 - x0, 0.4);
   for (const x of [-16, -5, 5, 16]) { marca(M.pintBlanca, x, 31.2, 0.22, 2.4); marca(M.pintBlanca, x - 0.35, 29.9, 0.22, 0.8, 0.8); marca(M.pintBlanca, x + 0.35, 29.9, 0.22, 0.8, -0.8); }
   // ───────────── 3. NORTE: LAS TORRES ─────────────
-  const cristal = (col, em = 0.9) => kit.mat('cristal_rascacielos', { color: col, emisivo: em });
+  const oscuro = (c) => { const k = new THREE.Color(c); k.multiplyScalar(0.42); return k.getHex(); };
+  const cristal = (col, em = 0.9) => kit.mat('cristal_rascacielos', { color: oscuro(col), emisivo: em * 0.4 });
   const zocaloTorre = { muro: kit.mat('panel_prefabricado', { color: 0x8c9fb0 }), zocalo: 'acero_cepillado', estilo: 'prefabricado', cornisa: true, pisos: 2, alto: 6.2, colorLuz: 0xbfe4ff,
     ventanas: { ancho: 2.3, alto: 1.6, sep: 4.2, luz: 0.55, marcoColor: 0x20303c, marcoMaterial: 'acero_pintado', travesanos: false }, tejado: { tipo: 'plano', material: 'tela_asfaltica', equipos: 2 } };
   const fuste = (o) => kit.edificio({ estilo: 'cristal', colision: false, ventanas: false, cornisa: false, puertas: [], tejado: { tipo: 'plano', material: 'hormigon', equipos: 3, parapetoAlto: 0.4 }, ...o });

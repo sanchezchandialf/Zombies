@@ -44,12 +44,11 @@ export async function construir(juego, kit) {
     return (h + ruido) * Math.min(1, d / 2.5);
   };
   kit.suelo({
-    tam: 160, material: 'barro', mezcla: 'hierba', mojado: 0.35, contraste: 2.2, semilla: 4, desgaste: 0.5, relieve,
+    tam: 160, material: 'barro', mezcla: 'hierba', mojado: 0.35, contraste: 2.8, semilla: 4, desgaste: 0.5, relieve,
     pintura: (p) => {
-      p.fondo(0.06);
+      p.fondo(0.0);
       p.rect(-80, -80, 80, -52, 1, 6).rect(-80, 52, 80, 80, 1, 6).rect(-80, -80, -52, 80, 1, 6).rect(52, -80, 80, 80, 1, 6);
-      p.salpicar(-50, -50, 50, 50, 70, 1.6, 4.5, 1, 2.2);
-      p.circulo(-28, 2, 7, 1, 3).circulo(30, 34, 7, 1, 3).circulo(-40, -15, 6, 1, 3).circulo(8, 30, 5, 1, 3);
+      p.salpicar(-50, -50, 50, 50, 34, 0.9, 2.2, 1, 1.6);
       for (const c of CRATERES) p.circulo(c.x, c.z, c.r * 0.9, 0, 2.5);
       p.rect(-38, -41, 38, -34, 0, 2).rect(-24, 20, 28, 28, 0, 2);
       p.romper(3.4, 0.55);
@@ -232,8 +231,8 @@ export async function construir(juego, kit) {
   CRATERES.forEach((c, i) => kit.parche({ tipo: 'charco', x: c.x + rng.rango(-0.4, 0.4), z: c.z + rng.rango(-0.4, 0.4), radio: c.r * rng.rango(0.42, 0.62), rot: rng() * 6, color: 0x2b3a30, semilla: i }));
   kit.parches({ tipo: 'charco', area: { x0: -42, z0: -34, x1: 42, z1: 42 }, cantidad: 16, radio: [0.8, 2.2], evitar: [...evitarParche, { x: 0, z: 0, r: 6 }], color: 0x27322d, semilla: 7 });
   // manchas de barro oscuro y quemaduras
-  kit.parches({ tipo: 'mancha', area: { x0: -44, z0: -40, x1: 44, z1: 42 }, cantidad: 18, radio: [2.5, 5.5], evitar: evitarParche, color: 0x2e281d, opacidad: 0.3, semilla: 31 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -38, x1: 42, z1: 40 }, cantidad: 16, radio: [0.8, 1.8], evitar: evitarParche, color: 0x1d1a15, opacidad: 0.5, semilla: 8 });
+  kit.parches({ tipo: 'mancha', area: { x0: -44, z0: -40, x1: 44, z1: 42 }, cantidad: 10, radio: [2.5, 5.5], evitar: evitarParche, color: 0x2e281d, opacidad: 0.25, semilla: 31 });
+  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -38, x1: 42, z1: 40 }, cantidad: 7, radio: [0.7, 1.4], evitar: evitarParche, color: 0x1d1a15, opacidad: 0.4, semilla: 8 });
   // gas amarillento a ras de suelo en las zonas bajas
   for (const [i, c] of CRATERES.slice(0, 9).entries()) kit.parche({ tipo: 'mancha', x: c.x, z: c.z, radio: c.r * 1.35, rot: i, color: 0xa7a24a, opacidad: 0.2, capa: 3, semilla: i });
   kit.parche({ tipo: 'mancha', x: 0, z: -36.5, radio: 10, alargado: 3, color: 0xa7a24a, opacidad: 0.16, capa: 3 });
