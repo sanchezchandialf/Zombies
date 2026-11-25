@@ -22,7 +22,7 @@ export async function construir(juego, kit) {
   const eraIdx = kit.eraIdx ?? IDX, era = ERAS[eraIdx] ?? ERAS[IDX];
   const rng = kit.rng(77);
   await kit.precargar(['tierra', 'arena', 'gravilla_via', 'tablones', 'tablas_viejas', 'tablas_pintadas', 'chapa_ondulada', 'hierro_forjado',
-    'hierro_oxidado', 'laton_bronce', 'silleria', 'hormigon', 'paja', 'saco_arena', 'lona', 'agua', 'troncos', 'hierba', 'cuero', 'cuerda']);
+    'hierro_oxidado', 'pizarra', 'laton_bronce', 'silleria', 'hormigon', 'paja', 'saco_arena', 'lona', 'agua', 'troncos', 'hierba', 'cuero', 'cuerda']);
   const M = (n, o) => kit.mat(n, o);
   const L = kit.lote0;
   const mm = (m, ...r) => new THREE.Matrix4().multiplyMatrices(m, matriz(...r));
@@ -141,15 +141,34 @@ export async function construir(juego, kit) {
   // Herrería (sur-oeste): cobertizo de chapa con fragua al aire libre
   const herreria = kit.edificio({
     x: -30, z: 24, ancho: 10, fondo: 8, pisos: 1, alto: 4.2, estilo: 'industrial', muro: 'tablas_viejas', colorMuro: 0x5b4b3d,
-    tejado: { tipo: 'dos_aguas', material: 'chapa_ondulada', color: 0x45474a, alero: 0.6, pendiente: 0.22, chimenea: { x: -3, z: -1, alto: 2 } },
+    tejado: { tipo: 'dos_aguas', material: 'pizarra', color: 0x5a5d60, alero: 0.6, pendiente: 0.22, chimenea: { x: -3, z: -1, alto: 2 } },
     ventanas: { marcoColor: 0x2c2a28, ancho: 1.1, alto: 1.2, sep: 3.4, luz: 0.8, postigos: false },
     puertas: [{ cara: 'sur', u: -2, ancho: 2.8, alto: 2.8, escalones: 0 }], semilla: 21, nombre: 'herreria',
   });
   rect(-35.3, 19.8, -24.7, 28.2, 0.4);
   cart.poner('herreria', -33, 3.5, 28.05, 3.6, 0.9, 0, 0.1);
   // Fragua exterior al este del taller
-  L.caja(M('silleria', { color: 0x6e665c }), -22.5, 0.5, 25, 2.2, 1.0, 1.6, { radio: 0.05 }); kit.muro(-22.5, 25, 2.2, 1.6, 0, { nombre: 'fragua' });
-  L.caja(kit.emisivo(0xff7a2a, 3.2), -22.5, 1.02, 25, 1.4, 0.06, 0.9, { radio: 0.02, uv: false });
+  {
+    const pied = M('silleria', { color: 0x8a8070 }), pied2 = M('silleria', { color: 0x6e665c }), hier = M('hierro_forjado');
+    L.caja(pied, -22.5, 0.45, 25, 2.2, 0.9, 1.6, { radio: 0.05 }); kit.muro(-22.5, 25, 2.2, 1.6, 0, { nombre: 'fragua' });
+    // brasero: reborde de sillares, lecho de carbón negro y brasas incandescentes (varias piezas, no un solo rectángulo)
+    for (const [bx, bz, w, h] of [[0, -0.62, 1.9, 0.14], [0, 0.62, 1.9, 0.14], [-0.92, 0, 0.14, 1.1], [0.92, 0, 0.14, 1.1]]) L.caja(pied2, -22.5 + bx, 0.98, 25 + bz, w, 0.16, h, { radio: 0.03 });
+    L.caja(M('hierro_forjado', { color: 0x1c1a19 }), -22.5, 0.93, 25, 1.7, 0.06, 1.1, { radio: 0.02 });
+    for (let i = 0; i < 14; i++) {
+      const bx = -22.5 + rng.rango(-0.72, 0.72), bz = 25 + rng.rango(-0.4, 0.4), w = rng.rango(0.14, 0.3);
+      L.caja(i % 3 === 0 ? kit.emisivo(0xffb03a, 4.2) : i % 3 === 1 ? kit.emisivo(0xff5a1a, 3.2) : M('hierro_forjado', { color: 0x14110f }), bx, 0.99 + rng() * 0.05, bz, w, 0.09 + rng() * 0.05, w * rng.rango(0.7, 1.1), { radio: 0.02, rotY: rng() * 3, uv: false });
+    }
+    // campana de la fragua: faldón inclinado de chapa sobre el brasero y tobera del fuelle
+    L.caja(hier, -22.5, 1.75, 25.55, 2.1, 0.08, 1.2, { radio: 0.02, rotX: 0.55, uv: false });
+    L.caja(M('hierro_oxidado'), -22.5, 2.05, 25.9, 2.2, 0.9, 0.12, { radio: 0.02, uv: false });
+    L.caja(M('cuero', { color: 0x5a3b26 }), -23.9, 0.7, 24.6, 0.5, 0.3, 0.9, { radio: 0.1, rotY: 0.3, uv: false });      // fuelle
+    L.caja(hier, -23.5, 0.8, 24.85, 0.5, 0.06, 0.06, { radio: 0.01, rotY: 0.25, uv: false });
+    // cubo de agua de temple, carbón y herraduras colgadas
+    L.anadir(kit.cilindro(0.32, 0.38, 0.5, 12, 0.02), M('tablas_viejas', { color: 0x6b5238 }), matriz(-21.1, 0, 24.4), { uv: false });
+    L.anadir(kit.cilindro(0.3, 0.3, 0.02, 12, 0.005), kit.mat('agua', { color: 0x24323a }), matriz(-21.1, 0.46, 24.4), { uv: false });
+    for (let i = 0; i < 7; i++) L.caja(M('hierro_forjado', { color: 0x1d1b1a }), -21.0 + rng.rango(-0.5, 0.5), 0.1 + rng() * 0.06, 26.2 + rng.rango(-0.3, 0.3), rng.rango(0.15, 0.3), 0.12, rng.rango(0.15, 0.25), { radio: 0.03, rotY: rng() * 3, uv: false });
+    for (let i = 0; i < 4; i++) L.caja(hier, -23.3 + i * 0.32, 2.3, 26.0, 0.18, 0.04, 0.18, { radio: 0.015, rotX: 1.4, uv: false });
+  }
   L.cajaBase(M('hierro_forjado'), -22.5, 0, 22.6, 0.7, 0.8, 0.5, { radio: 0.04 }); kit.muro(-22.5, 22.6, 0.7, 0.5, 0, { nombre: 'yunque' });
   L.caja(M('hierro_forjado'), -22.5, 0.88, 22.6, 1.0, 0.14, 0.34, { radio: 0.03 });
   L.cajaBase(M('silleria', { color: 0x6e665c }), -22.5, 0, 26.6, 0.9, 1.9, 0.9);        // chimenea de la fragua
@@ -483,17 +502,29 @@ function crearCarteles(kit) {
 
 // ═════════════════════ humo y vapor animados ═════════════════════
 function crearHumo(kit, { x, y, z, n = 8, color = 0xffffff, opac = 0.5, alto = 5, r = 0.4 }) {
-  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: opac, depthWrite: false, fog: true });
-  const mesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), mat, n);
+  // volutas blandas: planos con degradado radial orientados a la cámara (antes eran icosaedros con borde duro)
+  const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+  const g2 = cv.getContext('2d');
+  for (let k = 0; k < 5; k++) {
+    const cx = 64 + Math.sin(k * 2.3) * 22, cy = 64 + Math.cos(k * 1.7) * 22, rr = 30 + (k % 3) * 8;
+    const gr = g2.createRadialGradient(cx, cy, 0, cx, cy, rr);
+    gr.addColorStop(0, 'rgba(255,255,255,0.55)'); gr.addColorStop(0.5, 'rgba(255,255,255,0.28)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g2.fillStyle = gr; g2.beginPath(); g2.arc(cx, cy, rr, 0, 6.2832); g2.fill();
+  }
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  const mat = new THREE.MeshBasicMaterial({ color, map: tex, transparent: true, opacity: opac, depthWrite: false, fog: true });
+  const geo = new THREE.PlaneGeometry(2, 2); geo.rotateX(-0.95);
+  const mesh = new THREE.InstancedMesh(geo, mat, n);
   mesh.frustumCulled = false; mesh.castShadow = false; mesh.name = 'humo'; mesh.renderOrder = 5;
-  kit.anadir(mesh); kit._propios.push(mat);
+  kit.anadir(mesh); kit._propios.push(mat, tex);
   const d = new THREE.Object3D();
   const fase = Array.from({ length: n }, (_, i) => i / n), sem = Array.from({ length: n }, (_, i) => ((i * 7919) % 100) / 100);
   return (t) => {
     for (let i = 0; i < n; i++) {
       const p = (t * 0.14 + fase[i]) % 1;
-      const esc = r * (0.5 + p * 2.4) * (p > 0.78 ? (1 - p) / 0.22 : 1);
+      const esc = r * (0.8 + p * 3.0) * (p > 0.7 ? (1 - p) / 0.3 : 1) * (p < 0.12 ? p / 0.12 : 1);
       d.position.set(x + p * 2.2 + Math.sin(t * 0.6 + i) * 0.15 * p, y + p * alto, z + (sem[i] - 0.5) * 0.5 * p);
+      d.rotation.set(0, 0, sem[i] * 6.28 + t * 0.1);
       d.scale.setScalar(Math.max(0.001, esc)); d.updateMatrix();
       mesh.setMatrixAt(i, d.matrix);
     }
