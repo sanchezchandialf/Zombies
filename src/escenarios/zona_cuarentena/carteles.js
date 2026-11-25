@@ -69,7 +69,7 @@ function pintarAtlas() {
   texto(g, 'BIOLÓGICO', c.x + 340, c.y + 164, 60, '#141414', 280);
   // PROHIBIDO EL PASO
   c = CELDAS.prohibido;
-  g.fillStyle = '#f4f4f2'; g.fillRect(c.x, c.y, c.w, c.h);
+  g.fillStyle = '#d4d4d0'; g.fillRect(c.x, c.y, c.w, c.h);
   g.fillStyle = '#c8161d'; g.fillRect(c.x, c.y, c.w, 78);
   texto(g, 'PROHIBIDO', c.x + c.w / 2, c.y + 40, 54, '#ffffff', 440);
   texto(g, 'EL PASO', c.x + c.w / 2, c.y + 142, 84, '#c8161d', 440);
@@ -77,7 +77,7 @@ function pintarAtlas() {
   marco(g, c, '#c8161d', 8);
   // HOSPITAL DE CAMPAÑA
   c = CELDAS.hospital;
-  g.fillStyle = '#eef6fb'; g.fillRect(c.x, c.y, c.w, c.h);
+  g.fillStyle = '#cfdce5'; g.fillRect(c.x, c.y, c.w, c.h);
   g.fillStyle = '#0f6fb4'; g.fillRect(c.x, c.y, c.w, 64);
   texto(g, 'HOSPITAL DE CAMPAÑA', c.x + c.w / 2, c.y + 34, 40, '#ffffff', 470);
   g.fillStyle = '#d8232a'; g.fillRect(c.x + 36, c.y + 118, 100, 34 + 0); g.fillRect(c.x + 69, c.y + 85, 34, 100);
@@ -94,7 +94,7 @@ function pintarAtlas() {
 export function crearCarteles(kit, matTrasera) {
   const mapa = new THREE.Texture(pintarAtlas());
   mapa.colorSpace = THREE.SRGBColorSpace; mapa.anisotropy = 4; mapa.needsUpdate = true;
-  const mat = new THREE.MeshStandardMaterial({ map: mapa, emissiveMap: mapa, emissive: new THREE.Color(0x6a7480), emissiveIntensity: 0.55, roughness: 0.5, metalness: 0.1 });
+  const mat = new THREE.MeshStandardMaterial({ map: mapa, emissiveMap: mapa, emissive: new THREE.Color(0x6a7480), emissiveIntensity: 0.14, roughness: 0.78, metalness: 0 });
   mat.name = 'carteles';
   kit._propios.push({ dispose() { mapa.dispose(); mat.dispose(); } });
   const pos = [], uv = [], nor = [], idx = [];

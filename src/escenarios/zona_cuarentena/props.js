@@ -1,5 +1,6 @@
 // ERA Z · Zona de Cuarentena 7 · Constructores de props (vehículos, carpas, torres, contenedores…). Todo va a lotes fusionados.
 import * as THREE from 'three';
+import { crearPintura } from '../suburbio_neon/pintura.js';
 
 const mul = (a, b) => new THREE.Matrix4().multiplyMatrices(a, b);
 
@@ -7,6 +8,7 @@ export function crearProps(kit) {
   const mat = (n, o) => kit.mat(n, o);
   const mx = kit.matriz;
   const L0 = kit.lote0;
+  const pintura = crearPintura(kit);
   const caja = kit.cajaRedondeada;
 
   // ─── materiales de la paleta (azul clínico · rojo de emergencia · focos blancos · cristal) ───
@@ -19,8 +21,9 @@ export function crearProps(kit) {
     hierro: mat('hierro_forjado'),
     oxido: mat('hierro_oxidado'),
     goma: mat('goma', { color: 0x1d1f21 }),
-    lonaBlanca: mat('yeso', { color: 0xf1f5f8 }),
-    lonaTecho: mat('yeso', { color: 0xdbe6ee }),
+    lonaBlanca: mat('yeso', { color: 0xc7d1d8 }),
+    lonaTecho: mat('yeso', { color: 0xa4b0ba }),
+    lonaCostura: mat('yeso', { color: 0x6d7a85 }),
     lonaAzul: mat('lona', { color: 0x2c77b8 }),
     lonaVerde: mat('lona', { color: 0x5d6a4e }),
     lonaNegra: mat('lona', { color: 0x1c2024 }),
@@ -31,10 +34,10 @@ export function crearProps(kit) {
     prefab: mat('panel_prefabricado', { color: 0xaab5be }),
     placa: mat('placa_antideslizante', { color: 0x66727c }),
     rejilla: mat('rejilla', { color: 0x59646d }),
-    verde: mat('acero_pintado', { color: 0x3f4d3a }),
-    bomberoRojo: mat('acero_pintado', { color: 0xb3262b }),
-    azulMetal: mat('acero_pintado', { color: 0x2d5f95 }),
-    cremaMetal: mat('acero_pintado', { color: 0xd9dde0 }),
+    verde: pintura(0x3f4d3a),
+    bomberoRojo: pintura(0xb3262b),
+    azulMetal: pintura(0x2d5f95),
+    cremaMetal: pintura(0xd9dde0),
     emBlanco: kit.emisivo(0xfff6e8, 4.2),
     emFrio: kit.emisivo(0xcfe8ff, 3.2),
     emAzul: kit.emisivo(0x7cc8ff, 2.2),
@@ -55,9 +58,9 @@ export function crearProps(kit) {
     rojo: mat('chapa_ondulada', { color: 0x9c3028 }), blanco: mat('chapa_ondulada', { color: 0xcdd3d6 }), verde: mat('chapa_ondulada', { color: 0x56654f }),
   };
   const PINT = {
-    blanco: mat('acero_pintado', { color: 0xb4bec4 }), plata: mat('acero_pintado', { color: 0x9aa4ab }), azul: mat('acero_pintado', { color: 0x2b4f7e }),
-    negro: mat('acero_pintado', { color: 0x2a2e33 }), taxi: mat('acero_pintado', { color: 0xd6a416 }), verdeOsc: mat('acero_pintado', { color: 0x38503f }),
-    rojo: mat('acero_pintado', { color: 0x8c2328 }), militar: mat('acero_pintado', { color: 0x55614a }),
+    blanco: pintura(0xb4bec4), plata: pintura(0x9aa4ab), azul: pintura(0x2b4f7e),
+    negro: pintura(0x2a2e33), taxi: pintura(0xd6a416), verdeOsc: pintura(0x38503f),
+    rojo: pintura(0x8c2328), militar: pintura(0x55614a),
   };
 
   // Pieza con transformación raíz
@@ -162,6 +165,16 @@ export function crearProps(kit) {
     f.geo(kit.tejadoDosAguas(w + al * 2, d + al * 2, rise), mR, 0, h, 0, { uv: 'lona' });
     f.caja(mR, 0, h + 0.03, (d + al * 2) / 2 - 0.02, w + al * 2 + 0.05, 0.18, 0.06, { radio: 0.02 });
     f.caja(mR, 0, h + 0.03, -(d + al * 2) / 2 + 0.02, w + al * 2 + 0.05, 0.18, 0.06, { radio: 0.02 });
+    // costuras de la lona del tejado (rompen la mancha blanca) y cumbrera de aluminio
+    {
+      const run = (d + al * 2) / 2, ang = Math.atan2(rise, run), len = Math.hypot(run, rise), nS = Math.round((w + al * 2) / 1.7);
+      for (const s of [-1, 1]) {
+        const fs = F(mul(root, mx(0, h + rise / 2, s * run / 2, 0, s * ang, 0)));
+        for (let i = 1; i < nS; i++) fs.caja(M.lonaCostura, -(w + al * 2) / 2 + ((w + al * 2) / nS) * i, 0.012, 0, 0.07, 0.018, len, { radio: 0.004 });
+        fs.caja(M.lonaCostura, 0, 0.01, -s * len * 0.46, w + al * 2, 0.02, 0.1, { radio: 0.004 });
+      }
+      f.caja(M.acero, 0, h + rise + 0.02, 0, w + al * 2 + 0.1, 0.08, 0.12, { radio: 0.02 });
+    }
     // franja azul y estructura de aluminio
     if (med && azul) for (const sz of [-1, 1]) f.caja(M.lonaAzul, 0, h - 0.18, sz * (d / 2 + 0.012), w + 0.04, 0.34, 0.03, { radio: 0.01 });
     if (med && azul) for (const sx of [-1, 1]) f.caja(M.lonaAzul, sx * (w / 2 + 0.012), h - 0.18, 0, 0.03, 0.34, d + 0.04, { radio: 0.01 });
@@ -374,7 +387,7 @@ export function crearProps(kit) {
     for (const c of lista) {
       const f = F(mx(c.x, 0, c.z, c.rot ?? 0));
       f.caja(M.goma, 0, 0.025, 0, 0.36, 0.05, 0.36, { radio: 0.015 });
-      kit.lote0.anadir(new THREE.ConeGeometry(0.15, 0.62, 10), mat('acero_pintado', { color: 0xe8561a }), mx(c.x, 0.34, c.z), { uv: false });
+      kit.lote0.anadir(new THREE.ConeGeometry(0.15, 0.62, 10), pintura(0xe8561a), mx(c.x, 0.34, c.z), { uv: false });
       f.cil(M.pintBlanca, 0, 0.26, 0, 0.1, 0.08, 0.11, { seg: 10, bisel: 0.004 });
     }
   };

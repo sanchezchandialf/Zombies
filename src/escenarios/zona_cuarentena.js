@@ -32,15 +32,14 @@ export async function construir(juego, kit) {
       p.rect(-80, -80, 80, -46, 1, 3).rect(-80, 46, 80, 80, 1, 3).rect(-80, -80, -46, 80, 1, 3).rect(46, -80, 80, 80, 1, 3);   // periferia: aceras
       p.rect(-42, -46, -7, -22, 1, 1.5).rect(8, -46, 40, -23, 1, 1.5);                                                         // plazas de las torres
       p.rect(-46, -46, -40, 46, 1, 2.5).rect(40, -46, 46, 46, 1, 2.5);                                                         // aceras laterales
-      p.salpicar(-44, -22, 44, 46, 14, 0.5, 1.6, 1);                                                                           // parches de acera/reparaciones
       p.camino([[-44, 6], [-16, 6], [0, 8]], 2.2, 1, 1.5);                                                                     // acera junto al hospital
       p.romper(3.4, 0.55);
     },
   });
   const zr = (x0, z0, x1, z1, material, o = {}) => kit.zona({ rect: [x0, z0, x1, z1], material, alto: o.alto ?? 0.06, color: o.color, mojado: o.mojado, borde: o.borde });
-  zr(-42, -45.5, -6.5, -22.5, 'losas_acera', { color: 0xd3dbe0, borde: { material: 'hormigon', ancho: 0.28, alto: 0.15, color: 0xaab2b8 } });
-  zr(8, -45.5, 38, -23, 'losas_acera', { color: 0xd3dbe0, borde: { material: 'hormigon', ancho: 0.28, alto: 0.15, color: 0xaab2b8 } });
-  zr(-43, -14, -22, 21, 'baldosa_hospital', { color: 0xdfe9f0, alto: 0.05, borde: { material: 'hormigon', ancho: 0.25, alto: 0.12, color: 0x9fb0bd } });
+  zr(-42, -45.5, -6.5, -22.5, 'losas_acera', { color: 0xa3afb8, borde: { material: 'hormigon', ancho: 0.28, alto: 0.15, color: 0xaab2b8 } });
+  zr(8, -45.5, 38, -23, 'losas_acera', { color: 0xa3afb8, borde: { material: 'hormigon', ancho: 0.28, alto: 0.15, color: 0xaab2b8 } });
+  zr(-43, -14, -22, 21, 'baldosa_hospital', { color: 0xa9bbc8, alto: 0.05, borde: { material: 'hormigon', ancho: 0.25, alto: 0.12, color: 0x9fb0bd } });
   kit.zona({ circulo: { x: 30, z: 4, r: 9.4 }, material: 'hormigon', color: 0x59626b, alto: 0.07, borde: { material: 'hormigon', ancho: 0.3, alto: 0.16, color: 0xb8bec3 } });
   kit.zona({ circulo: { x: 0, z: 0, r: 14 }, material: 'hormigon', color: 0x8d9ca8, alto: 0.03, borde: { material: 'hormigon', ancho: 0.22, alto: 0.07, color: 0xd9ae1c } });
   zr(-28, -31.4, -18.6, -24, 'marmol', { color: 0x8a96a0, alto: 0.07 });                          // suelo del vestíbulo
@@ -67,7 +66,7 @@ export async function construir(juego, kit) {
   const oscuro = (c) => { const k = new THREE.Color(c); k.multiplyScalar(0.42); return k.getHex(); };
   const cristal = (col, em = 0.9) => kit.mat('cristal_rascacielos', { color: oscuro(col), emisivo: em * 0.4 });
   const zocaloTorre = { muro: kit.mat('panel_prefabricado', { color: 0x8c9fb0 }), zocalo: 'acero_cepillado', estilo: 'prefabricado', cornisa: true, pisos: 2, alto: 6.2, colorLuz: 0x7fa6c4,
-    ventanas: { ancho: 2.3, alto: 1.6, sep: 4.2, luz: 0.55, marcoColor: 0x20303c, marcoMaterial: 'acero_pintado', travesanos: false }, tejado: { tipo: 'plano', material: 'tela_asfaltica', equipos: 2 } };
+    ventanas: { ancho: 2.3, alto: 1.6, sep: 4.2, luz: 0.55, marcoColor: 0x20303c, marcoMaterial: 'acero_cepillado', travesanos: false }, tejado: { tipo: 'plano', material: 'tela_asfaltica', equipos: 2 } };
   const fuste = (o) => kit.edificio({ estilo: 'cristal', colision: false, ventanas: false, cornisa: false, puertas: [], tejado: { tipo: 'plano', material: 'hormigon', equipos: 3, parapetoAlto: 0.4 }, ...o });
   // Torre A (noroeste): dos alas y un cuerpo trasero que dejan el vestíbulo abierto al sur
   kit.edificio({ ...zocaloTorre, x: -33.5, z: -35, ancho: 13, fondo: 18, puertas: [], semilla: 11, nombre: 'torreA_oeste' });
