@@ -168,7 +168,7 @@ export function cajaEra(eraIdx) {
       break;
     }
     case 1: { // cajón de carga con letras pintadas y cinchas
-      const tabla = matMadera('vieja'), marco = matMadera('tablones'), cinta = matSimple(0xc8bda4, { rugosidad: 0.9 });
+      const tabla = matMadera('tablones'), marco = matMadera('vieja'), cinta = matSimple(0xc8bda4, { rugosidad: 0.9 });
       cajaDeTablas(e, tabla, marco, 0.95, 0.86, 0.75, 6);
       for (const x of [-0.3, 0.3]) e.caja(hierro, [0.05, 0.92, 0.79], [x, 0.47, 0], { radio: 0.006 });
       e.caja(cinta, [0.42, 0.2, 0.008], [0, 0.5, 0.384], { radio: 0.002 });
@@ -177,15 +177,21 @@ export function cajaEra(eraIdx) {
       for (const s of [-1, 1]) e.toro(matSimple(0xb8a070, { rugosidad: 0.9 }), 0.07, 0.012, [s * 0.485, 0.62, 0], { rot: [0, PI / 2, 0], seg: 10, seg2: 4 });
       break;
     }
-    case 2: { // caja de suministros militar de acero verde oliva
-      const pint = matMetal('pintado', { color: 0x586340, desgaste: 0.75 }), borde = matMetal('forjado');
+    case 2: { // caja de suministros militar de acero verde oliva (tono medio claro: bajo la luz de trinchera debe leerse desde arriba)
+      const pint = matMetal('pintado', { color: 0xa2ad74, desgaste: 0.5 }), borde = matMetal('pintado', { color: 0x6f7a4a, desgaste: 0.7 });
+      const blanco = matSimple(0xe4dfc6, { rugosidad: 0.7 }), amar = matSimple(0xe0b82a, { rugosidad: 0.6 }), asa = matSimple(0x3a3d32, { rugosidad: 0.6, metal: 0.4 });
       e.caja(pint, [0.92, 0.7, 0.62], [0, 0.39, 0], { radio: 0.03 });
       e.caja(borde, [0.96, 0.05, 0.66], [0, 0.07, 0], { radio: 0.012 });
       e.caja(borde, [0.96, 0.04, 0.66], [0, 0.74, 0], { radio: 0.012 });
       for (const x of [-0.25, 0.25]) for (const s of [-1, 1]) e.caja(pint, [0.05, 0.64, 0.02], [x, 0.4, s * 0.32], { radio: 0.006 });
-      for (const s of [-1, 1]) { e.caja(borde, [0.2, 0.05, 0.02], [s * 0.2, 0.62, 0.318], { radio: 0.006 }); e.toro(borde, 0.07, 0.01, [0, 0.55, s * 0.33], { rot: [0, 0, 0], seg: 12, seg2: 4 }); }
-      e.caja(matSimple(0xd8c25a, { rugosidad: 0.6 }), [0.28, 0.1, 0.01], [-0.2, 0.42, 0.317], { radio: 0.002 });
-      remaches(e, borde, [[-0.42, 0.74, 0.3], [0.42, 0.74, 0.3], [-0.42, 0.74, -0.3], [0.42, 0.74, -0.3]], 0.014);
+      for (const s of [-1, 1]) { e.caja(borde, [0.2, 0.05, 0.02], [s * 0.2, 0.62, 0.318], { radio: 0.006 }); e.toro(asa, 0.07, 0.01, [0, 0.55, s * 0.33], { rot: [0, 0, 0], seg: 12, seg2: 4 }); }
+      e.caja(amar, [0.28, 0.1, 0.01], [-0.2, 0.42, 0.317], { radio: 0.002 });
+      // tapa: rotulado en plantilla y franja de aviso, visibles desde la cámara cenital
+      e.caja(blanco, [0.5, 0.012, 0.06], [-0.12, 0.764, 0.1], { radio: 0.002 });
+      e.caja(blanco, [0.3, 0.012, 0.05], [-0.22, 0.764, -0.02], { radio: 0.002 });
+      e.caja(amar, [0.08, 0.012, 0.5], [0.36, 0.764, 0], { radio: 0.002 });
+      e.caja(asa, [0.34, 0.03, 0.05], [0, 0.78, -0.24], { radio: 0.012 });
+      remaches(e, asa, [[-0.42, 0.765, 0.3], [0.42, 0.765, 0.3], [-0.42, 0.765, -0.3], [0.42, 0.765, -0.3]], 0.014);
       break;
     }
     case 3: { // caja de embalaje pintada de blanco con esquineros
@@ -196,17 +202,20 @@ export function cajaEra(eraIdx) {
       e.caja(matSimple(0xf4eee0, { rugosidad: 0.6 }), [0.3, 0.05, 0.012], [0, 0.55, 0.415], { radio: 0.002 });
       break;
     }
-    case 4: { // maletín rígido de polímero con cierres amarillos
-      const pol = matSimple(0x3c4146, { rugosidad: 0.42, metal: 0.1 }), amar = matSimple(0xe8b81c, { rugosidad: 0.45 });
+    case 4: { // maletín rígido de polímero gris pizarra con cierres amarillos
+      const pol = matSimple(0x77828c, { rugosidad: 0.42, metal: 0.05 }), amar = matSimple(0xf0c01c, { rugosidad: 0.45 }), tapa = matSimple(0x8f9aa3, { rugosidad: 0.4, metal: 0.05 });
       e.caja(pol, [0.96, 0.7, 0.66], [0, 0.4, 0], { radio: 0.07, seg: 3 });
-      e.caja(matSimple(0x2b2f33, { rugosidad: 0.5 }), [1.0, 0.06, 0.7], [0, 0.42, 0], { radio: 0.02 });
+      e.caja(tapa, [1.0, 0.06, 0.7], [0, 0.42, 0], { radio: 0.02 });
+      e.caja(tapa, [0.86, 0.02, 0.56], [0, 0.762, 0], { radio: 0.008 });
+      e.caja(amar, [0.34, 0.012, 0.1], [0.2, 0.772, 0.14], { radio: 0.004 });   // etiqueta en la tapa
+      e.caja(matSimple(0x25282b, { rugosidad: 0.6 }), [0.5, 0.012, 0.03], [0.2, 0.774, 0.14], { radio: 0.002 });
       for (const x of [-0.3, 0.0, 0.3]) e.caja(amar, [0.1, 0.12, 0.02], [x, 0.42, 0.335], { radio: 0.01 });
-      for (const s of [-1, 1]) e.caja(pol, [0.3, 0.06, 0.06], [0, 0.62, s * 0.34], { radio: 0.02 });
-      for (const sx of [-1, 1]) e.caja(matSimple(0x25282b, { rugosidad: 0.6 }), [0.1, 0.07, 0.7], [sx * 0.4, 0.04, 0], { radio: 0.02 });
+      for (const s of [-1, 1]) e.caja(matSimple(0x3a4047, { rugosidad: 0.5 }), [0.3, 0.06, 0.06], [0, 0.62, s * 0.34], { radio: 0.02 });
+      for (const sx of [-1, 1]) e.caja(matSimple(0x3a4047, { rugosidad: 0.6 }), [0.1, 0.07, 0.7], [sx * 0.4, 0.04, 0], { radio: 0.02 });
       break;
     }
     default: { // contenedor de composite con rayas de energía
-      const comp = mat('composite_futurista', { color: 0x35e6ff }, 0x20232b), cian = matEmisivo(0x38e8ff, 2.6);
+      const comp = matSimple(0xc2ccd8, { rugosidad: 0.3, metal: 0.25 }), cian = matEmisivo(0x38e8ff, 2.6);
       e.caja(comp, [0.94, 0.72, 0.7], [0, 0.4, 0], { radio: 0.06, seg: 3 });
       for (const s of [-1, 1]) {
         e.caja(cian, [0.7, 0.025, 0.012], [0, 0.52, s * 0.356], { radio: 0.003 });
@@ -215,6 +224,10 @@ export function cajaEra(eraIdx) {
       }
       e.caja(matEmisivo(0xff3fd0, 2.2), [0.12, 0.04, 0.012], [0.3, 0.64, 0.357], { radio: 0.003 });
       e.caja(matSimple(0x16181e, { rugosidad: 0.3, metal: 0.8 }), [0.98, 0.05, 0.74], [0, 0.05, 0], { radio: 0.012 });
+      // tapa: dos tiras de energía y un panel oscuro central, legibles desde arriba
+      e.caja(matSimple(0x2b3340, { rugosidad: 0.35, metal: 0.5 }), [0.5, 0.012, 0.36], [-0.1, 0.766, 0], { radio: 0.004 });
+      for (const s of [-1, 1]) e.caja(cian, [0.8, 0.014, 0.025], [0, 0.768, s * 0.24], { radio: 0.003 });
+      e.caja(cian, [0.025, 0.014, 0.5], [0.36, 0.768, 0], { radio: 0.003 });
     }
   }
   return e.construir('caja_' + eraIdx);
