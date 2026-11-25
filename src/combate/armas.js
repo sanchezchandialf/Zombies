@@ -228,6 +228,10 @@ export function instalarArmas(c) {
    */
   function trazar(tir, ang, alcance, perf, perdida) {
     const def = tir.def;
+    // Perforación total: arma + mods del portador (Punta de acero) + siguiente disparo (Bala fantasma: atraviesaTodo / perforacion 99)
+    perf = (perf ?? 0) + (tir.mods?.perforacion ?? 0);
+    const ex = tir.extra;
+    if (ex) { if (ex.atraviesaTodo) perf = 99; else if (ex.perforacion) perf = Math.max(perf, ex.perforacion); }
     const dx = Math.sin(ang), dz = Math.cos(ang);
     const hits = fisica.rayoTodos(tir.ox, tir.oz, dx, dz, alcance, MASCARA_BALA, tir.filtro ??= filtroBalas(tir.portador));
     const res = { dx, dz, impactos: [], fin: alcance, muro: null };

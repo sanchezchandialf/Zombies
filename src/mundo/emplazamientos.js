@@ -99,6 +99,7 @@ function crearEmplazamiento(juego, mundo, o) {
       if (arma && c?.gatillo) {
         obj.mods.danio = t.mods?.danio ?? 1;
         obj.mods.explosivos = t.mods?.explosivos ?? 1;
+        obj.mods.perforacion = t.mods?.perforacion ?? 0;
         if (ud.boca) { obj._origen.copy(ud.boca); ud.cabeza.localToWorld(obj._origen); } else obj._origen.set(obj.pos.x, 1.2, obj.pos.z);
         const disparo = c.gatillo(obj, arma, obj._origen, obj.rotCabeza, !!it.disparar, !!it.disparoPulsado);
         if (disparo) obj.recul = 1;
