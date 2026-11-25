@@ -145,6 +145,8 @@ const DEF = {
   em_rojo: () => emis(0xff2a1a, 3.2),
   em_verde: () => emis(0x50ff7a, 2.8),
   em_ambar: () => emis(0xffb030, 3.0),
+  // líquido inflamable: ámbar translúcido con un leve brillo propio (no una bombilla)
+  liquido_ambar: () => new THREE.MeshStandardMaterial({ name: 'arsenal_liquido', color: 0xb8620e, emissive: 0x7a3200, emissiveIntensity: 0.55, metalness: 0, roughness: 0.12 }),
   em_blanco: () => emis(0xeaf6ff, 3.0),
   brasa: () => emis(0xff5a10, 2.2),
   mecha: () => emis(0xffc060, 4.0),

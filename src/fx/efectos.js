@@ -11,7 +11,10 @@ const _c = new THREE.Color();
 export const col = (hex, a = 1, m = 1) => { _c.set(hex); return [_c.r * m, _c.g * m, _c.b * m, a]; };
 
 // paletas de fuego (HDR para el bloom)
-const FU0 = [2.0, 1.1, 0.32, 0.85], FU1 = [1.55, 0.38, 0.06, 0.75], FU2 = [0.35, 0.03, 0.005, 0];
+// Fuego en capas: núcleo blanco-amarillo pequeño y denso en la base, lenguas naranjas que se enfrían a rojo oscuro al subir
+// (alfa moderado: al solaparse en modo aditivo no se queman en una masa plana), humo negro encima y pavesas.
+const FU0 = [1.5, 0.72, 0.16, 0.5], FU1 = [1.15, 0.27, 0.035, 0.42], FU2 = [0.22, 0.02, 0.0, 0];
+const NUC0 = [2.4, 1.75, 0.75, 0.62], NUC1 = [2.0, 0.95, 0.2, 0.5], NUC2 = [0.5, 0.08, 0.0, 0];
 const FUF0 = [3.0, 1.9, 0.7, 0.9], FUF1 = [2.0, 0.65, 0.12, 0.8], FUF2 = [0.35, 0.04, 0.0, 0];
 const CHI0 = [4.2, 2.8, 1.0, 1], CHI1 = [2.4, 0.8, 0.14, 0.9], CHI2 = [0.35, 0.05, 0.0, 0];
 const FLASH0 = [7, 5.2, 2.4, 1], FLASH1 = [4, 1.8, 0.5, 0.75], FLASH2 = [0.8, 0.15, 0.0, 0];
@@ -49,18 +52,25 @@ export function crearEfectos(ctx) {
   // ─────────────────────────────── fuego ───────────────────────────────
   /** Una lengua de llama que nace en (x,z) sobre el suelo. */
   function lengua(x, y0, z, e, vel = 1, dur = 1) {
-    const tam = rr(0.7, 1.15) * e;
-    S.drag = 1.7; S.grav = -3.2 * vel; S.rot = rr(-0.22, 0.22); S.nfr = 4; S.flags = F.FUEGO | F.SIN_SUELO; S.luz = 0;
-    lanzar(B, x, y0 + tam * 0.5, z, rr(-0.35, 0.35) * e, rr(0.5, 1.4) * e * vel, rr(-0.35, 0.35) * e, rr(0.5, 0.95) * dur, tam, tam * rr(0.25, 0.5), LLAMA, FU0, FU1, FU2);
+    const tam = rr(0.55, 1.05) * e;
+    S.drag = 1.5; S.grav = -3.6 * vel; S.rot = rr(-0.3, 0.3); S.nfr = 4; S.flags = F.FUEGO | F.SIN_SUELO; S.luz = 0;
+    lanzar(B, x, y0 + tam * 0.45, z, rr(-0.45, 0.45) * e, rr(0.6, 1.7) * e * vel, rr(-0.45, 0.45) * e, rr(0.45, 0.9) * dur, tam, tam * rr(0.15, 0.4), LLAMA, FU0, FU1, FU2);
+  }
+  /** Núcleo: llama pequeña, casi blanca, pegada a la base (lo más caliente). */
+  function nucleo(x, y0, z, e) {
+    const tam = rr(0.32, 0.55) * e;
+    S.drag = 2.2; S.grav = -2.2; S.rot = rr(-0.2, 0.2); S.nfr = 4; S.flags = F.FUEGO | F.SIN_SUELO; S.luz = 0;
+    lanzar(B, x, y0 + tam * 0.35, z, rr(-0.15, 0.15) * e, rr(0.3, 0.8) * e, rr(-0.15, 0.15) * e, rr(0.28, 0.5), tam, tam * 0.45, LLAMA, NUC0, NUC1, NUC2);
   }
   function chispaBrasa(x, y, z, e) {
     S.drag = 0.7; S.grav = -1.2; S.stretch = 0.02; S.flags = F.SIN_SUELO; S.luz = 0;
     lanzar(B, x, y, z, rr(-1, 1) * e, rr(1.5, 4.5) * e, rr(-1, 1) * e, rr(0.9, 1.8), 0.09 * e, 0.03 * e, ESTELA, BRASA0, BRASA1, BRASA2);
   }
   function humoFuego(x, y, z, e) {
-    const tam = rr(0.6, 1.0) * e;
-    S.drag = 0.7; S.grav = -0.9; S.rot = rng() * TAU; S.rotV = rr(-0.4, 0.4); S.flags = F.SALE; S.luz = 0.9;
-    lanzar(H, x, y, z, rr(-0.4, 0.4), rr(1.3, 2.4) * Math.sqrt(e), rr(-0.4, 0.4), rr(1.8, 3.0), tam * 0.7, tam * 2.4, (rng() * 4) | 0, HUMO_OSC[0], HUMO_OSC[1], HUMO_OSC[2]);
+    const tam = rr(0.6, 1.05) * e;
+    S.drag = 0.6; S.grav = -1.0; S.rot = rng() * TAU; S.rotV = rr(-0.4, 0.4); S.flags = F.SALE; S.luz = 0.75;
+    // deriva con el viento: la columna se inclina y deja ver las llamas desde la cámara cenital
+    lanzar(H, x, y, z, rr(-0.3, 0.5) + 0.5, rr(1.3, 2.4) * Math.sqrt(e), rr(-0.6, 0.1) - 0.35, rr(2.0, 3.4), tam * 0.75, tam * 2.8, (rng() * 4) | 0, HUMO_OSC[0], HUMO_OSC[1], HUMO_OSC[2]);
   }
   function brilloSuelo(x, z, e, y = 0.06) {
     S.flags = F.PLANO | F.SIN_SUELO; S.rot = rng() * TAU; S.drag = 0; S.luz = 0;
@@ -72,17 +82,21 @@ export function crearEfectos(ctx) {
     const e = op.escala ?? 1, n = cnt(op.cantidad ?? 5);
     const y = Math.max(0, Y(p, 0.1) - 0.1);
     for (let i = 0; i < n; i++) { const a = rng() * TAU, r = Math.sqrt(rng()) * 0.3 * e; lengua(p.x + Math.cos(a) * r, y, p.z + Math.sin(a) * r, e); }
-    if (n >= 3) { chispaBrasa(p.x, y + 0.4 * e, p.z, e); humoFuego(p.x, y + 0.9 * e, p.z, e); brilloSuelo(p.x, p.z, e, y + 0.05); }
+    for (let i = 0; i < Math.ceil(n * 0.6); i++) { const a = rng() * TAU, r = Math.sqrt(rng()) * 0.18 * e; nucleo(p.x + Math.cos(a) * r, y, p.z + Math.sin(a) * r, e); }
+    if (n >= 3) { chispaBrasa(p.x, y + 0.4 * e, p.z, e); chispaBrasa(p.x, y + 0.6 * e, p.z, e); humoFuego(p.x, y + 1.1 * e, p.z, e); brilloSuelo(p.x, p.z, e, y + 0.05); }
   }
 
   /** Paso de un emisor continuo de fuego (tasas por segundo ∝ escala). */
   function fuegoCont(p, e, dt, acum) {
     const area = Math.pow(e, 1.35);
-    acum.a += dt * 19 * area * ctx.factor; acum.b += dt * 5 * area * ctx.factor; acum.c += dt * 6.5 * area * ctx.factor; acum.d += dt * 3.2;
+    acum.a += dt * 13 * area * ctx.factor; acum.b += dt * 8 * area * ctx.factor; acum.c += dt * 7.5 * area * ctx.factor; acum.d += dt * 3.2;
+    acum.t += dt * 15 * area * ctx.factor;
     const y = Math.max(0, Y(p, 0.05));
-    while (acum.a >= 1) { acum.a--; const a = rng() * TAU, r = Math.sqrt(rng()) * 0.5 * e; lengua(p.x + Math.cos(a) * r, y, p.z + Math.sin(a) * r, e * rr(0.8, 1.15)); }
-    while (acum.b >= 1) { acum.b--; chispaBrasa(p.x + rr(-0.3, 0.3) * e, y + 0.3 * e, p.z + rr(-0.3, 0.3) * e, e); }
-    while (acum.c >= 1) { acum.c--; humoFuego(p.x + rr(-0.3, 0.3) * e, y + rr(0.9, 1.6) * e, p.z + rr(-0.3, 0.3) * e, e); }
+    // lenguas repartidas por el área (más en el centro), núcleos en la base, pavesas y humo negro
+    while (acum.a >= 1) { acum.a--; const a = rng() * TAU, r = Math.pow(rng(), 0.7) * 0.55 * e; lengua(p.x + Math.cos(a) * r, y, p.z + Math.sin(a) * r, e * rr(0.75, 1.15) * (1 - r / (1.4 * e) * 0.5)); }
+    while (acum.t >= 1) { acum.t--; const a = rng() * TAU, r = Math.sqrt(rng()) * 0.32 * e; nucleo(p.x + Math.cos(a) * r, y, p.z + Math.sin(a) * r, e); }
+    while (acum.b >= 1) { acum.b--; chispaBrasa(p.x + rr(-0.35, 0.35) * e, y + rr(0.2, 0.7) * e, p.z + rr(-0.35, 0.35) * e, e); }
+    while (acum.c >= 1) { acum.c--; humoFuego(p.x + rr(-0.3, 0.3) * e, y + rr(1.1, 1.9) * e, p.z + rr(-0.3, 0.3) * e, e); }
     while (acum.d >= 1) { acum.d--; brilloSuelo(p.x, p.z, e, y + 0.06); }
   }
 
@@ -136,8 +150,14 @@ export function crearEfectos(ctx) {
       }
       case 'moderno': case 'moderno_grande': {
         const g = tipo === 'moderno_grande' ? 1.5 : 1, s = e * g;
-        estrella(x + DX * 0.12, y, z + DZ * 0.12, 1.25 * s, 0.06, [6, 4.4, 2.0, 1], [3.2, 1.6, 0.5, 0.7], [0.5, 0.1, 0, 0]);
-        for (let i = 0; i < 2; i++) {
+        // núcleo pequeño + llamarada cónica hacia delante (nada de cruz gigante); con freno de boca, chorros laterales
+        estrella(x + DX * 0.1, y, z + DZ * 0.1, 0.72 * s, 0.045, [6, 4.4, 2.0, 1], [3.2, 1.6, 0.5, 0.7], [0.5, 0.1, 0, 0], Math.atan2(DZ, DX) + 0.785);
+        disco(x + DX * 0.25, y, z + DZ * 0.25, 0.9 * s, 0.5 * s, 0.07, [2.4, 1.5, 0.6, 0.5], [1.4, 0.6, 0.15, 0.3], [0.3, 0.05, 0, 0]);
+        if (g > 1) for (const lado of [-1, 1]) {
+          S.drag = 6; S.stretch = 0.07; S.flags = F.SIN_SUELO; S.luz = 0;
+          lanzar(B, x - DX * 0.05, y, z - DZ * 0.05, -DZ * lado * 9 * s + DX * 2, 0.1, DX * lado * 9 * s + DZ * 2, 0.05, 0.16 * s, 0.22 * s, ESTELA, [4.5, 3.0, 1.2, 0.9], [2.4, 1.0, 0.3, 0.6], [0.3, 0.06, 0, 0]);
+        }
+        for (let i = 0; i < 3; i++) {
           const a = Math.atan2(DZ, DX) + rr(-0.12, 0.12), v = rr(16, 24) * s;
           S.drag = 4; S.stretch = 0.09; S.flags = F.SIN_SUELO; S.luz = 0;
           lanzar(B, x, y, z, Math.cos(a) * v, rr(-0.1, 0.2), Math.sin(a) * v, rr(0.045, 0.075), 0.26 * s, 0.34 * s, ESTELA, [5, 3.4, 1.4, 1], [3, 1.4, 0.4, 0.7], [0.4, 0.1, 0, 0]);

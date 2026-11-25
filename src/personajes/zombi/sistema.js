@@ -1,7 +1,7 @@
 // Sistema de la horda: visuales de zombis instanciados (clases) y jefes; muertes físicas, restos y reciclaje.
 import * as THREE from 'three';
 import { crearRng } from '../../nucleo/util.js';
-import { Granja } from './granja.js';
+import { Granja, OJOS } from './granja.js';
 import { crearModeloZombi } from './cuerpo.js';
 import { NJ } from './matematica.js';
 import { animarVivo, construirJoints, DUR_ACCION } from './animacion.js';
@@ -81,7 +81,10 @@ export function crearVisualesZombis(juego) {
     dt = Math.min(dt, 0.1);
     sis.t += dt;
     const t = sis.t;
-    RIM_ZOMBI.value = 1 + 1.1 * (juego.render?.ambienteActual?.noche ?? 0);
+    const noche = juego.render?.ambienteActual?.noche ?? 0, eraAct = juego.estado?.eraIdx ?? 0;
+    RIM_ZOMBI.value = 1 + 1.1 * noche;
+    // ojos: brasas tenues de día; de noche y en las eras oscuras (1950, 2050) brillan lo justo para delatar a la horda
+    OJOS.value = 0.55 + 2.4 * noche + (eraAct === 3 || eraAct === 5 ? 0.8 : 0);
     const cam = juego.render?.camara;
     let cx = 0, cz = 0;
     if (cam) { cam.updateMatrixWorld?.(); mat.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse); frustum.setFromProjectionMatrix(mat); cx = cam.position.x; cz = cam.position.z; }

@@ -30,7 +30,7 @@ function redondear(pts, r) {
   return seg;
 }
 /** Perfil lateral [[z,y],…] extruido en X con grosor w (centrado en x=0). `suave` redondea las esquinas (m). */
-export function gPerfil(pts, w, { bisel = 0.0025, suave = 0 } = {}) {
+export function gPerfil(pts, w, { bisel = 0.0025, suave = 0, redondo = true } = {}) {
   const sh = new THREE.Shape();
   if (suave > 0) {
     const s = redondear(pts, suave);
@@ -40,8 +40,16 @@ export function gPerfil(pts, w, { bisel = 0.0025, suave = 0 } = {}) {
     sh.moveTo(pts[0][0], pts[0][1]);
     for (let i = 1; i < pts.length; i++) sh.lineTo(pts[i][0], pts[i][1]);
   }
-  const bis = Math.min(bisel, w * 0.3);
-  const g = new THREE.ExtrudeGeometry(sh, { depth: Math.max(w - bis * 2, 0.0004), bevelEnabled: bis > 0, bevelThickness: bis, bevelSize: bis * 0.9, bevelSegments: 1, curveSegments: 5 });
+  let bis = Math.min(bisel, w * 0.3), segB = 1, off = 0;
+  // Piezas gruesas (culatas, empuñaduras, guardamanos): canto redondeado de verdad, no una losa con chaflán.
+  // El desplazamiento negativo conserva el contorno dibujado.
+  if (redondo && w >= 0.03 && pts.length >= 4) {
+    let z0 = 1e9, z1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const p of pts) { z0 = Math.min(z0, p[0]); z1 = Math.max(z1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); }
+    const r = Math.min(w * 0.28, 0.0065, Math.min(z1 - z0, y1 - y0) * 0.15);
+    if (r > bis) { bis = r; segB = 3; off = -r * 0.9; }
+  }
+  const g = new THREE.ExtrudeGeometry(sh, { depth: Math.max(w - bis * 2, 0.0004), bevelEnabled: bis > 0, bevelThickness: bis, bevelSize: bis * 0.9, bevelOffset: off, bevelSegments: segB, curveSegments: 5 });
   g.rotateY(-PI / 2);
   g.computeBoundingBox(); g.translate(-(g.boundingBox.min.x + g.boundingBox.max.x) / 2, 0, 0);
   return g;

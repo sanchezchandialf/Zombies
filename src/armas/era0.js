@@ -52,14 +52,15 @@ function mosquete(b) {
 function pistolaChispaPieza(b, { largo = 0.26, esc = 1 } = {}) {
   const y = 0.05;
   b.perfil('nogal', [
-    [largo * 0.85, 0.045], [largo * 0.85, 0.022], [0.05, 0.02], [0.022, 0.0], [0.014, -0.09], [0.0, -0.115],
-    [-0.075, -0.126], [-0.088, -0.092], [-0.062, -0.02], [-0.05, 0.022], [-0.064, 0.058], [-0.02, 0.062], [0.0, 0.047],
-  ], 0.032, [0, 0, 0], { suave: 0.01, bisel: 0.0025 });
+    // culata «de pico de loro»: inclinada hacia atrás, estrecha en la garganta y ensanchada en el pomo
+    [largo * 0.85, 0.045], [largo * 0.85, 0.022], [0.05, 0.02], [0.02, 0.002], [0.0, -0.05], [-0.022, -0.09],
+    [-0.052, -0.112], [-0.092, -0.108], [-0.1, -0.08], [-0.072, -0.03], [-0.054, 0.02], [-0.064, 0.056], [-0.02, 0.06], [0.0, 0.047],
+  ], 0.03, [0, 0, 0], { suave: 0.012, bisel: 0.0025 });
   canon(b, { mat: 'acero', y, z0: -0.02, z1: largo, r: 0.0125, r2: 0.0108, oct: true });
   abrazaderas(b, { mat: 'laton', y, zs: [largo * 0.5, largo * 0.8], r: 0.011, ancho: 0.012 });
   baqueta(b, { y: 0.026, z0: 0.0, z1: largo * 0.84, r: 0.0036, mat: 'acero_c' });
   llaveChispa(b, { x: -0.0175, z: 0.02, y: 0.036, esc: 0.7 });
-  b.caja('laton', [0.036, 0.016, 0.1], [0, -0.122, -0.04], 0.006, [-0.14, 0, 0]); // pomo de latón
+  b.caja('laton', [0.034, 0.016, 0.06], [0, -0.108, -0.074], 0.006, [-0.5, 0, 0]); // pomo de latón
   guardamonte(b, { z: -0.03, y: 0.0, largo: 0.085, prof: 0.032, r: 0.0048 });
   b.caja('laton', [0.034, 0.012, 0.03], [0, 0.0, 0.01], 0.004); // refuerzo
   b.caja('laton', [0.005, 0.01, 0.012], [0, y + 0.0165, largo - 0.01], 0.001); // punto de mira

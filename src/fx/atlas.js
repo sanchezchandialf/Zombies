@@ -249,37 +249,51 @@ function nuevoCampoMetabola() {
   };
 }
 
-/** Salpicadura de sangre: masa central, chorros radiales con gotas en la punta y rocío de motas. */
+/** Salpicadura de sangre: charco central lobulado, pocos chorros de largo y grosor desiguales (agrupados, no en estrella),
+ *  gotas satélite que se alargan en la dirección del vuelo y rocío fino. */
 function sangre(idx, buf, o) {
   const rnd = rngSemilla(o.semilla), M = nuevoCampoMetabola();
   const { masa = 0.32, nRayos = 14, largoMin = 0.35, largoMax = 0.86, sesgo = 0, motas = 14, rocio = 0.9, ang0 = 0 } = o;
-  // masa central: 3–5 manchas solapadas
-  const nm = 3 + Math.floor(rnd() * 3);
+  // masa central: 5–8 lóbulos de tamaño muy distinto (charco orgánico, nunca un círculo)
+  const nm = 5 + Math.floor(rnd() * 4);
   for (let i = 0; i < nm; i++) {
-    const a = rnd() * 6.283, d = rnd() * masa * 0.7;
-    M.circulo(Math.cos(a) * d, Math.sin(a) * d, masa * (0.55 + rnd() * 0.5));
+    const a = rnd() * 6.283, d = Math.sqrt(rnd()) * masa * 0.85;
+    M.circulo(Math.cos(a) * d * (sesgo ? 1.4 : 1), Math.sin(a) * d * (sesgo ? 0.6 : 1), masa * (0.3 + rnd() * 0.55));
   }
-  if (o.centro) M.circulo(0, 0, masa);
-  // chorros
-  for (let i = 0; i < nRayos; i++) {
-    let a = ang0 + (i / nRayos) * 6.283 + (rnd() - 0.5) * 0.5;
-    if (sesgo) a = ang0 + (rnd() - 0.5) * (6.283 * (1 - sesgo) + 0.6);
-    const L = largoMin + (largoMax - largoMin) * rnd() * (sesgo ? 0.6 + 0.6 * rnd() : 1);
-    const gr = 0.06 + rnd() * 0.08;
-    const ax = Math.cos(a) * masa * 0.6, ay = Math.sin(a) * masa * 0.6;
-    const bx = Math.cos(a + (rnd() - 0.5) * 0.18) * L, by = Math.sin(a + (rnd() - 0.5) * 0.18) * L;
-    M.hilo(ax, ay, bx, by, gr, gr * 0.28, 0.04);
-    // gota al final del chorro (separada o unida)
-    if (rnd() < 0.8) M.circulo(bx + Math.cos(a) * 0.05, by + Math.sin(a) * 0.05, 0.03 + rnd() * 0.04);
+  if (o.centro) M.circulo(0, 0, masa * 0.9);
+  // chorros: agrupados en 2–3 abanicos (el impacto tiene una dirección), longitudes y grosores muy variables
+  const nAb = sesgo ? 1 : 2 + Math.floor(rnd() * 2);
+  const abanicos = []; for (let k = 0; k < nAb; k++) abanicos.push(ang0 + (sesgo ? 0 : rnd() * 6.283));
+  const nR = Math.max(4, Math.round(nRayos * 0.6));
+  for (let i = 0; i < nR; i++) {
+    const base = abanicos[i % nAb];
+    const a = base + (rnd() - 0.5) * (sesgo ? 0.9 : 1.5);
+    const L = largoMin + (largoMax - largoMin) * Math.pow(rnd(), 1.6);
+    const gr = 0.03 + rnd() * rnd() * 0.11;
+    const ax = Math.cos(a) * masa * 0.5, ay = Math.sin(a) * masa * 0.5;
+    const curva = (rnd() - 0.5) * 0.25;
+    const mx = Math.cos(a + curva) * (L * 0.55), my = Math.sin(a + curva) * (L * 0.55);
+    const bx = Math.cos(a + curva * 1.6) * L, by = Math.sin(a + curva * 1.6) * L;
+    M.hilo(ax, ay, mx, my, gr, gr * 0.6, 0.03);
+    M.hilo(mx, my, bx, by, gr * 0.6, gr * 0.22, 0.03);
+    // gotas sueltas más allá del chorro, cada vez menores y alargadas
+    let gx = bx, gy = by, gs = 0.02 + rnd() * 0.035;
+    const ng = rnd() < 0.7 ? 1 + Math.floor(rnd() * 3) : 0;
+    for (let g = 0; g < ng; g++) {
+      gx += Math.cos(a) * (0.05 + rnd() * 0.08); gy += Math.sin(a) * (0.05 + rnd() * 0.08);
+      if (Math.hypot(gx, gy) > 0.95) break;
+      M.hilo(gx - Math.cos(a) * gs, gy - Math.sin(a) * gs, gx, gy, gs * 0.5, gs, 0.02);
+      gs *= 0.7;
+    }
   }
-  // rocío de motas
-  for (let i = 0; i < motas; i++) {
-    let a = ang0 + rnd() * 6.283;
-    if (sesgo) a = ang0 + (rnd() - 0.5) * 1.6;
-    const d = 0.3 + rnd() * rocio * 0.65;
-    M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.022 + rnd() * rnd() * 0.045);
+  // rocío de motas finas, más denso del lado de los abanicos
+  for (let i = 0; i < motas * 1.4; i++) {
+    const a = (rnd() < 0.6 ? abanicos[i % nAb] + (rnd() - 0.5) * 1.6 : rnd() * 6.283);
+    const d = masa * 0.6 + rnd() * rocio * 0.55;
+    if (d > 0.93) continue;
+    M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.012 + rnd() * rnd() * 0.04);
   }
-  escribirMetabola(buf, idx, M.S, o.rugosidad ?? 0.09, rnd, o);
+  escribirMetabola(buf, idx, M.S, o.rugosidad ?? (sesgo ? 0.07 : 0.11), rnd, o);
 }
 
 function escribirMetabola(buf, idx, S, rug, rnd, o = {}) {
@@ -296,11 +310,12 @@ function escribirMetabola(buf, idx, S, rug, rnd, o = {}) {
 }
 
 function charco(idx, buf, semilla) {
+  // charco espeso que se ha extendido: lóbulos de tamaños muy distintos, entrantes y un par de lenguas que buscan la pendiente
   const rnd = rngSemilla(semilla), M = nuevoCampoMetabola();
-  for (let i = 0; i < 7; i++) { const a = rnd() * 6.283, d = rnd() * 0.4; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.34 + rnd() * 0.22); }
-  for (let i = 0; i < 5; i++) { const a = rnd() * 6.283; const d = 0.35 + rnd() * 0.25; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.07 + rnd() * 0.08); }
-  for (let i = 0; i < 6; i++) { const a = rnd() * 6.283, d = 0.6 + rnd() * 0.3; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.015 + rnd() * 0.03); }
-  escribirMetabola(buf, idx, M.S, 0.07, rnd, { grosor: 0.7, normalFuerza: 4 });
+  for (let i = 0; i < 11; i++) { const a = rnd() * 6.283, d = Math.sqrt(rnd()) * 0.42; M.circulo(Math.cos(a) * d, Math.sin(a) * d * 0.8, 0.12 + rnd() * rnd() * 0.3); }
+  for (let i = 0; i < 2; i++) { const a = rnd() * 6.283; M.hilo(Math.cos(a) * 0.2, Math.sin(a) * 0.2, Math.cos(a) * 0.72, Math.sin(a) * 0.72, 0.1, 0.04, 0.04); }
+  for (let i = 0; i < 8; i++) { const a = rnd() * 6.283, d = 0.55 + rnd() * 0.35; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.015 + rnd() * 0.035); }
+  escribirMetabola(buf, idx, M.S, 0.12, rnd, { grosor: 0.6, normalFuerza: 3 });
 }
 
 function gotero(idx, buf, semilla) {
@@ -313,26 +328,29 @@ function gotero(idx, buf, semilla) {
   escribirMetabola(buf, idx, M.S, 0.08, rnd, { grosor: 0.8 });
 }
 
-/** Quemadura: núcleo oscuro, halo de hollín desigual y rayos finos que parten del centro. */
+/** Quemadura: mancha de hollín lobulada con borde deshilachado, zonas más negras y lenguas cortas e irregulares
+ *  (agrupadas por el soplo de la explosión), nunca una estrella de rayos iguales. */
 function quemadura(idx, buf, semilla) {
   const rnd = rngSemilla(semilla), M = nuevoCampoMetabola();
-  const n = 5 + Math.floor(rnd() * 3);
-  for (let i = 0; i < n; i++) { const a = rnd() * 6.283, d = rnd() * 0.22; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.2 + rnd() * 0.16); }
-  const rayos = 22 + Math.floor(rnd() * 10);
-  for (let i = 0; i < rayos; i++) {
-    const a = (i / rayos) * 6.283 + (rnd() - 0.5) * 0.25;
-    const L = 0.45 + rnd() * rnd() * 0.5 + (i % 3 === 0 ? 0.12 : 0);
-    M.hilo(Math.cos(a) * 0.2, Math.sin(a) * 0.2, Math.cos(a) * L, Math.sin(a) * L, 0.045, 0.012, 0.035);
+  const n = 6 + Math.floor(rnd() * 4);
+  for (let i = 0; i < n; i++) { const a = rnd() * 6.283, d = Math.sqrt(rnd()) * 0.3; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.14 + rnd() * 0.2); }
+  const lenguas = 7 + Math.floor(rnd() * 5), soplo = rnd() * 6.283;
+  for (let i = 0; i < lenguas; i++) {
+    const a = rnd() < 0.5 ? soplo + (rnd() - 0.5) * 1.8 : rnd() * 6.283;
+    const L = 0.38 + Math.pow(rnd(), 1.5) * 0.45;
+    const g = 0.04 + rnd() * 0.06;
+    M.hilo(Math.cos(a) * 0.15, Math.sin(a) * 0.15, Math.cos(a + (rnd() - 0.5) * 0.3) * L, Math.sin(a + (rnd() - 0.5) * 0.3) * L, g, g * 0.35, 0.03);
   }
   const sem = Math.floor(rnd() * 999);
   escribirCelda(buf, idx, (u, v, out) => {
-    const s = muestra(M.S, u, v);
-    const r = Math.hypot(u, v), ang = Math.atan2(v, u);
-    // halo de hollín moteado
-    const halo = sm(0.9, 0.2, r + (fbm(u * 3.2, v * 3.2, sem, 4) - 0.5) * 0.62) * (0.3 + 0.35 * fbm(u * 9, v * 9, sem + 4, 2));
-    const nucleo = sm(UMBRAL - 0.3, UMBRAL + 0.25, s + (fbm(u * 7, v * 7, sem + 7, 3) - 0.5) * 0.3);
-    const a = clamp(Math.max(nucleo * 0.96, halo)) * sm(1, 0.9, r);
-    out.a = a; out.r = clamp(nucleo * 0.7 + halo * 0.5 + 0.3 * Math.max(0, s)); out.h = 0.3 * a + 0.1 * Math.sin(ang * 0);
+    const r = Math.hypot(u, v);
+    const w1 = fbm(u * 3.0 + 7, v * 3.0, sem, 4) - 0.5, w2 = fbm(u * 11, v * 11, sem + 4, 3);
+    const s = muestra(M.S, u + w1 * 0.08, v + w1 * 0.08);
+    // halo de hollín: borde deshilachado por ruido, motas más oscuras dentro
+    const halo = sm(0.92, 0.25, r + w1 * 0.75) * (0.22 + 0.4 * w2);
+    const nucleo = sm(UMBRAL - 0.32, UMBRAL + 0.3, s + (w2 - 0.5) * 0.35);
+    const a = clamp(Math.max(nucleo * (0.82 + 0.16 * w2), halo)) * sm(1, 0.88, r);
+    out.a = a; out.r = clamp(0.15 + nucleo * 0.55 * w2 + halo * 0.6 - nucleo * 0.25); out.h = 0.25 * a;
   });
 }
 
@@ -351,25 +369,32 @@ function acido(idx, buf, semilla) {
   }, { normal: 7 });
 }
 
+/** Cráter: hoyo oscuro y hondo, labio de tierra levantada irregular, tierra proyectada en grumos y regueros de
+ *  distinta longitud (distribución aleatoria, sin simetría radial) y un halo de hollín que se deshace en el suelo. */
 function crater(idx, buf, semilla) {
   const rnd = rngSemilla(semilla), sem = Math.floor(rnd() * 999);
-  const fis = []; const nf = 14; for (let i = 0; i < nf; i++) fis.push([(i / nf) * 6.283 + (rnd() - 0.5) * 0.3, 0.45 + rnd() * 0.45, rnd()]);
+  const M = nuevoCampoMetabola();
+  const reg = 9 + Math.floor(rnd() * 6);
+  for (let i = 0; i < reg; i++) {
+    const a = rnd() * 6.283, L = 0.55 + Math.pow(rnd(), 2) * 0.38, g = 0.025 + rnd() * 0.05;
+    M.hilo(Math.cos(a) * 0.42, Math.sin(a) * 0.42, Math.cos(a + (rnd() - 0.5) * 0.25) * L, Math.sin(a + (rnd() - 0.5) * 0.25) * L, g, g * 0.3, 0.03);
+  }
+  for (let i = 0; i < 26; i++) { const a = rnd() * 6.283, d = 0.5 + rnd() * 0.42; M.circulo(Math.cos(a) * d, Math.sin(a) * d, 0.015 + rnd() * rnd() * 0.06); }
   escribirCelda(buf, idx, (u, v, out) => {
     const r = Math.hypot(u, v), ang = Math.atan2(v, u);
-    const R = 0.46 + (fbm(Math.cos(ang) * 1.5 + 5, Math.sin(ang) * 1.5 + 5, sem, 3) - 0.5) * 0.24;
-    const hoyo = sm(R, R * 0.72, r + (fbm(u * 8, v * 8, sem + 3, 2) - 0.5) * 0.06);
-    const borde = Math.exp(-(((r - R * 1.12) / 0.09) ** 2)) * (0.55 + 0.45 * fbm(u * 10, v * 10, sem + 8, 2));
-    const halo = sm(0.98, 0.3, r + (fbm(u * 4, v * 4, sem + 1, 3) - 0.5) * 0.5) * 0.5;
-    // grietas radiales
-    let grieta = 0;
-    for (const [fa, L, g] of fis) {
-      const da = Math.abs(((ang - fa + 3.1416) % 6.2832 + 6.2832) % 6.2832 - 3.1416);
-      const w = 0.045 / Math.max(0.1, r);
-      if (r > R * 0.8 && r < L * 1.1) grieta = Math.max(grieta, sm(w, w * 0.2, da) * (1 - sm(R * 0.8, L * 1.1, r)) * (0.5 + 0.5 * g));
-    }
-    const a = clamp(Math.max(hoyo * 0.97, borde * 0.8, halo, grieta * 0.9)) * sm(1, 0.9, r);
-    out.a = a; out.r = clamp(hoyo * 0.9 + borde * 0.9 + grieta * 0.7 + halo * 0.3); out.h = hoyo * -0.5 + borde * 0.9;
-  }, { normal: 5 });
+    const wob = fbm(Math.cos(ang) * 1.3 + 5, Math.sin(ang) * 1.3 + 5, sem, 4) - 0.5;
+    const R = 0.36 + wob * 0.16;
+    const n1 = fbm(u * 9, v * 9, sem + 3, 3), n2 = fbm(u * 22, v * 22, sem + 9, 2);
+    const hoyo = sm(R, R * 0.55, r + (n1 - 0.5) * 0.08);
+    const anillo = Math.exp(-(((r - R * 1.15 - (n1 - 0.5) * 0.08) / (0.08 + 0.05 * n1)) ** 2)) * (0.45 + 0.55 * n1);
+    const eyecta = sm(UMBRAL - 0.05, UMBRAL + 0.05, muestra(M.S, u, v) + (n2 - 0.5) * 0.15);
+    const halo = sm(0.95, 0.35, r + (fbm(u * 3.5, v * 3.5, sem + 1, 4) - 0.5) * 0.7) * (0.25 + 0.3 * n2);
+    const a = clamp(Math.max(hoyo * 0.98, anillo * 0.9, eyecta * 0.85, halo)) * sm(1, 0.9, r);
+    out.a = a;
+    // R: claro = tierra removida (labio y grumos); el fondo del hoyo es lo más oscuro
+    out.r = clamp(anillo * (0.6 + 0.4 * n2) + eyecta * 0.4 * n2 + halo * 0.12 + hoyo * (0.03 + 0.08 * n2) * (1 - anillo));
+    out.h = -hoyo * 0.7 + anillo * 0.9 + eyecta * 0.25;
+  }, { normal: 6 });
 }
 
 function aceite(idx, buf, semilla) {

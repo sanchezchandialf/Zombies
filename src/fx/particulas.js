@@ -141,7 +141,11 @@ function crearCola(escena, cap, aditivo, atlas, uniformes, orden) {
   const malla = new THREE.Mesh(g, mat);
   malla.frustumCulled = false; malla.renderOrder = orden; malla.name = aditivo ? 'fx_brillo' : 'fx_humo';
   escena.add(malla);
-  return { data, buf, geo: g, mat, malla, cap, sig: 0, alto: 0, dMin: 1e9, dMax: -1, lleno: false, vivas: 0 };
+  const cola = { data, buf, geo: g, mat, malla, cap, sig: 0, alto: 0, dMin: 1e9, dMax: -1, lleno: false, vivas: 0, pMin: 1e9, pMax: -1, dibujada: true };
+  // Si un cuadro no se dibuja (pausa del render, capturas, pestaña oculta), los tramos sucios se acumulan hasta el siguiente
+  // dibujo: si no, lo emitido en los cuadros sin dibujar nunca llegaría a la GPU.
+  malla.onBeforeRender = () => { cola.dibujada = true; };
+  return cola;
 }
 
 export function crearMotor(juego, escena, opciones = {}) {
@@ -202,9 +206,11 @@ export function crearMotor(juego, escena, opciones = {}) {
     if (cola.dMax < 0) return;
     cola.geo.instanceCount = cola.lleno ? cola.cap : cola.alto;
     const b = cola.buf;
+    if (cola.dibujada) { cola.pMin = 1e9; cola.pMax = -1; cola.dibujada = false; }
+    cola.pMin = Math.min(cola.pMin, cola.dMin); cola.pMax = Math.max(cola.pMax, cola.dMax);
     b.clearUpdateRanges?.();
-    if (cola.lleno && cola.dMin < 1e8 && cola.dMax - cola.dMin > cola.cap * 0.6) { /* subida completa */ }
-    else b.addUpdateRange?.(cola.dMin * STRIDE, (cola.dMax - cola.dMin + 1) * STRIDE);
+    if (cola.pMax - cola.pMin > cola.cap * 0.6) { /* subida completa */ }
+    else b.addUpdateRange?.(cola.pMin * STRIDE, (cola.pMax - cola.pMin + 1) * STRIDE);
     b.needsUpdate = true;
     cola.dMin = 1e9; cola.dMax = -1;
   }

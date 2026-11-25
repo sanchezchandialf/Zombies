@@ -8,10 +8,10 @@ import { atlasCalcos } from './atlas.js';
 const STRIDE = 16;
 const TIPOS = {
   //            celdas            kind  color                         vida   crece  alfa
-  sangre:    { celdas: [0, 1, 2, 3, 6], kind: 0, color: [0.56, 0.008, 0.014], vida: 210, crece: 0.28, alfa: 0.97 },
-  quemadura: { celdas: [8, 9, 10], kind: 1, color: [0.06, 0.055, 0.05], vida: 150, crece: 0.18, alfa: 0.6 },
+  sangre:    { celdas: [0, 1, 2, 3, 6], kind: 0, color: [0.4, 0.012, 0.014], vida: 210, crece: 0.28, alfa: 0.97 },
+  quemadura: { celdas: [8, 9, 10], kind: 1, color: [0.045, 0.04, 0.036], vida: 150, crece: 0.18, alfa: 0.88 },
   acido:     { celdas: [11, 12], kind: 2, color: [0.32, 0.9, 0.06], vida: 40, crece: 0.45, alfa: 0.92 },
-  crater:    { celdas: [13], kind: 3, color: [0.11, 0.085, 0.065], vida: 320, crece: 0.12, alfa: 0.7 },
+  crater:    { celdas: [13], kind: 3, color: [0.11, 0.085, 0.065], vida: 320, crece: 0.12, alfa: 0.92 },
   aceite:    { celdas: [14], kind: 4, color: [0.012, 0.011, 0.012], vida: 160, crece: 0.8, alfa: 0.95 },
   huella:    { celdas: [15], kind: 5, color: [0.1, 0.07, 0.05], vida: 28, crece: 0.0, alfa: 0.8 },
 };
@@ -57,18 +57,19 @@ void main() {
   vec3 col; vec3 emi = vec3(0.0);
   if (kind < 0.5) {            // sangre: roja saturada, mojada al principio
     float seca = smoothstep(6.0, 80.0, vAge);
-    col = vC.rgb * mix(1.12, 0.62, t.r) * mix(1.0, 0.58, seca);
+    // borde fino más vivo, centro espeso casi granate; se oscurece al secarse
+    col = vC.rgb * mix(1.15, 0.5, t.r) * mix(1.0, 0.55, seca);
     col *= mix(vec3(1.0), vec3(1.0, 1.0, 1.0), seca);
-    float spec = pow(max(dot(n, H), 0.0), 70.0) * (1.0 - seca * 0.85) * 1.8 * smoothstep(0.1, 0.5, t.r);
+    float spec = pow(max(dot(n, H), 0.0), 90.0) * (1.0 - seca * 0.85) * 0.75 * smoothstep(0.2, 0.6, t.r);
     col *= lum; col += vec3(1.0, 0.85, 0.85) * spec * (uSol + 0.15);
   } else if (kind < 1.5) {     // quemadura: hollín mate, más claro en el borde
-    col = mix(vC.rgb * 2.6, vC.rgb * 0.8, t.r) * lum;
+    col = mix(vC.rgb * 2.2, vC.rgb * 0.55, t.r) * lum;
   } else if (kind < 2.5) {     // ácido: charco que burbujea y brilla
     float p = 0.75 + 0.25 * sin(uT * 3.0 + vW.x * 2.0 + vW.z * 3.0);
     col = vC.rgb * (0.35 + 0.5 * t.r) * lum;
     emi = vec3(0.45, 1.5, 0.1) * (0.35 + 0.65 * t.r) * p * (1.0 - smoothstep(0.55, 1.0, vAge / vB.z));
-  } else if (kind < 3.5) {     // cráter
-    col = vC.rgb * (0.5 + 1.1 * t.r) * lum;
+  } else if (kind < 3.5) {     // cráter: fondo casi negro, tierra removida más clara y cálida en el labio
+    col = mix(vC.rgb * 0.3, vC.rgb * vec3(1.7, 1.45, 1.15), t.r) * lum;
   } else if (kind < 4.5) {     // aceite: casi negro con reflejos
     float spec = pow(max(dot(n, H), 0.0), 30.0) * 1.2;
     float fres = pow(1.0 - clamp(dot(n, V), 0.0, 1.0), 4.0);
@@ -105,7 +106,8 @@ export function crearCalcos(juego, escena, uniformes, opciones = {}) {
   malla.frustumCulled = false; malla.renderOrder = 3; malla.name = 'fx_calcos';
   escena.add(malla);
 
-  let sig = 0, alto = 0, lleno = false, dMin = 1e9, dMax = -1;
+  let sig = 0, alto = 0, lleno = false, dMin = 1e9, dMax = -1, pMin = 1e9, pMax = -1, dibujada = true;
+  malla.onBeforeRender = () => { dibujada = true; };   // acumula tramos sucios mientras no se dibuja (ver particulas.js)
   const rng = juego.rng ?? Math.random;
   const reloj = () => uniformes.uT.value;
 
@@ -161,8 +163,10 @@ export function crearCalcos(juego, escena, uniformes, opciones = {}) {
     }
     if (dMax >= 0) {
       g.instanceCount = lleno ? cap : alto;
+      if (dibujada) { pMin = 1e9; pMax = -1; dibujada = false; }
+      pMin = Math.min(pMin, dMin); pMax = Math.max(pMax, dMax);
       buf.clearUpdateRanges?.();
-      buf.addUpdateRange?.(dMin * STRIDE, (dMax - dMin + 1) * STRIDE);
+      buf.addUpdateRange?.(pMin * STRIDE, (pMax - pMin + 1) * STRIDE);
       buf.needsUpdate = true; dMin = 1e9; dMax = -1;
     }
   }

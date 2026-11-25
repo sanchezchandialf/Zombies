@@ -252,9 +252,10 @@ export function crearFx(juego) {
     if (info.tipo === 'veneno' || info.tipo === 'acido') { efectos.tabla.acido(p, { escala: e, cantidad: 6 }); calcos.calco('acido', p.x, p.z, 1.6 * e); return; }
     if (info.tipo === 'explosivo') { efectos.sangreGrande(p, { dirX: dx, dirZ: dz, escala: e * 1.2, cantidad: 34, trozos: 6 }); return; }
     efectos.sangre(p, { dirX: dx, dirZ: dz, cantidad: Math.round(14 * (Math.min(1, ctx.factor) + 0.2)), escala: 1.15 * e, calco: false });
-    calcos.calco('sangre', p.x, p.z, rr(2.5, 3.3) * e, { charco: false });
-    calcos.programar(0.25, 'sangre', p.x + rr(-0.7, 0.7), p.z + rr(-0.7, 0.7), rr(1.8, 2.5) * e);
-    calcos.calco('sangre', p.x + dx * 1.1, p.z + dz * 1.1, rr(1.6, 2.4) * e, (dx || dz) ? { dirX: dx, dirZ: dz } : undefined);
+    // salpicadura principal, rocío desplazado y reguero en la dirección del disparo (el charco lo deja el cadáver al asentarse)
+    calcos.calco('sangre', p.x, p.z, rr(1.5, 2.1) * e, { charco: false });
+    calcos.programar(0.25, 'sangre', p.x + rr(-0.6, 0.6), p.z + rr(-0.6, 0.6), rr(0.8, 1.3) * e);
+    calcos.calco('sangre', p.x + dx * 1.0, p.z + dz * 1.0, rr(1.2, 1.8) * e, (dx || dz) ? { dirX: dx, dirZ: dz } : undefined);
   });
   function rr(a, b) { return a + (b - a) * rng(); }
 

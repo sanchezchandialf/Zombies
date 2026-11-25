@@ -27,12 +27,16 @@ function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
         float suc = smoothstep(0.75, 0.0, vAlt);
         diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.42, 0.36, 0.3), suc * ${suciedad.toFixed(2)});
         diffuseColor.rgb *= 1.0 - vFx.y * 0.93;
+        // impacto: tinte breve de carne magullada (no un blanco plano)
+        float zfl = max(vFx.z, 0.0);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.05, 0.035), zfl * 0.75);
         if (vFx.w > 0.001) { float dn = zr(vLoc * 9.0 + vec3(1.3, 4.1, 2.2)) * 0.6 + zn2 * 0.4; if (dn < vFx.w) discard; }`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        float zrim = pow(1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0), 2.4);
-        totalEmissiveRadiance += (diffuseColor.rgb + vec3(0.035, 0.04, 0.045)) * zrim * ${rim.toFixed(2)} * uRimZ;
+        // borde de luz ceñido al contorno (no lava el volumen): separa la silueta del suelo sin volver gris la horda
+        float zrim = pow(1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0), 4.0);
+        totalEmissiveRadiance += (diffuseColor.rgb * 0.8 + vec3(0.02, 0.026, 0.034)) * zrim * ${rim.toFixed(2)} * 1.3 * uRimZ;
         totalEmissiveRadiance += vec3(1.0, 0.38, 0.06) * (vFx.x * (0.6 + 0.8 * zn) + vFx.y * 0.9 * smoothstep(0.72, 0.9, zn2) * (0.4 + vFx.x));
-        totalEmissiveRadiance += vec3(1.0, 0.92, 0.82) * vFx.z;
+        totalEmissiveRadiance += vec3(1.0, 0.22, 0.1) * zfl * 0.42 + vec3(1.0, 0.92, 0.82) * max(-vFx.z, 0.0);
         if (vFx.w > 0.001) { float dn2 = zr(vLoc * 9.0 + vec3(1.3, 4.1, 2.2)) * 0.6 + zn2 * 0.4; float ed = 1.0 - smoothstep(vFx.w, vFx.w + 0.1, dn2); totalEmissiveRadiance += vec3(1.0, 0.45, 0.1) * ed * 4.0; }`);
   };
   mat.customProgramCacheKey = () => 'zombi-' + granulado + rim + suciedad;

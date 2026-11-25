@@ -119,7 +119,7 @@ export function iniciarMuerte(sis, it, info) {
   const px = it.x, pz = it.z, py = 1.1;
   const fx = juego.fx;
   fx?.emitir?.(explosivo ? 'sangre_grande' : 'sangre', { x: px, y: py, z: pz }, { dirX: dx, dirY: 0.3, dirZ: dz, escala: explosivo ? 1.4 : 0.9 + fuerza * 0.2 });
-  fx?.calco?.('sangre', px + dx * 0.5, pz + dz * 0.5, (explosivo ? 2.2 : 1.1) + rnd() * 0.8, { dirX: dx, dirZ: dz });
+  if (explosivo) fx?.calco?.('sangre', px + dx * 0.5, pz + dz * 0.5, 2.2 + rnd() * 0.8, { dirX: dx, dirZ: dz });   // (la salpicadura normal la pone el FX con zombi:muerte)
   if (energia) {
     fx?.emitir?.('plasma', { x: px, y: py, z: pz }, { escala: 0.8, cantidad: 16 });
     fx?.emitir?.('chispas', { x: px, y: py, z: pz }, { escala: 0.9, cantidad: 14 });
@@ -191,6 +191,8 @@ export function actualizarMuerto(sis, it, dt) {
   if (b.dormido && !it.reposo) {
     it.reposo = true;
     sis.juego.fx?.calco?.('sangre', b.cx, b.cz, 1.3 + rnd() * 0.8 + (it.modoMuerte === 'fuego' ? 0 : 0.3));
+    // charco que se extiende despacio bajo el cadáver (oscuro, espeso)
+    if (it.modoMuerte !== 'energia') sis.juego.fx?.calco?.('sangre', b.cx + (rnd() - 0.5) * 0.3, b.cz + (rnd() - 0.5) * 0.3, 0.75 + it.d.W * 0.4 + rnd() * 0.3, { charco: true, crece: 6 + rnd() * 3, color: [0.26, 0.006, 0.008], rot: rnd() * 6.28 });
     if (it.modoMuerte === 'fuego') sis.juego.fx?.calco?.('quemadura', b.cx, b.cz, 1.6);
   }
   // resortes
@@ -210,7 +212,7 @@ export function actualizarMuerto(sis, it, dt) {
     if (it.emisor) { it.emisor.pos.x = b.cx; it.emisor.pos.z = b.cz; it.emisor.pos.y = Math.max(0.2, b.cy - 0.2); if (q <= 0) { it.emisor.detener?.(); it.emisor = null; } }
   } else if (it.modoMuerte === 'energia') {
     const u = clamp01((it.tMuerte - 0.12) / 1.15);
-    fxv[3] = u; fxv[2] = 0.25 * (1 - u);
+    fxv[3] = u; fxv[2] = -0.25 * (1 - u);   // negativo: brillo de desintegración (positivo = tinte de impacto)
     if (u > 0 && (it.tMuerte * 14) % 1 < dt * 14 && sis.juego.fx) sis.juego.fx.emitir?.('chispas', { x: b.cx + (rnd() - 0.5), y: b.cy + (rnd() - 0.2), z: b.cz + (rnd() - 0.5) }, { escala: 0.5, cantidad: 3 });
     if (u >= 1) return false;
   }

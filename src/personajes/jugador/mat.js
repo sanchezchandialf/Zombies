@@ -101,6 +101,28 @@ export function matSilueta(color = 0xffffff) {
   return m;
 }
 
+// Tinte de impacto: variante del propio material con el color empujado hacia el tinte y un brillo emisivo suave
+// (la textura y el volumen siguen leyéndose; nada de silueta blanca plana). Cacheada por material+tinte+nivel.
+const tintes = new Map();
+const _ct = new THREE.Color();
+export function matTinte(m0, color = 0xff3a2a, nivel = 1) {
+  if (!m0 || !m0.isMeshStandardMaterial) return m0;
+  const k = m0.uuid + ':' + color + ':' + nivel;
+  let m = tintes.get(k);
+  if (!m) {
+    m = m0.clone();
+    m.onBeforeCompile = m0.onBeforeCompile; m.customProgramCacheKey = m0.customProgramCacheKey;
+    _ct.set(color);
+    const f = nivel > 1 ? 0.6 : 0.32;
+    m.color = m0.color.clone().lerp(_ct, f);
+    m.emissive = _ct.clone(); m.emissiveIntensity = nivel > 1 ? 0.5 : 0.22;
+    m.emissiveMap = null;
+    m.userData.compartido = true;
+    tintes.set(k, m);
+  }
+  return m;
+}
+
 const flash = new Map();
 export function matFlash(color = 0xffffff) {
   let m = flash.get(color);
@@ -129,6 +151,8 @@ export function liberarMateriales() {
   siluetas.clear();
   for (const m of flash.values()) m.dispose();
   flash.clear();
+  for (const m of tintes.values()) m.dispose();
+  tintes.clear();
   fantasma?.dispose(); fantasma = null;
   if (T) { for (const t of Object.values(T)) t.dispose(); T = null; }
 }

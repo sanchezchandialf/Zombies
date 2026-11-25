@@ -13,13 +13,13 @@ export const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) 
 export const PERFIL = {
   caminante: {
     H: 1.0, W: 1.0, G: 1.0, tw: 1.0, td: 1.0, th: 1.0, cuello: 0, cabeza: 1.0, altura: 1.82,
-    pieles: [0x7d8f6c, 0x8a9477, 0x948f78, 0x77888a, 0x859a72], ojos: 0xe8e0a0,
+    pieles: [0x6f8a5c, 0x7d9064, 0x8c8f66, 0x6a8284, 0x859a62, 0x8e8478, 0x74865a], ojos: 0xffe890,
     anim: { zancada: 1.15, pierna: 0.42, rodilla: 0.55, brazo: 0.09, inclina: 0.3, cabInc: 0.18, cabLado: 0.26, boca: 0.2,
       bI: [-1.18, 0.1, -0.35], bD: [-0.1, 0.08, -0.14], arrastre: 1, hombro: 0.1, cadera: 0.16, rebote: 0.03, vref: 2.0, temblor: 0.5 },
   },
   corredor: {
-    H: 1.03, W: 0.8, G: 0.78, tw: 0.84, td: 0.86, th: 1.0, cuello: 0.04, cabeza: 0.98, altura: 1.8,
-    pieles: [0xa89a58, 0xb4a468, 0x9c9a6a, 0xb09a62], ojos: 0xfff0a0,
+    H: 1.03, W: 0.8, G: 0.77, tw: 0.82, td: 0.84, th: 1.0, cuello: 0.04, cabeza: 0.98, altura: 1.8,
+    pieles: [0xc2a456, 0xb89a4c, 0xc8ae62, 0xb0984e], ojos: 0xffd060,
     anim: { zancada: 2.3, pierna: 0.98, rodilla: 1.5, brazo: 0.62, inclina: 0.66, cabInc: -0.5, cabLado: 0.1, boca: 0.5,
       bI: [0.75, 0.25, -1.0], bD: [0.75, 0.25, -1.0], arrastre: 0, hombro: 0, cadera: 0.12, rebote: 0.07, vref: 6.4, temblor: 0.9 },
   },
@@ -31,26 +31,26 @@ export const PERFIL = {
   },
   escupidor: {
     H: 1.04, W: 0.88, G: 0.86, tw: 0.9, td: 0.9, th: 0.95, cuello: 0.34, cabeza: 0.92, altura: 2.0,
-    pieles: [0x8aa84a, 0x98b25a, 0x7fa05c, 0x92aa55], ojos: 0xd8ff70,
+    pieles: [0x7fa83e, 0x8cb24a, 0x74a050, 0x86aa44], ojos: 0xd8ff70,
     anim: { zancada: 1.2, pierna: 0.38, rodilla: 0.5, brazo: 0.1, inclina: 0.22, cabInc: 0.2, cabLado: 0.18, boca: 0.4,
       bI: [-0.55, 0.22, -0.9], bD: [-0.5, 0.22, -0.95], arrastre: 0, hombro: 0.05, cadera: 0.14, rebote: 0.025, vref: 2.4, temblor: 0.5 },
   },
   apestado: {
     H: 0.93, W: 1.5, G: 1.18, tw: 1.75, td: 1.9, th: 0.95, cuello: 0, cabeza: 0.86, altura: 1.75,
-    pieles: [0x86a864, 0x94a870, 0x7f9f66, 0x90a47a], ojos: 0xf0ff80,
+    pieles: [0x8c9c58, 0x98a462, 0x84945a, 0x9aa070], ojos: 0xf0ff80,
     anim: { zancada: 1.0, pierna: 0.28, rodilla: 0.22, brazo: 0.07, inclina: 0.1, cabInc: 0.1, cabLado: 0.12, boca: 0.3,
       bI: [-0.28, 0.82, -0.2], bD: [-0.22, 0.8, -0.2], arrastre: 0, hombro: 0, cadera: 0.28, rebote: 0.03, vref: 1.6, temblor: 0.3 },
   },
   mole: {
     H: 1.38, W: 1.55, G: 1.5, tw: 1.5, td: 1.45, th: 1.05, cuello: 0, cabeza: 0.7, altura: 2.6,
-    pieles: [0x9a6a5e, 0x8c6258, 0xa07466, 0x946c62], ojos: 0xffd8b0,
+    pieles: [0x8e6a72, 0x86626c, 0x967078, 0x7e6470], ojos: 0xffb070,
     anim: { zancada: 1.5, pierna: 0.36, rodilla: 0.3, brazo: 0.08, inclina: 0.28, cabInc: 0.1, cabLado: 0.1, boca: 0.2,
       bI: [-0.1, 0.34, -0.15], bD: [-0.22, 0.4, -0.18], arrastre: 0, hombro: 0, cadera: 0.1, rebote: 0.03, vref: 2.2, temblor: 0.2 },
     brazoI: { l: 0.82, g: 0.7 }, brazoD: { l: 1.18, g: 2.5 },
   },
   aullador: {
     H: 1.05, W: 0.74, G: 0.74, tw: 0.8, td: 0.82, th: 1.0, cuello: 0.02, cabeza: 1.1, altura: 1.9,
-    pieles: [0xb896b4, 0xa890a8, 0xb89ca6, 0xa6a0b4], ojos: 0xffe0f0,
+    pieles: [0xa496c0, 0x9a8cb8, 0xae9ec6, 0x9690b4], ojos: 0xff90c0,
     anim: { zancada: 1.15, pierna: 0.4, rodilla: 0.5, brazo: 0.08, inclina: 0.2, cabInc: -0.3, cabLado: 0.16, boca: 0.95,
       bI: [-1.85, 0.35, -1.85], bD: [-1.75, 0.35, -1.9], arrastre: 0, hombro: 0, cadera: 0.14, rebote: 0.02, vref: 2.6, temblor: 1.1 },
   },
@@ -63,6 +63,51 @@ export const PERFIL = {
 };
 
 export const SANGRE = lin(0x4a0b0d);
+const CARNE = lin(0x8a2218), MORADO = lin(0x4a3442);
+const CABEZA_PROPIA = new Set(['corredor', 'escupidor', 'apestado', 'mole', 'aullador']);
+const TRONCO_ARRIBA = new Set([J.TORSO, J.X0, J.BRAZO_I, J.BRAZO_D, J.ANTEBRAZO_I, J.ANTEBRAZO_D]);
+
+/** Tela sucia: oscurece, calienta hacia el barro y varía por instancia. */
+function ensuciar(c, rng) {
+  const k = 0.7 + rng() * 0.12;
+  return [c[0] * k * 0.98 + 0.006, c[1] * k * 0.9 + 0.005, c[2] * k * 0.8 + 0.004];
+}
+/** Quita del modelo (desde el índice `desde`) las piezas que cumplan `quitar(i)`, compactando los arrays. */
+function filtrar(M, desde, quitar) {
+  let w = desde;
+  for (let i = desde; i < M.n; i++) {
+    if (quitar(i)) continue;
+    if (w !== i) {
+      M.mi[w] = M.mi[i]; M.joint[w] = M.joint[i]; M.pulso[w] = M.pulso[i]; M.lod[w] = M.lod[i]; M.grupo[w] = M.grupo[i];
+      M.loc.copyWithin(w * 12, i * 12, i * 12 + 12); M.col.copyWithin(w * 3, i * 3, i * 3 + 3);
+    }
+    w++;
+  }
+  M.n = w;
+}
+/** Jirones de camisa colgando de los hombros y la cintura (Corredor). */
+function harapos(c) {
+  const { d, p, rng } = c;
+  const tela = mul(lin(rng.elegir([0x6a5a44, 0x5a4a3a, 0x7a6a52, 0x4a4438])), 0.8);
+  for (let k = 0; k < 4; k++) {
+    const x = (k / 3 - 0.5) * d.tw * 0.9, larg = rng.rango(0.12, 0.24);
+    p('almohada', MAT.MATE, J.TORSO, [x, d.th * rng.rango(0.05, 0.25), rng.signo() * d.td * 0.5], [d.tw * 0.26, larg, 0.03], tela, { rz: rng.rango(-0.3, 0.3) });
+  }
+  p('toro', MAT.MATE, J.TORSO, [0, d.th * 0.9, 0], [d.tw * 0.95, 0.05, d.td * 1.05], tela);
+}
+/** Piel enferma: moratones, livideces y venas oscuras repartidas por miembros y espalda (varían por instancia). */
+function podredumbre(c) {
+  const { d, p, rng, piel, clase } = c;
+  if (clase === 'acorazado') return;
+  const js = [J.BRAZO_I, J.ANTEBRAZO_I, J.BRAZO_D, J.ANTEBRAZO_D, J.TORSO, J.CABEZA];
+  const n = rng.entero(2, 4);
+  for (let k = 0; k < n; k++) {
+    const j = rng.elegir(js), col = mix(piel, rng() < 0.5 ? MORADO : lin(0x3a4a2a), rng.rango(0.45, 0.7));
+    if (j === J.TORSO) p('almohada', MAT.MATE, j, [rng.rango(-0.35, 0.35) * d.tw, d.th * rng.rango(0.4, 0.9), -d.td * 0.52], [rng.rango(0.08, 0.14), rng.rango(0.06, 0.12), 0.02], col, { rz: rng.rango(0, 3), lod: true });
+    else if (j === J.CABEZA) p('esfera', MAT.MATE, j, [rng.signo() * d.hr * 0.55, d.hr * rng.rango(0.9, 1.5), d.hr * rng.rango(-0.3, 0.4)], [d.hr * 0.7, d.hr * 0.5, d.hr * 0.6], col, { lod: true });
+    else p('esfera', MAT.MATE, j, [0, -d.ua * rng.rango(0.2, 0.7), 0.03], [0.07, 0.11, 0.06], col, { lod: true });
+  }
+}
 export const HUESO = lin(0xd8d0b8);
 
 export function crearModeloZombi(claseId, eraIdx, semilla, elite) {
@@ -112,8 +157,17 @@ export function crearModeloZombi(claseId, eraIdx, semilla, elite) {
 
   anatomia(ctx);
   rasgosClase(ctx);
+  // Vestuario de la era: la tela se ensucia y oscurece (contraste con la piel enferma; nada de maniquíes pálidos)
+  const n0 = M.n, pBase = ctx.p;
+  ctx.p = (kind, mat, joint, pos, tam, col, o) => pBase(kind, mat, joint, pos, tam, mat === MAT.MATE ? ensuciar(col, rng) : col, o);
   if (claseId === 'acorazado') armadura(ctx); else vestirEra(ctx);
+  ctx.p = pBase;
+  // Las clases especiales se reconocen por la cabeza (lo que más se ve desde la cámara cenital): fuera sombreros, cascos y capuchas
+  if (CABEZA_PROPIA.has(claseId)) filtrar(M, n0, (i) => M.joint[i] === J.CABEZA && M.loc[i * 12 + 10] > -0.015);
+  // El Corredor va casi desnudo: solo jirones (se ven las costillas y la espalda en carne viva)
+  if (claseId === 'corredor' || claseId === 'mole') { filtrar(M, n0, (i) => TRONCO_ARRIBA.has(M.joint[i]) && (M.mi[i] % 3) !== MAT.EMISIVO); harapos(ctx); }
   if (claseId === 'detonador') explosivoEra(ctx);
+  podredumbre(ctx);
   heridas(ctx);
   ojos(ctx);
 
@@ -194,9 +248,19 @@ function rasgosClase(c) {
     }
     // baba/ácido de la barbilla
     p('segmento', MAT.EMISIVO, J.MANDIBULA, [0, -hr * 0.9, hr * 1.2], [hr * 0.18, hr * 1.1, hr * 0.18], [0.35, 1.5, 0.12], { lod: true });
+    // cráneo hinchado con venas y ampollas de ácido que brillan desde arriba
+    p('esfera', MAT.MATE, J.CABEZA, [0, hr * 1.35, -hr * 0.1], [hr * 2.0, hr * 1.4, hr * 2.0], pielB);
+    for (let k = 0; k < 4; k++) { const a = k * 1.57 + rng.rango(-0.3, 0.3); p('segmento', MAT.EMISIVO, J.CABEZA, [Math.sin(a) * hr * 0.55, hr * 1.85, Math.cos(a) * hr * 0.55 - hr * 0.1], [hr * 0.09, hr * 0.9, hr * 0.09], [0.3, 1.25, 0.1], { rx: Math.cos(a) * 0.9, rz: -Math.sin(a) * 0.9, pulso: 2 }); }
+    for (let k = 0; k < 3; k++) p('esfera', MAT.EMISIVO, J.TORSO, [rng.rango(-0.5, 0.5) * d.tw, d.th * rng.rango(0.55, 0.9), -d.td * 0.5], [0.09, 0.08, 0.07], [0.45, 1.7, 0.15], { pulso: 2 });
     c.anclas.boca = { j: J.MANDIBULA, x: 0, y: -hr * 0.4, z: hr * 1.4 };
   }
   if (clase === 'apestado') {
+    // pústulas en espalda, hombros y coronilla: es lo que la cámara ve de la masa que se acerca
+    for (let k = 0; k < (elite ? 9 : 7); k++) {
+      const a = rng.rango(Math.PI * 0.55, Math.PI * 1.45), s2 = rng.rango(0.07, 0.13), v = rng.rango(-0.2, 0.55);
+      p('esfera', MAT.EMISIVO, J.X0, [Math.sin(a) * d.tw * 0.5, v * d.th * 0.8, Math.cos(a) * d.td * 0.6], [s2, s2 * 0.9, s2], rng() < 0.7 ? [1.35, 1.6, 0.18] : [1.7, 0.75, 0.1], { pulso: 2 });
+    }
+    for (let k = 0; k < 3; k++) p('esfera', MAT.EMISIVO, J.CABEZA, [rng.rango(-0.6, 0.6) * hr, hr * rng.rango(1.5, 1.8), rng.rango(-0.6, 0.3) * hr], [0.06, 0.06, 0.06], [1.4, 1.6, 0.2], { pulso: 2 });
     // Panza hinchada y pústulas emisivas
     p('almohada', MAT.MATE, J.X0, [0, -d.th * 0.12, d.td * 0.28], [d.tw * 1.05, d.th * 0.8, d.td * 1.05], piel);
     p('esfera', MAT.MATE, J.X0, [-d.tw * 0.28, -d.th * 0.05, d.td * 0.58], [0.26, 0.24, 0.2], mul(pielB, 1.05), { lod: true });
@@ -225,6 +289,13 @@ function rasgosClase(c) {
     for (let k = 0; k < 3; k++) p('cono', MAT.MATE, J.ANTEBRAZO_D, [rng.rango(-0.1, 0.1), -d.fa * 0.4 - k * 0.12, 0.2 + k * 0.02], [0.05, 0.16, 0.05], HUESO, { rx: 1.4, lod: true });
     // costuras / cicatrices
     for (let k = 0; k < 3; k++) p('almohada', MAT.MATE, J.TORSO, [rng.rango(-0.2, 0.2), d.th * rng.rango(0.3, 0.75), d.td * 0.46], [0.22, 0.03, 0.02], SANGRE, { rz: rng.rango(-0.6, 0.6), lod: true });
+    // púas de hueso por la espalda y la joroba (silueta erizada vista desde arriba)
+    for (let k = 0; k < 7; k++) {
+      const x = rng.rango(-0.3, 0.4) * d.tw, y = d.th * rng.rango(0.55, 0.95);
+      p('cono', MAT.MATE, J.TORSO, [x, y, -d.td * 0.55], [0.07, 0.26, 0.07], HUESO, { rx: -1.0 - rng() * 0.5, rz: x * 1.2 });
+    }
+    for (let k = 0; k < 3; k++) p('cono', MAT.MATE, J.BRAZO_D, [rng.rango(-0.1, 0.15), 0.12, rng.rango(-0.15, 0.1)], [0.06, 0.22, 0.06], HUESO, { rz: -0.4 - rng() * 0.4 });
+    for (let k = 0; k < 4; k++) p('almohada', MAT.MATE, J.TORSO, [rng.rango(-0.3, 0.3), d.th * rng.rango(0.4, 0.9), -d.td * 0.5], [0.25, 0.035, 0.02], SANGRE, { rz: rng.rango(-0.8, 0.8), lod: true });
     c.pelvisCol = mul(piel, 0.7);
   }
   if (clase === 'aullador') {
@@ -244,6 +315,11 @@ function rasgosClase(c) {
     c.anclas.boca = { j: J.MANDIBULA, x: 0, y: -hr * 0.3, z: hr * 1.2 };
   }
   if (clase === 'corredor') {
+    // Espalda en carne viva con la columna asomando (lo que se ve desde arriba al correr encorvado)
+    p('almohada', MAT.MATE, J.TORSO, [0, d.th * 0.62, -d.td * 0.42], [d.tw * 0.62, d.th * 0.58, d.td * 0.3], CARNE);
+    for (let k = 0; k < 6; k++) p('esfera', MAT.MATE, J.TORSO, [0, d.th * (0.32 + k * 0.11), -d.td * 0.56], [0.05, 0.045, 0.045], HUESO);
+    for (const sg of [-1, 1]) p('almohada', MAT.MATE, J.BRAZO_I + (sg > 0 ? 2 : 0), [0, -0.02, -0.02], [0.1, 0.08, 0.09], CARNE, { lod: true });
+    p('almohada', MAT.MATE, J.CABEZA, [hr * 0.25, hr * 1.7, -hr * 0.1], [hr * 0.9, hr * 0.35, hr * 1.0], CARNE, { rz: 0.3 });   // cuero cabelludo arrancado
     // Costillas marcadas y columna a la vista; pelo revuelto
     for (let k = 0; k < 4; k++) p('arcoFino', MAT.MATE, J.TORSO, [0, d.th * (0.42 + k * 0.09), d.td * 0.1], [d.tw * 0.98, 0.02, d.td * 1.0], mul(piel, 1.15), { lod: true });
     for (let k = 0; k < 7; k++) p('cono', MAT.MATE, J.CABEZA, [rng.rango(-hr * 0.5, hr * 0.5), hr * rng.rango(1.5, 1.95), rng.rango(-hr * 0.7, hr * 0.3)], [hr * 0.28, hr * 0.7, hr * 0.28], lin(0x2c2418), { rx: rng.rango(-0.7, 0.4), rz: rng.rango(-0.6, 0.6) });
@@ -271,6 +347,6 @@ function ojos(c) {
   const col = lin(P.ojos);
   for (const s of [-1, 1]) {
     if (elite) p('esfera', MAT.EMISIVO, J.CABEZA, [s * hr * 0.4, hr * 1.12, hr * 0.9], [hr * 0.3, hr * 0.26, hr * 0.2], [3.2, 0.9, 0.18], { pulso: 3 });
-    else p('esfera', MAT.EMISIVO, J.CABEZA, [s * hr * 0.4, hr * 1.12, hr * 0.9], [hr * 0.17, hr * 0.15, hr * 0.12], [col[0] * 1.1, col[1] * 1.1, col[2] * 1.1], { pulso: 3, lod: true });
+    else p('esfera', MAT.EMISIVO, J.CABEZA, [s * hr * 0.4, hr * 1.12, hr * 0.9], [hr * 0.21, hr * 0.17, hr * 0.13], [col[0] * 1.2, col[1] * 1.2, col[2] * 1.2], { pulso: 5 });
   }
 }

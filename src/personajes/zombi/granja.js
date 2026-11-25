@@ -6,6 +6,8 @@ import { materialesZombi } from './materiales.js';
 import { GRUPO_DE_J } from './matematica.js';
 
 export const MAT = { MATE: 0, METAL: 1, EMISIVO: 2 };
+/** Brillo global de los ojos (pulso 5): tenue de día, encendidos de noche y en las eras oscuras (lo fija el sistema). */
+export const OJOS = { value: 1 };
 const NMAT = 3;
 
 /** Modelo: lista plana de piezas de un zombi (compartida con sus restos). */
@@ -110,6 +112,7 @@ export class Granja {
           else if (p === 2) e = 0.7 + 0.45 * Math.sin(t * 3.1 + semilla + i);
           else if (p === 3) e = 0.85 + 0.15 * Math.sin(t * 7 + semilla);
           else if (p === 4) e = Math.sin(t * 9 + semilla) > -0.2 ? 1.4 : 0.15;
+          else if (p === 5) e = OJOS.value * (0.88 + 0.12 * Math.sin(t * 2.3 + semilla * 0.37));
           r *= e; g *= e; bl *= e;
         }
       } else if (ta > 0) { r += (tr - r) * ta; g += (tg - g) * ta; bl += (tb - bl) * ta; }

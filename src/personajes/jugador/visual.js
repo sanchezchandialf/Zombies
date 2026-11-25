@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { D } from './construir.js';
 import { RASGOS } from './rasgos.js';
 import { atuendo } from './atuendos.js';
-import { matFlash, matFantasma, matSilueta, RIM } from './mat.js';
+import { matTinte, matFantasma, matSilueta, RIM } from './mat.js';
 import { ROLES } from '../../datos/roles.js';
 import { crearAuras } from './auras.js';
 
@@ -15,6 +15,9 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const damp = (a, b, k, dt) => lerp(a, b, 1 - Math.exp(-k * dt));
 const TAU = Math.PI * 2;
+/** Escala heroica: a 22 m de cámara el héroe debe dominar el encuadre frente a la horda (ARTE §8). */
+const ESC_HEROE = 1.12;
+const DUR_TINTE = 0.16;
 
 // Posición del puño derecho (empuñadura) en el marco del pecho y parámetros de retroceso por pose de arma
 const POSES = {
@@ -56,10 +59,10 @@ export class VisualJugador {
   constructor(sis, rolId, eraIdx) {
     this.sis = sis; this.juego = sis.juego; this.rolId = rolId;
     const R = this.R = RASGOS[rolId] ?? RASGOS.soldado;
-    this.altura = 1.95 * R.esc;
+    this.altura = 1.95 * R.esc * ESC_HEROE;
     const H = this.H = {};
     const mk = (n, padre, x = 0, y = 0, z = 0) => { const g = new THREE.Group(); g.name = n; g.position.set(x, y, z); padre.add(g); H[n] = g; return g; };
-    const root = this.root = new THREE.Group(); root.name = 'jugador_' + rolId; root.scale.setScalar(R.esc);
+    const root = this.root = new THREE.Group(); root.name = 'jugador_' + rolId; root.scale.setScalar(R.esc * ESC_HEROE);
     const caida = mk('caida', root), volteo = mk('volteo', caida, 0, 0.9, 0), cuerpo = mk('cuerpo', volteo, 0, -0.9, 0);
     const w = R.w;
     const pelvis = mk('pelvis', cuerpo, 0, D.alturaCadera, 0);
@@ -83,7 +86,7 @@ export class VisualJugador {
     this.auras = crearAuras(this);
     this.sombra = sis.crearSombra(); root.add(this.sombra);
     this.anillo = sis.crearAnillo?.(ROLES[rolId]?.color ?? '#ffffff') ?? null;
-    if (this.anillo) { this.anillo.scale.setScalar(1 / R.esc); root.add(this.anillo); }
+    if (this.anillo) { this.anillo.scale.setScalar(1 / (R.esc * ESC_HEROE)); root.add(this.anillo); }
     // Luz de héroe: pequeño foco sin sombra sobre la cabeza, blanco teñido del color del rol. De noche separa al jugador del fondo.
     this.colLuz = new THREE.Color(ROLES[rolId]?.color ?? '#ffffff').lerp(new THREE.Color(1, 0.96, 0.9), 0.45);
     this.luz = this.juego?.render?.luzPuntual?.({ x: 0, y: 2.6, z: 0, color: this.colLuz, intensidad: 0, distancia: 8 }) ?? null;
@@ -170,7 +173,7 @@ export class VisualJugador {
     }
     this._mats();
   }
-  destello(color = 0xffffff) { this.flashT = 0.1; this.flashCol = color; this._mats(); }
+  destello(color = 0xffffff) { this.flashT = DUR_TINTE; this.flashCol = color === 0xffffff ? 0xff3424 : color; this.flashNivel = 2; this._mats(); }
   visible(v) { this.root.visible = v; }
   liberar() { this.root.removeFromParent(); this.sis.quitar(this); this.auras.liberar(); this.luz?.quitar?.(); this.luz = null; }
 
@@ -204,8 +207,8 @@ export class VisualJugador {
 
   // ───────────── materiales (destello / invisible) ─────────────
   _mats() {
-    const f = this.flashT > 0 ? matFlash(this.flashCol) : this.invisible ? matFantasma() : null;
-    for (const m of this.mallas) { m.material = f || m.userData.m0; m.castShadow = !this.invisible; }
+    const tinte = this.flashT > 0 && !this.invisible, f = !tinte && this.invisible ? matFantasma() : null;
+    for (const m of this.mallas) { m.material = tinte ? matTinte(m.userData.m0, this.flashCol, this.flashNivel) : (f || m.userData.m0); m.castShadow = !this.invisible; }
     for (const m of this.siluetas ?? []) m.visible = !this.invisible && !this.muerto;
     this.sombra.visible = !this.invisible;
   }
@@ -213,7 +216,11 @@ export class VisualJugador {
   // ───────────── animación ─────────────
   actualizar(dt) {
     dt = Math.min(dt, 0.1);
-    if (this.flashT > 0) { this.flashT -= dt; if (this.flashT <= 0) this._mats(); }
+    if (this.flashT > 0) {
+      this.flashT -= dt;
+      if (this.flashT <= 0) this._mats();
+      else if (this.flashNivel > 1 && this.flashT < DUR_TINTE * 0.55) { this.flashNivel = 1; this._mats(); }   // el tinte se apaga en dos pasos
+    }
     if (dt <= 0) return;
     this.t += dt;
     this.auras.actualizar(dt, this.t);
