@@ -2,11 +2,12 @@
 // Todo cuelga de lotes del kit; los ventanales y rótulos son lienzos emisivos (utiles.js).
 import * as THREE from 'three';
 import { ROSA, TURQUESA } from './utiles.js';
+import { crearPintura } from './pintura.js';
 
 export function crearEdificios(kit, U) {
   const lote = kit.lote0, M = kit.matriz, CR = kit.cajaRedondeada;
   const mat = (n, o) => kit.mat(n, o);
-  const pint = (c, o = {}) => kit.mat('acero_pintado', { color: c, desgaste: 0.3, ...o });
+  const pintura = crearPintura(kit), pint = (c, o = {}) => pintura(c);
   const cromo = mat('cromo'), cepillado = mat('acero_cepillado'), hierro = mat('hierro_forjado'), oxido = mat('hierro_oxidado');
   const A = (g, m, mm, o) => lote.anadir(g, m, mm, o);
   const caja = (m, cx, cy, cz, w, h, d, o = {}) => lote.caja(m, cx, cy, cz, w, h, d, o);

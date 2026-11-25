@@ -1,6 +1,7 @@
 // ERA Z · Avenida Neón: utilidades de construcción (coches de los 50, palmeras, rótulos de neón, ventanales pintados, mobiliario).
 // Todo se funde en los lotes del kit; los rótulos y ventanales son mallas sueltas con lienzos procedurales (emisivos).
 import * as THREE from 'three';
+import { crearPintura } from './pintura.js';
 
 export const PINTURAS = [0x4fd1c5, 0xf08cb5, 0xf0e6c8, 0x8fd8b0, 0x7fb4e8, 0xe8c968, 0x1f7a7a, 0x2b3a55, 0x9b3d56, 0xe8ecef];
 export const ROSA = 0xff3fa8, TURQUESA = 0x2ff0ff;
@@ -27,7 +28,7 @@ function neonTexto(g, texto, cx, cy, tam, color, o = {}) {
 export function crearUtiles(kit) {
   const lote = kit.lote0, M = kit.matriz, rng = kit.rng(77);
   const mat = (n, o) => kit.mat(n, o);
-  const pint = (color, o = {}) => kit.mat('acero_pintado', { color, desgaste: 0.28, ...o });
+  const pintura = crearPintura(kit), pint = (color, o = {}) => pintura(color);
   const cromo = mat('cromo'), goma = mat('goma'), cepillado = mat('acero_cepillado'), hierro = mat('hierro_forjado');
   const vidrioOff = kit.vidrio(false);
   const faro = kit.emisivo(0xfff0c8, 1.3), piloto = kit.emisivo(0xff2a2a, 1.6);

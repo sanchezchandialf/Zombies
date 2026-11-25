@@ -4,6 +4,7 @@
 //   centro: avenida E-O abierta (inicio de jugadores) · suroeste: gasolinera · sur: aparcamiento · sureste: lavandería
 import { ERAS } from '../datos/eras.js';
 import { crearUtiles, PINTURAS, ROSA, TURQUESA } from './suburbio_neon/utiles.js';
+import { crearPintura } from './suburbio_neon/pintura.js';
 import { crearEdificios } from './suburbio_neon/edificios.js';
 
 const TAU = Math.PI * 2;
@@ -15,7 +16,7 @@ export async function construir(juego, kit) {
     'tela_asfaltica', 'ladrillo_encalado', 'estuco_desconchado', 'panel_prefabricado', 'troncos', 'hierro_forjado', 'hierro_oxidado', 'agua', 'tablas_viejas', 'rayas_peligro', 'ladrillo_rojo']);
   const U = crearUtiles(kit), E = crearEdificios(kit, U);
   const lote = kit.lote0, M = kit.matriz, CR = kit.cajaRedondeada;
-  const pint = (c, o = {}) => kit.mat('acero_pintado', { color: c, desgaste: 0.3, ...o });
+  const pintura = crearPintura(kit), pint = (c, o = {}) => pintura(c);
 
   // ───────────── 1. SUELO ─────────────
   kit.suelo({
@@ -31,10 +32,10 @@ export async function construir(juego, kit) {
   // periferia: césped oscuro fuera de la arena (la avenida sigue hacia los lados)
   for (const r of [[-80, -80, 80, -49], [-80, 49, 80, 80], [-80, -49, -49, -4], [-80, 11, -49, 49], [49, -49, 80, -4], [49, 11, 80, 49]]) kit.zona({ rect: r, material: 'hierba', alto: 0.02, mojado: 0.4 });
   // acera con bordillo (norte y sur de la avenida)
-  kit.zona({ rect: [-45, -6.5, 45, -2.6], material: 'losas_acera', alto: 0.12, borde: { material: 'hormigon', ancho: 0.22, alto: 0.15 }, mojado: 0.35 });
-  kit.zona({ rect: [-45, 10.6, 45, 13.6], material: 'losas_acera', alto: 0.12, borde: { material: 'hormigon', ancho: 0.22, alto: 0.15 }, mojado: 0.35 });
+  kit.zona({ rect: [-45, -6.5, 45, -2.6], material: 'losas_acera', color: 0x9fb2c0, alto: 0.12, borde: { material: 'hormigon', ancho: 0.22, alto: 0.15 }, mojado: 0.35 });
+  kit.zona({ rect: [-45, 10.6, 45, 13.6], material: 'losas_acera', color: 0x9fb2c0, alto: 0.12, borde: { material: 'hormigon', ancho: 0.22, alto: 0.15 }, mojado: 0.35 });
   // explanada de la gasolinera, cubierta de la piscina y suelo del autocine
-  kit.zona({ rect: [-45, 13.6, -12, 31], material: 'hormigon', alto: 0.05, mojado: 0.45 });
+  kit.zona({ rect: [-45, 13.6, -12, 31], material: 'hormigon', color: 0x8d9aab, alto: 0.05, mojado: 0.45 });
   kit.zona({ rect: [-40.5, -17.5, -24.5, -7.5], material: 'hormigon', alto: 0.05, borde: { material: 'losas_acera', ancho: 0.3, alto: 0.1 }, mojado: 0.3 });
   kit.zona({ rect: [-6, -44.5, 45, -19.5], material: 'gravilla_via', alto: 0.03, mojado: 0.45 });
   // montículos en arco de las filas del autocine (centro detrás de la pantalla)
@@ -59,6 +60,12 @@ export async function construir(juego, kit) {
   plazas(22, 44, 30, 35.2, 2.9);                                                     // frente a la lavandería
   // discapacitados / marcas de pintura quemada
   for (const [x, z] of [[-4, 17.4], [-6, -18.6]]) raya(pint(0x2f8cff), x, z, 1.1, 0.5);
+
+  // neón rasante en los bordillos de la acera: guía la lectura de la avenida y da luz de color al asfalto mojado
+  {
+    const tur = kit.emisivo(TURQUESA, 1.5), ros = kit.emisivo(ROSA, 1.5);
+    for (let x = -44.5; x < 44; x += 3) { lote.caja(tur, x + 1.2, 0.2, -2.42, 2.4, 0.05, 0.07, { uv: false, radio: 0.015 }); lote.caja(ros, x + 1.2, 0.2, 10.42, 2.4, 0.05, 0.07, { uv: false, radio: 0.015 }); }
+  }
 
   // ───────────── 3. EDIFICIOS ─────────────
   const motel = E.motel({}), diner = E.diner({}), gas = E.gasolinera({}), lav = E.lavanderia({}), kiosco = E.kiosco({});
@@ -94,7 +101,13 @@ export async function construir(juego, kit) {
   // ───────────── 4. COCHES (obstáculos) ─────────────
   const P = PINTURAS;
   const coches = [];
-  const c = (x, z, rot, ci, tipo = 'sedan', col2) => { U.coche({ x, z, rot, color: P[ci % P.length], tipo, color2: col2 }); coches.push({ x, z }); };
+  const c = (x, z, rot, ci, tipo = 'sedan', col2) => {
+    U.coche({ x, z, rot, color: P[ci % P.length], tipo, color2: col2 }); coches.push({ x, z });
+    // neón de bajos: aro luminoso bajo la carrocería + charco de luz de color en el asfalto mojado
+    const glow = ci % 2 ? ROSA : TURQUESA;
+    lote.caja(kit.emisivo(glow, 1.4), x, 0.06, z, 5.1, 0.03, 2.25, { uv: false, radio: 0.012, rotY: rot });
+    kit.parche({ tipo: 'mancha', x, z, radio: 3.1, color: glow, opacidad: 0.2, capa: 5, alargado: 1.2, rot });
+  };
   const haciaCentro = (x, z) => Math.atan2(-(ACZ - z), ACX - x);
   // autocine en filas de arco, mirando a la pantalla
   for (const [r, ang, ci, tipo] of [[10.4, 62, 0, 'sedan'], [10.4, 112, 1, 'cupe'], [17.1, 50, 5, 'ranchera'], [17.1, 84, 2, 'sedan'], [17.1, 128, 6, 'cupe'], [23.7, 66, 3, 'sedan'], [23.7, 98, 8, 'ranchera'], [23.7, 130, 4, 'sedan'], [23.7, 54, 9, 'cupe']]) {
@@ -142,10 +155,12 @@ export async function construir(juego, kit) {
   // ───────────── 6. DETALLES DE SUELO ─────────────
   const evitar = [[-29, -26, 26, 7], [31, -12, 17, 9], [-37, 17.25, 9, 6.5], [30, 22, 14, 8], [3, -30, 9, 5.5], [22, -42.3, 31, 2.4]].map(([x, z, w, d]) => ({ x, z, hx: w / 2, hz: d / 2, margen: 0.6 }));
   kit.parches({ tipo: 'charco', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 26, radio: [0.9, 2.6], evitar, semilla: 3, alargado: 1.4 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 18, radio: [1.6, 3.6], evitar, color: 0x15181c, opacidad: 0.32, semilla: 31 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 14, radio: [0.4, 1.0], evitar, color: 0x0d0f12, opacidad: 0.55, semilla: 8 });
+  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 18, radio: [1.6, 3.6], evitar, color: 0x0c1020, opacidad: 0.2, semilla: 31 });
+  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 14, radio: [0.4, 1.0], evitar, color: 0x0a0c14, opacidad: 0.32, semilla: 8 });
   // reflejos de neón sobre el asfalto mojado
   for (const [x, z, r, col, o] of [[31, -3, 7, ROSA, 0.2], [-13.5, -15, 6.5, ROSA, 0.2], [-22, 25, 8, TURQUESA, 0.2], [30, 31, 6.5, ROSA, 0.17], [3, -24, 5, TURQUESA, 0.14], [22, -30, 12, TURQUESA, 0.1], [16, -3, 4, TURQUESA, 0.14]]) kit.parche({ tipo: 'mancha', x, z, radio: r, color: col, opacidad: o, capa: 4, alargado: 1.5 });
+  // charcos de luz sobre el asfalto: sodio bajo las farolas encendidas y neón de color en la calzada (ayudan a leer horda y sangre)
+  for (const [x, z, r, col, o] of [[-6, 0, 5.5, 0xffb060, 0.1], [16, 6, 5.5, 0xffb060, 0.1], [-18, 3, 6, TURQUESA, 0.07], [6, 3, 6, ROSA, 0.06], [28, 3, 6, TURQUESA, 0.07], [-30, 3, 5, ROSA, 0.06]]) kit.parche({ tipo: 'mancha', x, z, radio: r, color: col, opacidad: o, capa: 4, alargado: 1.6, rot: 0 });
   for (let i = 0; i < 5; i++) kit.parche({ tipo: 'hojas', x: rng.rango(-40, 40), z: rng.rango(-12, 40), radio: rng.rango(1.5, 3), cantidad: 14, semilla: i, paleta: [0x4a5a2a, 0x6b6a2c, 0x7a6a3a, 0x3d4a28] });
 
   // ───────────── 7. LUCES (≤ 10) ─────────────
