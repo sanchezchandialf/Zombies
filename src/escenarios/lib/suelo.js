@@ -279,12 +279,15 @@ export function materialParche(kit, tipo, color, extra = {}) {
   const k = `${tipo}|${color}|${JSON.stringify(extra)}`;
   let m = kit._matParche.get(k);
   if (m) return m;
+  // Los mapas piden tonos casi negros: se aclaran para que charcos y manchas oscurezcan el suelo sin parecer agujeros.
+  if (tipo !== 'hojas') color = new THREE.Color(color).lerp(new THREE.Color(tipo === 'charco' ? 0x3a4652 : 0x3a3128), 0.45).getHex();
   if (tipo === 'charco') {
-    m = new THREE.MeshStandardMaterial({ map: atlasBlobs('charco'), color, roughness: extra.rugosidad ?? 0.04, metalness: extra.metal ?? 0.8, envMapIntensity: extra.reflejo ?? 1.4, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    // El agua es dieléctrica: con metal 0,8 el charco reflejaba el cielo nocturno y desde la cámara cenital se veía como un agujero negro.
+    m = new THREE.MeshStandardMaterial({ map: atlasBlobs('charco'), color, roughness: extra.rugosidad ?? 0.06, metalness: Math.min(extra.metal ?? 0.1, 0.2), envMapIntensity: extra.reflejo ?? 1.2, transparent: true, opacity: 0.6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   } else if (tipo === 'hojas') {
     m = new THREE.MeshStandardMaterial({ map: atlasHojas(), vertexColors: true, roughness: 0.9, metalness: 0, alphaTest: 0.35, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   } else {
-    m = new THREE.MeshStandardMaterial({ map: atlasBlobs('mancha'), color, roughness: extra.rugosidad ?? 0.95, metalness: 0, transparent: true, opacity: extra.opacidad ?? 0.7, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    m = new THREE.MeshStandardMaterial({ map: atlasBlobs('mancha'), color, roughness: extra.rugosidad ?? 0.95, metalness: 0, transparent: true, opacity: Math.min(extra.opacidad ?? 0.5, 0.6), depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   }
   m.name = 'parche_' + tipo;
   kit._matParche.set(k, m); kit._propios.push(m);
@@ -298,7 +301,7 @@ export function materialParche(kit, tipo, color, extra = {}) {
 export function anadirParche(kit, o) {
   const tipo = o.tipo ?? 'mancha';
   const rng = kit.rng((o.semilla ?? 1) * 131 + Math.floor((o.x ?? 0) * 7 + (o.z ?? 0) * 13));
-  const def = { charco: 0x15202a, mancha: 0x1c1a17, hojas: 0xffffff }[tipo] ?? 0x222222;
+  const def = { charco: 0x3a4652, mancha: 0x3a3128, hojas: 0xffffff }[tipo] ?? 0x222222;
   const color = o.color ?? def;
   const mat = materialParche(kit, tipo, color, { opacidad: o.opacidad, rugosidad: o.rugosidad, metal: o.metal, reflejo: o.reflejo });
   let cola = kit._parches.get(mat);

@@ -83,9 +83,10 @@ const acero_pintado = {
       // desconchones: más en bordes, remaches y con ruido
       const borde = 1 - suave(0, px(18), d);
       const f = des[i] + borde * 0.12 + rem.mask[i] * 0.06 + (des2[i] - 0.5) * 0.18 + (bl[i] - 0.5) * 0.03;
-      const pv = suave(0.6, 0.64, f);        // 1 = pintura saltada
+      // Desconchones escasos (cantos y remaches): con umbral bajo la carrocería parecía manchada de negro.
+      const pv = suave(0.76, 0.8, f);        // 1 = pintura saltada
       const pm = 1 - pv;
-      const prim = pv * (1 - suave(0.64, 0.7, f)) * 0.0 + suave(0.6, 0.62, f) * (1 - suave(0.63, 0.66, f));
+      const prim = suave(0.74, 0.76, f) * (1 - suave(0.77, 0.8, f));
       const sk = 0.9 + (sup[i] - 0.5) * 0.3 + (ray[i] - 0.5) * 0.2;
       const om = suave(0.58, 0.7, ox[i]) * pv * 0.8;
       const pk = 0.95 + (suc[i] - 0.5) * 0.12 + (sup[i] - 0.5) * 0.04 - hol[i] * 0.0;
@@ -97,7 +98,7 @@ const acero_pintado = {
       poner(c, i, r, g, b);
       c.tinte[i] = clamp(pm * (1 - prim * 0.5) * (1 - om));
       c.h[i] = mezcla(0.1, 0.6 + bisel * 0.06 + pm * 0.07 + rem.alt[i] * 0.18 - om * 0.02 + (sup[i] - 0.5) * 0.02, m);
-      c.met[i] = pv * (1 - om) * 0.9;
+      c.met[i] = pv * (1 - om) * 0.6;
       c.rug[i] = clamp(mezcla(0.42 + (ray[i] - 0.5) * 0.3, 0.38 + (sup[i] - 0.5) * 0.12, pm) * (1 - om) + om * 0.9);
     }
     c.fuerzaNormal = 3; c.cav = [{ r: 2, f: 3 }, { r: 8, f: 1.4 }];
