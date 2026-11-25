@@ -65,7 +65,10 @@ export async function correr(o = {}) {
   console.error = errOrig;
   r.render = renderOrig;
   for (const j of juego.jugadores) ent?.simular?.(j.indice, null);
-  if (dibujar || o.foto) { for (let k = 0; k < (o.cuadrosFoto ?? 3); k++) juego.avanzar(1 / 60); } // dibuja sin pausar (la pausa abre el menú)
+  if (dibujar || o.foto) {
+    // Reanuda el bucle real: la interfaz mide sus animaciones en tiempo real y necesita que pasen segundos de verdad.
+    juego._andando = true; juego._ultimo = performance.now(); requestAnimationFrame(juego._cuadro);
+  }
 
   const e = juego.estado;
   return {
