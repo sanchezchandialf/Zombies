@@ -153,8 +153,10 @@ export async function construir(juego, kit) {
     lote.anadir(extruir(circ(cx, cz, r + ancho / 2), alto, { bisel: 0.004, huecos: [circ(cx, cz, r - ancho / 2).reverse()] }), m_, matriz(0, y, 0), Y());
   };
   // plaza central (magenta) con borde de acero y avenida al reactor
-  kit.zona({ circulo: { x: PLAZA.x, z: PLAZA.z, r: PLAZA.r }, seg: 72, mat: mCompM, alto: 0.03, borde: { mat: mAceroOsc, ancho: 0.28, alto: 0.09 } });
-  kit.zona({ rect: [-3.6, -24, 3.6, -9.2], mat: mCompC, alto: 0.036, borde: { mat: mAceroOsc, ancho: 0.2, alto: 0.1 } });
+  // suelo base de toda la arena: chapa estriada azul acero oscuro (legible: la sangre y los zombis destacan); el neón queda en líneas finas
+  kit.zona({ rect: [-45.5, -45.5, 45.5, 45.5], mat: mat('placa_antideslizante', { color: 0x252e48 }), alto: 0.02 });
+  kit.zona({ circulo: { x: PLAZA.x, z: PLAZA.z, r: PLAZA.r }, seg: 72, mat: mat('placa_antideslizante', { color: 0x36436a }), alto: 0.035, borde: { mat: mAceroOsc, ancho: 0.28, alto: 0.09 } });
+  kit.zona({ rect: [-3.6, -24, 3.6, -9.2], mat: mat('composite_futurista', { color: 0x4a86a8, emisivo: 0.6 }), alto: 0.04, borde: { mat: mAceroOsc, ancho: 0.2, alto: 0.1 } });
   // plataforma del andén y lecho de los raíles
   kit.zona({ rect: [10.5, -11.9, 41, -8.9], mat: mat('placa_antideslizante', { color: 0x3a4658 }), alto: 0.05, borde: { mat: mAceroOsc, ancho: 0.2, alto: 0.08 } });
   kit.zona({ rect: [5.5, RAIL_Z - 2.1, 46, RAIL_Z + 2.1], mat: mat('rejilla', { color: 0x2c3a52 }), alto: 0.03 });
@@ -166,14 +168,14 @@ export async function construir(juego, kit) {
   kit.zona({ rect: [26, -28.5, 42, -25], mat: mat('placa_antideslizante', { color: 0x2d3445 }), alto: 0.03 });
 
   // neones empotrados en el suelo
-  anillo(Lneon, eC, PLAZA.x, PLAZA.z, 12.5, 0.14, 0.045);
-  anillo(Lneon, eM, PLAZA.x, PLAZA.z, 8.2, 0.1, 0.045);
-  anillo(Lneon, eC, PLAZA.x, PLAZA.z, 4.2, 0.08, 0.045);
+  anillo(Lneon, eCsuave, PLAZA.x, PLAZA.z, 12.5, 0.07, 0.05);
+  anillo(Lneon, eMsuave, PLAZA.x, PLAZA.z, 8.2, 0.04, 0.05);
+  anillo(Lneon, eCsuave, PLAZA.x, PLAZA.z, 4.2, 0.04, 0.05);
   anillo(Lneon, eM, REACTOR.x, REACTOR.z, 10.4, 0.16, 0.05);
   anillo(Lneon, eC, REACTOR.x, REACTOR.z, 11.6, 0.08, 0.05);
   for (let k = 0; k < 16; k++) { // radios de la plaza
     const a = (k / 16) * 6.2832 + 0.1;
-    Lneon.caja(eMsuave, PLAZA.x + Math.cos(a) * 14.1, 0.045, PLAZA.z + Math.sin(a) * 14.1, 1.4, 0.02, 0.08, { rotY: -a, uv: false, radio: 0.005 });
+    Lneon.caja(eMsuave, PLAZA.x + Math.cos(a) * 14.1, 0.05, PLAZA.z + Math.sin(a) * 14.1, 1.0, 0.02, 0.05, { rotY: -a, uv: false, radio: 0.005 });
   }
   for (const sx of [-3.6, 3.6]) Lneon.caja(eC, sx, 0.06, -16.6, 0.1, 0.02, 15, Y({ radio: 0.005 }));
   Lneon.caja(eM, 0, 0.06, -9.9, 6.8, 0.02, 0.12, Y({ radio: 0.005 }));
@@ -400,7 +402,7 @@ export async function construir(juego, kit) {
     Lneon.caja(eP, x, 3.75, z, ancho + 0.9, 0.08, 0.14, Y({ rotY: rot, radio: 0.01 }));
     Lneon.caja(eP, x, 0.08, z, ancho + 0.9, 0.04, 0.14, Y({ rotY: rot, radio: 0.01 }));
     const obj = m?.crear?.('puerta_energia', { x, z, rot, ancho, eraIdx });
-    if (!obj) { // sin el interactivo del mundo, se dibuja solo el campo (no bloquea)
+    if (!obj && !m?.tiposRegistrados?.().includes('puerta_energia')) { // sin el interactivo del mundo, se dibuja solo el campo (no bloquea)
       const campo = new THREE.Mesh(new THREE.PlaneGeometry(ancho, 3.3), mCampo);
       campo.position.set(x, 1.95, z); campo.rotation.y = rot; campo.renderOrder = 4; campo.name = 'campo_energia';
       kit.anadir(campo); campos.push(campo);
@@ -413,7 +415,7 @@ export async function construir(juego, kit) {
 
   const tesla = ({ x, z }) => {
     const obj = m?.crear?.('torre_tesla', { x, z, eraIdx });
-    if (obj) return;
+    if (obj || m?.tiposRegistrados?.().includes('torre_tesla')) return;   // el interactivo ya dibuja su torre: sin visual de respaldo duplicado
     L.anadir(cilindro(1.0, 0.8, 0.9, 16, 0.06), mCasco, matriz(x, 0, z));
     L.anadir(cilindro(0.38, 0.2, 4.6, 12, 0.03), mAcero, matriz(x, 0.9, z));
     for (let i = 0; i < 4; i++) {
