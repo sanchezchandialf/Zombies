@@ -9,6 +9,8 @@
 import * as THREE from 'three';
 import { ERAS } from '../datos/eras.js';
 import * as P from './villa_colonial/props.js';
+import { detallePlaza, detalleVilla } from './villa_colonial/suelo.js';
+import * as A from './villa_colonial/ambiente.js';
 
 const ERA_IDX = 0;
 
@@ -118,6 +120,11 @@ export async function construir(juego, kit) {
   P.carro(kit, 36.5, -16.5, 0.5, 'cajas'); P.carro(kit, -15.5, 25.5, 0.6, 'heno'); P.carro(kit, 8, 35.5, 3.0, 'barriles'); P.carro(kit, -26, -3.2, 1.45, 'heno');
   P.pajar(kit, -13, 30, 1.0, 0.3); P.pajar(kit, 28, 27, 0.9, 1.2); P.pajar(kit, -41, -20, 1.1, 2.0);
   P.pozo(kit, -22.5, 23.5);
+  // mobiliario de plaza: bancos de piedra sobre el anillo, mercancías en los rincones, tablón de avisos y cubetas
+  A.bancoPiedra(kit, -6.9, -3, Math.PI / 2); A.bancoPiedra(kit, 6.9, -3, Math.PI / 2); A.bancoPiedra(kit, 0, -9.9, 0);
+  A.rinconMercancias(kit, -12.0, -7.0, 0.3, 0); A.rinconMercancias(kit, 12.2, 6.0, Math.PI + 0.2, 1);
+  A.tablonAvisos(kit, -8.5, -14.5, 0.05);
+  A.cubeta(kit, 3.9, -7.3, 0); A.cubeta(kit, -4.6, 2.4, 0.6);
   // palenque de caballos (valla baja de madera)
   kit.valla({ puntos: [[-20, 9.6], [-12.5, 9.6]], tipo: 'madera', alto: 1.1, colision: 'baja' });
 
@@ -139,25 +146,25 @@ export async function construir(juego, kit) {
     ...kit._edificios.map((e) => ({ x: e.x, z: e.z, hx: e.ancho / 2, hz: e.fondo / 2, rot: e.rot, margen: 1 })),
     { x: -9.5, z: -28.5, hx: 2.7, hz: 2.7, margen: 0.5 },
   ];
-  kit.parches({ tipo: 'charco', area: { x0: -40, z0: -38, x1: 40, z1: 40 }, cantidad: 12, radio: [0.8, 2.2], evitar, semilla: 7 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 10, radio: [2.5, 5.5], evitar, color: 0x3a2e22, opacidad: 0.2, semilla: 31 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -42, x1: 42, z1: 42 }, cantidad: 12, radio: [0.7, 1.7], evitar, color: 0x2b2118, opacidad: 0.5, semilla: 8 });
-  // musgo y hierba en los bordes, paja suelta cerca de los carros y puestos
-  kit.parches({ tipo: 'mancha', area: [{ x0: -45, z0: -45, x1: -36, z1: 45 }, { x0: 36, z0: -20, x1: 45, z1: 45 }, { x0: -45, z0: 36, x1: 45, z1: 45 }], cantidad: 20, radio: [2.0, 4.5], evitar, color: 0x55703a, opacidad: 0.42, semilla: 41 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -30, x1: 42, z1: 38 }, cantidad: 8, radio: [0.8, 2.0], evitar, color: 0x9a8f68, opacidad: 0.22, semilla: 42 });
-  for (let i = 0; i < 8; i++) kit.parche({ tipo: 'hojas', x: rng.rango(-38, 38), z: rng.rango(-36, 38), radio: rng.rango(1.6, 3.4), cantidad: 22, semilla: i });
-  // matas de hierba instanciadas (cementerio, bordes y pies de muro)
+  detallePlaza(kit, kit.rng(61));
+  detalleVilla(kit, kit.rng(62), {
+    edificios: kit._edificios,
+    arboles: [[-42.5, -13], [-43, 6], [42.5, -26], [42.3, 2], [-24, -41], [15.8, -36.8], [38.6, -36.2]],
+    tumbas: fosas.map(([x, z]) => [x, z]),
+  });
+  // hojas secas dispersas (decals con relieve) y matas instanciadas en bordes y camposanto
+  for (let i = 0; i < 6; i++) kit.parche({ tipo: 'hojas', x: rng.rango(-38, 38), z: rng.rango(-36, 38), radio: rng.rango(1.6, 3.2), cantidad: 18, semilla: i });
   const matasMat = P.propio(kit, 'matas', { color: 0xffffff, roughness: 0.9, metalness: 0, side: THREE.DoubleSide });
-  const verdes = [0x5d7a3a, 0x6f8a41, 0x7d8f4a, 0x8f9a55, 0x4f6a35, 0x9a9158];
+  const verdes = [0x8aa84a, 0x9bb552, 0x7a9a44, 0xaab85e, 0x6f9040, 0xb4ae62];
   const pm = kit.dispersar({
     area: [{ x0: -45, z0: -45, x1: -37, z1: 45 }, { x0: 37, z0: -45, x1: 45, z1: 45 }, { x0: -45, z0: 36, x1: 45, z1: 45 }, { x0: 14.5, z0: -37.5, x1: 39.5, z1: -20.5 }, { x0: -45, z0: -45, x1: 45, z1: -40 }],
-    cantidad: 260, distMin: 1.0, libre: 0.5, semilla: 12, escMin: 0.8, escMax: 1.5, evitar,
+    cantidad: 200, distMin: 1.0, libre: 0.5, semilla: 12, escMin: 0.8, escMax: 1.5, evitar,
   });
   P.matas(kit, pm.map((p) => ({ x: p.x, z: p.z, rot: p.rot, esc: p.esc, color: verdes[Math.floor(p.u * verdes.length)] })), matasMat);
 
   // ───────────── 5. JUGABILIDAD ─────────────
   const m = juego.mundo, vh = juego.vehiculos;
-  const vetar = [...evitar, { x: 0, z: -3, r: 4 }, { x: 0, z: 6, r: 6 }, { rect: [13, -39, 41, -19] }, { rect: [14, -14, 42, -1] }];
+  const vetar = [...evitar, { x: 0, z: -3, r: 8 }, { x: 0, z: 6, r: 6 }, { x: -12, z: -7, r: 3 }, { x: 12.2, z: 6, r: 3 }, { x: -8.5, z: -14.5, r: 2.5 }, { rect: [13, -39, 41, -19] }, { rect: [14, -14, 42, -1] }];
   const area = [{ x0: -41, z0: -40, x1: 41, z1: 38 }];
   const explosivos = kit.dispersar({ area, cantidad: 9, distMin: 13, libre: 1.3, semilla: 21, evitar: vetar });
   for (const p of explosivos) m?.crear?.('explosivo', { x: p.x, z: p.z, rot: p.rot, eraIdx: ERA_IDX });
