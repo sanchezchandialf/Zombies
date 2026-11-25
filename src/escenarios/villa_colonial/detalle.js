@@ -91,7 +91,7 @@ export function capaSuelo(kit, o, dibujar) {
           const wob = Math.sin(i * 0.11 + fase + lado) * 0.1 + Math.sin(i * 0.37 + fase * 1.7) * 0.04;
           const px = S[i][0] + nx * (lado * sep / 2 + wob), pz = S[i][1] + nz * (lado * sep / 2 + wob);
           const corte = Math.sin(i * 0.23 + fase * lado) * Math.sin(i * 0.071 + 2 * fase);
-          const a2 = alpha * Math.max(0, Math.min(1, 0.55 + corte * 1.1));
+          const a2 = alpha * Math.max(0, Math.min(1, 0.8 + corte * 0.55));
           if (prev && a2 > 0.02) {
             g.lineCap = 'round';
             g.strokeStyle = rgba(color, a2 * 0.3); g.lineWidth = Mt(grosor * 1.7); g.beginPath(); g.moveTo(X(prev[0]), Z(prev[1])); g.lineTo(X(px), Z(pz)); g.stroke();

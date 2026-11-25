@@ -12,6 +12,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ERAS } from '../datos/eras.js';
 import { cajaRedondeada, cilindro, torno, matriz } from './lib/geometria.js';
+import { detalleEstacion } from './estacion_fronteriza/suelo.js';
+import * as PZ from './estacion_fronteriza/piezas.js';
 
 const IDX = 1;
 const ZV = -40;                                   // eje de la vía
@@ -29,12 +31,12 @@ export async function construir(juego, kit) {
 
   // ───────────── 1. SUELO: tierra parda y arena naranja, calle clara, periferia de desierto ─────────────
   kit.suelo({
-    tam: 160, material: 'tierra', mezcla: 'arena', mojado: 0, semilla: 9, contraste: 1.7, desgaste: 0.45,
+    tam: 160, material: 'tierra', mezcla: 'arena', mojado: 0, semilla: 9, contraste: 0.95, desgaste: 0.45,
     relieve: { amp: 0.05, escala: 14, centroPlano: 60 },
     pintura: (p) => {
       p.fondo(0.0);
       p.rect(-80, -80, 80, -49, 1, 5).rect(-80, 49, 80, 80, 1, 5).rect(-80, -80, -49, 80, 1, 5).rect(49, -80, 80, 80, 1, 5);   // periferia arenosa
-      p.salpicar(-48, -46, 48, 48, 85, 1.6, 5.5, 1, 2).salpicar(-48, -46, 48, 48, 30, 1.2, 3.5, 0, 1.5);
+      p.salpicar(-48, -46, 48, 48, 70, 1.2, 3.6, 0.75, 3.5).salpicar(-48, -46, 48, 48, 50, 1.6, 4.2, 0.45, 4).salpicar(-48, -46, 48, 48, 30, 1.2, 3.5, 0, 2);
       p.camino([[-50, 0.5], [-20, 0], [0, 0.5], [22, 0], [50, 1]], 13, 0, 3.5);                       // calle principal arenosa
       p.circulo(0, 1, 15, 0, 4);                                                                      // plaza de la calle
       p.camino([[-4, -12], [-4, -34]], 7, 0, 2.5).camino([[9, -12], [9, -36]], 7, 0, 2.5);             // callejones hacia la vía
@@ -109,7 +111,7 @@ export async function construir(juego, kit) {
   porche(kit, { xa: -31.5, xb: -16.5, zF: -12, prof: 2.4, yT: 3.12, posts: [-31.2, -27, -21, -16.8], mT: mTabla(0xdacdb0), deck: true, barandilla: true });
   batientes(kit, -24, -12, 2.3);
   cart.poner('saloon', -24, 7.7, -11.9, 9, 2.25, 0, 0.1);
-  farolPorche(kit, -27.5, 2.3, -9.8, true); farolPorche(kit, -20.5, 2.3, -9.8, false);
+  farolPorche(kit, -27.5, 2.3, -9.8, false); farolPorche(kit, -20.5, 2.3, -9.8, false);
 
   // Sheriff
   kit.edificio({
@@ -206,6 +208,9 @@ export async function construir(juego, kit) {
   kit.farola({ x: -15, z: -35.2, tipo: 'gas', rot: 0 });
   // Carro del almacén y rueda apoyada
   carro(kit, 31, -4.5, 0.35);
+  // Interés cerca del centro: diligencia abandonada al oeste de la plaza y horca al este
+  PZ.diligencia(kit, -10.5, 11, 0.35); rect(-13.5, 8, -7.5, 14, 0.5);
+  PZ.horca(kit, 10.5, -6.8, 0.1); rect(8.3, -8.6, 12.7, -4.8, 0.6);
   // Barricada de sacos de arena junto al emplazamiento
   // Pila de carbón junto a la vía
   for (const [x, z, r] of [[28, -35.8, 1.5], [30, -35.2, 1.1], [26.7, -35.3, 0.9]]) kit.roca({ x, z, radio: r, color: 0x26272a, material: 'hierro_forjado', semilla: Math.floor(x) });
@@ -231,20 +236,33 @@ export async function construir(juego, kit) {
   const rocasPts = [[-42, -26, 2.0], [-43, 14, 1.7], [-40, 39, 1.8], [43, 14, 1.9], [42, 37, 2.2], [-12, 43, 1.6], [14, 42, 1.5], [-41.5, -4, 1.3], [39, 6, 1.4]];
   for (const [x, z, r] of rocasPts) kit.roca({ x, z, radio: r, color: rng.elegir([0xb08a60, 0xa6825c, 0x9a7a58]), semilla: Math.floor(x + z) });
   for (const [x, z] of [[-42.5, 24], [41.5, -3], [-8, 41.5]]) kit.arbol({ x, z, tipo: 'muerto', escala: 1.0 });
-  // Pastos secos: instancias de matas
-  const matas = kit.dispersar({ area: [{ x0: -44, z0: -34, x1: 44, z1: 44 }], cantidad: 70, distMin: 2.2, libre: 0, semilla: 8, evitar: [...evitar, { rect: [-46, -12, 46, 12] }] });
-  const geoMata = new THREE.ConeGeometry(0.32, 0.55, 5); geoMata.translate(0, 0.27, 0);
-  kit.instancias(geoMata, M('hierba', { color: 0x9a8a52, desgaste: 0.8 }), matas.map((p) => ({ x: p.x, z: p.z, rot: p.rot, esc: [p.esc * 0.9, p.esc * (0.7 + p.u * 0.8), p.esc * 0.9], color: rng.elegir([0xa89a60, 0x8e8650, 0xb0a070]) })), { sombras: false, nombre: 'matas' });
+  // Pastos secos: matas de hojas finas (material propio de color liso: el color por instancia no se oscurece como con 'hierba')
+  const matas = kit.dispersar({ area: [{ x0: -44, z0: -34, x1: 44, z1: 44 }], cantidad: 90, distMin: 2.2, libre: 0, semilla: 8, evitar: [...evitar, { rect: [-46, -12, 46, 12] }] });
+  const hojasMata = [];
+  for (let i = 0; i < 9; i++) {
+    const g = new THREE.ConeGeometry(0.035 + (i % 3) * 0.01, 0.5 + (i % 4) * 0.12, 4); g.translate(0, 0.25 + (i % 4) * 0.06, 0);
+    g.rotateZ(((i % 5) - 2) * 0.28); g.rotateX(((i % 3) - 1) * 0.3); g.rotateY(i * 0.7); g.translate(Math.cos(i * 2.4) * 0.07, 0, Math.sin(i * 2.4) * 0.07);
+    hojasMata.push(g);
+  }
+  const geoMata = mergeGeometries(hojasMata); hojasMata.forEach((g) => g.dispose());
+  const matMata = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.92, metalness: 0, side: THREE.DoubleSide }); matMata.name = 'matas'; kit._propios.push(matMata);
+  const secos = [0xd8c47c, 0xc9b062, 0xe6d494, 0xb9a257, 0xa8b068];
+  kit.instancias(geoMata, matMata, matas.map((p) => ({ x: p.x, z: p.z, rot: p.rot, esc: [p.esc * 1.1, p.esc * (0.8 + p.u * 0.7), p.esc * 1.1], color: secos[Math.floor(p.u * 5) % 5] })), { sombras: false, nombre: 'matas' });
+  // rodadoras (matorral seco rodante) y cráneos de res: interés en el suelo cerca del centro de la acción
+  const geoRoda = mergeGeometries([0, 1, 2].map((i) => { const t = new THREE.TorusGeometry(0.34, 0.018, 4, 14); t.rotateX(i * 1.05); t.rotateY(i * 0.8); return t; }));
+  const matRoda = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, side: THREE.DoubleSide }); matRoda.name = 'rodadoras'; kit._propios.push(matRoda);
+  const rodadoras = [[-12.5, 8.5, 0.9], [14.5, 11, 1.1], [3.5, -4.5, 0.8], [-26.5, 4.5, 1.0], [26, 9.5, 0.85], [9, 25, 1.0], [-14, -5, 0.9]];
+  kit.instancias(geoRoda, matRoda, rodadoras.map(([x, z, e], i) => ({ x, y: 0.34 * e, z, rot: i * 1.3, esc: e, color: [0x9a8450, 0x86703f, 0xa58f58][i % 3] })), { nombre: 'rodadoras' });
+  const mHueso = M('yeso', { color: 0xd8cfb6, desgaste: 0.6 });
+  for (const [x, z, r] of [[-10.5, 10.5, 0.5], [8.5, 12.5, -0.8]]) {
+    L.caja(mHueso, x, 0.1, z, 0.34, 0.2, 0.26, { radio: 0.07, rotY: r }); L.caja(mHueso, x + Math.cos(r) * 0.28, 0.07, z - Math.sin(r) * 0.28, 0.2, 0.12, 0.14, { radio: 0.04, rotY: r });
+    for (const k of [-1, 1]) L.caja(mHueso, x - Math.sin(r) * k * 0.28, 0.2, z - Math.cos(r) * k * 0.28, 0.05, 0.05, 0.4, { radio: 0.02, rotY: r + k * 0.5, rotZ: k * 0.3 });
+  }
 
   // ───────────── 7. DETALLES DEL SUELO ─────────────
-  const evP = evitar.slice();
-  kit.parches({ tipo: 'charco', area: [{ x0: -23, z0: -8, x1: -23, z1: -8 }, { x0: -40, z0: -10, x1: 40, z1: 12 }], cantidad: 5, radio: [0.8, 1.8], evitar: evP, semilla: 3, opacidad: 0.8 });
-  kit.parches({ tipo: 'mancha', area: { x0: -44, z0: -34, x1: 44, z1: 44 }, cantidad: 16, radio: [2.5, 5.5], evitar: evP, color: 0x6a4a2c, opacidad: 0.2, semilla: 31 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -34, x1: 42, z1: 42 }, cantidad: 18, radio: [0.6, 1.5], evitar: evP, color: 0x2d2219, opacidad: 0.45, semilla: 8 });
-  for (let i = 0; i < 7; i++) kit.parche({ tipo: 'mancha', x: -34 + i * 11, z: 2.5 + (i % 2) * 2.5, radio: 5, alargado: 4.5, rot: 0.04 * (i % 3 - 1), color: 0x5a3f26, opacidad: 0.16, capa: i % 3 });   // rodadas de carretas
-  // Bolsas de ceniza bajo el depósito y la fragua
-  kit.parche({ tipo: 'mancha', x: -22.5, z: 25, radio: 3, color: 0x1c1613, opacidad: 0.55, capa: 2 });
-  kit.parche({ tipo: 'mancha', x: 12, z: -33, radio: 4.4, color: 0x2b2118, opacidad: 0.35, capa: 1 });
+  detalleEstacion(kit, kit.rng(91), { edificios: kit._edificios, abrevaderos: [[-23.5, -8.0], [19.2, -8.4], [18.5, 21]] });
+  // charcos con reflejo suave (agua turbia, no negra) junto a los abrevaderos
+  for (const [x, z, r, rot] of [[-21.5, -5.6, 1.2, 0.2], [21.5, -5.8, 1.0, -0.3], [20.5, 23.5, 1.1, 0.5]]) kit.parche({ tipo: 'charco', x, z, radio: r, rot, alargado: 1.4, color: 0x6a5a48, metal: 0.2, rugosidad: 0.12, reflejo: 0.9, opacidad: 1 });
 
   // ───────────── 8. HUMO Y VAPOR (animación) ─────────────
   const humos = [
