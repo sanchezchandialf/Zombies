@@ -318,7 +318,7 @@ function asfalto(c, mojado) {
   const grt = grietas(c, { freq: 4, ancho: 0.016, deform: 0.5, zona: 0.4 });
   const grt2 = grietas(c, { freq: 9, ancho: 0.011, deform: 0.7, zona: 0.4 });
     const aceite = c.fbm(5, 4, { warp: { amp: 0.7, freq: 3 } });
-  const betun = col(0x3e3e41), piedra = col(0x8a867f), claro = col(0xa09b93);
+  const betun = col(0x47474b), piedra = col(0x8a867f), claro = col(0xa09b93);
   for (let i = 0; i < n; i++) {
     const a = 1 - suave(0.0, 0.28, arido.f1[i]);
     const expuesto = clamp(0.25 + desg[i] * 0.6 + (fino[i] - 0.5) * 0.4); // árido a la vista por el desgaste
@@ -334,13 +334,13 @@ function asfalto(c, mojado) {
     r *= 1 - gr * 0.65; g *= 1 - gr * 0.65; b *= 1 - gr * 0.65;
     const ac = suave(0.62, 0.78, aceite[i]) * 0.5;
     r *= 1 - ac * 0.4; g *= 1 - ac * 0.4; b *= 1 - ac * 0.4;
-    if (mojado) { r *= 0.62; g *= 0.62; b *= 0.65; }
+    if (mojado) { r *= 0.8; g *= 0.8; b *= 0.84; } // mojado pero legible: los charcos no deben quedar negros
     poner(c, i, r, g, b);
     let h = 0.5 + pm * 0.18 * arido.id[i] + (fino[i] - 0.5) * 0.08 - gr * 0.3 - junta * 0.08 + (bl[i] - 0.5) * 0.03;
     c.h[i] = h;
     if (mojado) {
       const charco = suave(0.52, 0.6, mancha[i] * 0.7 + (1 - desg[i]) * 0.3);
-      c.rug[i] = clamp(mezcla(0.28 + (fino[i] - 0.5) * 0.25 + pm * 0.12, 0.035, charco) + ac * 0.1 + gr * 0.3);
+      c.rug[i] = clamp(mezcla(0.28 + (fino[i] - 0.5) * 0.25 + pm * 0.12, 0.07, charco) + ac * 0.1 + gr * 0.3);
       c.h[i] = mezcla(h, 0.45 - gr * 0.3, charco * 0.85);
       c.met[i] = 0;
     } else c.rug[i] = clamp(0.88 - pm * 0.12 + (bl[i] - 0.5) * 0.12 + ac * 0.1 - junta * 0.1);
@@ -534,12 +534,12 @@ const composite_futurista = {
       const hx = (x / px(14)), hy = (y / px(12.1));
       const ph = Math.sin(hx * Math.PI * 2) * Math.sin(hy * Math.PI * 2 + (Math.floor(hx) % 2) * Math.PI);
       const pts = suave(0.35, 0.8, ph) * 0.5;
-      const k = 0.085 + (fino[i] - 0.5) * 0.02 + id * 0.01 + bisel * 0.012 + (bl[i] - 0.5) * 0.01;
+      const k = 0.125 + (fino[i] - 0.5) * 0.025 + id * 0.012 + bisel * 0.014 + (bl[i] - 0.5) * 0.01;
       poner(c, i, k * 0.9, k * 0.95, k * 1.1);
       c.tinte[i] = 0;
       c.h[i] = mezcla(0.0, 0.7 + bisel * 0.12 + pts * 0.05 + (id - 0.5) * 0.02, m);
       c.rug[i] = clamp(0.12 + suave(0.55, 0.85, roce[i]) * 0.3 + pts * 0.2 + (mancha[i] - 0.5) * 0.06);
-      c.met[i] = 0.3 * m;
+      c.met[i] = 0.2 * m;
       // marcas de luz: pequeños testigos en las esquinas de cada panel
       const cu = Math.min(D.u[i], 1 - D.u[i]) * D.pw[i], cv = Math.min(D.v[i], 1 - D.v[i]) * D.ph[i];
       const dot = 1 - suave(px(2), px(4), Math.sqrt((cu - px(26)) ** 2 + (cv - px(26)) ** 2));

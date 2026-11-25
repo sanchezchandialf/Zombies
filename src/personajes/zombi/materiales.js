@@ -9,13 +9,16 @@ const GLSL_RUIDO = /* glsl */`
                mix(mix(zh(i + vec3(0,0,1)), zh(i + vec3(1,0,1)), f.x), mix(zh(i + vec3(0,1,1)), zh(i + vec3(1,1,1)), f.x), f.y), f.z); }
 `;
 
+/** Multiplicador global del borde de luz de la horda (el sistema lo sube de noche para mantener las siluetas legibles). */
+export const RIM_ZOMBI = { value: 1 };
 function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
   mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uRimZ = RIM_ZOMBI;
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', `#include <common>\n attribute vec4 aFx; varying vec4 vFx; varying vec3 vLoc; varying float vAlt;`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>\n vFx = aFx; vLoc = position;\n vAlt = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).y;`);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', `#include <common>\n varying vec4 vFx; varying vec3 vLoc; varying float vAlt;\n${GLSL_RUIDO}`)
+      .replace('#include <common>', `#include <common>\n uniform float uRimZ; varying vec4 vFx; varying vec3 vLoc; varying float vAlt;\n${GLSL_RUIDO}`)
       .replace('#include <color_fragment>', `#include <color_fragment>
         float zn = zr(vLoc * 6.0 + vColor.rgb * 13.0);
         float zn2 = zr(vLoc * 17.0 + 3.7);
@@ -26,8 +29,8 @@ function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
         diffuseColor.rgb *= 1.0 - vFx.y * 0.93;
         if (vFx.w > 0.001) { float dn = zr(vLoc * 9.0 + vec3(1.3, 4.1, 2.2)) * 0.6 + zn2 * 0.4; if (dn < vFx.w) discard; }`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        float zrim = pow(1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0), 3.0);
-        totalEmissiveRadiance += diffuseColor.rgb * zrim * ${rim.toFixed(2)};
+        float zrim = pow(1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0), 2.4);
+        totalEmissiveRadiance += (diffuseColor.rgb + vec3(0.035, 0.04, 0.045)) * zrim * ${rim.toFixed(2)} * uRimZ;
         totalEmissiveRadiance += vec3(1.0, 0.38, 0.06) * (vFx.x * (0.6 + 0.8 * zn) + vFx.y * 0.9 * smoothstep(0.72, 0.9, zn2) * (0.4 + vFx.x));
         totalEmissiveRadiance += vec3(1.0, 0.92, 0.82) * vFx.z;
         if (vFx.w > 0.001) { float dn2 = zr(vLoc * 9.0 + vec3(1.3, 4.1, 2.2)) * 0.6 + zn2 * 0.4; float ed = 1.0 - smoothstep(vFx.w, vFx.w + 0.1, dn2); totalEmissiveRadiance += vec3(1.0, 0.45, 0.1) * ed * 4.0; }`);
@@ -39,8 +42,8 @@ function parchear(mat, { granulado = 1, rim = 0.3, suciedad = 0.5 } = {}) {
 let mats = null;
 export function materialesZombi() {
   if (mats) return mats;
-  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.1, suciedad: 0.5 });
-  const metal = parchear(new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.38, metalness: 0.85 }), { granulado: 0.55, rim: 0.06, suciedad: 0.4 });
+  const mate = parchear(new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.86, metalness: 0.0 }), { granulado: 1, rim: 0.42, suciedad: 0.5 });
+  const metal = parchear(new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.38, metalness: 0.85 }), { granulado: 0.55, rim: 0.2, suciedad: 0.4 });
   const emisivo = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
   mats = { mate, metal, emisivo };
   return mats;
@@ -48,7 +51,7 @@ export function materialesZombi() {
 export function liberarMateriales() { if (mats) { for (const m of Object.values(mats)) m.dispose(); mats = null; } }
 
 /** Material para jefes (mallas normales, no instanciadas): grano por objeto, suciedad cerca del suelo y borde de luz. */
-export function materialJefe({ color = 0x888888, metal = 0, rough = 0.7, emis = null, ei = 0, rim = 0.12, grano = 0.8 } = {}) {
+export function materialJefe({ color = 0x888888, metal = 0, rough = 0.7, emis = null, ei = 0, rim = 0.3, grano = 0.8 } = {}) {
   const m = new THREE.MeshStandardMaterial({ color, metalness: metal, roughness: rough });
   if (emis !== null) { m.emissive = new THREE.Color(emis); m.emissiveIntensity = ei; }
   m.onBeforeCompile = (sh) => {

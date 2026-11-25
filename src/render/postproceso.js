@@ -133,7 +133,9 @@ const FS_COMP = /* glsl */`
     vec3 s = srgb(aces(col));
     float l = dot(s, vec3(.2126, .7152, .0722));
     s *= mix(uSombras, uLuces, smoothstep(.04, .9, l));
-    s = mix(vec3(l), s, uSat);
+    // la sangre y los rojos saturados conservan su fuerza aunque la era esté desaturada (lectura instantánea)
+    float rojo = smoothstep(.06, .3, s.r - max(s.g, s.b));
+    s = mix(vec3(l), s, mix(uSat, max(uSat, 1.12), rojo));
     s = clamp((s - .46) * uContraste + .46, 0., 1.);
     vec2 q = (vUv - .5) * vec2(uAsp * .62, 1.);
     float r = length(q) * 1.5;

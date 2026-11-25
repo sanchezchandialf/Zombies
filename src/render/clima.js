@@ -86,7 +86,7 @@ const FS_SALPICADURA = /* glsl */`
     float a;
     if (vTipo < .5) {
       float r = length(vUv) * 2.;
-      a = exp(-pow((r - .82) / .13, 2.)) * pow(1. - vFase, 1.6) * .8;
+      a = exp(-pow((r - .82) / .09, 2.)) * pow(1. - vFase, 2.4) * .6;
     } else {
       float f = (vUv.y + .5);
       a = smoothstep(.5, 0., abs(vUv.x) * 2. * (.4 + f)) * smoothstep(.0, .25, f) * (1. - vFase) * (1. - vFase) * step(vFase, .6) * .9;
@@ -228,7 +228,7 @@ const TIPOS = {
   niebla(rng, escala, base) {
     const sistemas = [];
     const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(80, 3, 80) }, uVel: { value: new THREE.Vector3(.5, 0, .2) }, uTam: { value: new THREE.Vector2(9, 17) }, uY0: { value: 0.12 } });
-    u.uColA.value.copy(base.niebla).multiplyScalar(1.15); u.uColB.value.copy(base.niebla).lerp(C(0x9fb4d8), .45).multiplyScalar(1.2); u.uAlfa.value = 0.55;
+    u.uColA.value.copy(base.niebla).multiplyScalar(1.15); u.uColB.value.copy(base.niebla).lerp(C(0x9fb4d8), .45).multiplyScalar(1.2); u.uAlfa.value = 0.26;
     sistemas.push({ m: crearMalla(geoQuadSuelo(), Math.round(46 * escala), rng, VS_NIEBLA, FS_NIEBLA, u), u, luz: true, cant: 0.8 });
     const u2 = mezclarUniformes({ uCaja: { value: new THREE.Vector3(46, 7, 46) }, uVel: { value: new THREE.Vector3(.18, .05, .08) }, uTam: { value: new THREE.Vector2(.03, .07) }, uOscila: { value: .6 }, uY0: { value: .3 }, uParp: { value: .8 } });
     u2.uColA.value.set(2.2, 1.35, .6); u2.uColB.value.set(1.6, 1.5, 1.2); u2.uAlfa.value = .75; u2.uEmisivo.value = 1;
@@ -237,58 +237,58 @@ const TIPOS = {
   },
   polvo(rng, escala, base) {
     const sistemas = [];
-    const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(60, 14, 60) }, uVel: { value: new THREE.Vector3(5.2, .1, 1.1) }, uTam: { value: new THREE.Vector2(.1, .3) }, uOscila: { value: .9 }, uY0: { value: .1 }, uParp: { value: 0 } });
-    u.uColA.value.set(.95, .62, .34); u.uColB.value.set(.8, .55, .38); u.uAlfa.value = .5;
-    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(1100 * escala), rng, VS_MOTA, FS_MOTA, u), u, luz: true, cant: .9 });
+    const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(60, 7, 60) }, uVel: { value: new THREE.Vector3(5.2, .1, 1.1) }, uTam: { value: new THREE.Vector2(.05, .14) }, uOscila: { value: .9 }, uY0: { value: .1 }, uParp: { value: 0 } });
+    u.uColA.value.set(.95, .62, .34); u.uColB.value.set(.8, .55, .38); u.uAlfa.value = .38;
+    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(600 * escala), rng, VS_MOTA, FS_MOTA, u), u, luz: true, cant: .9 });
     const u2 = mezclarUniformes({ uCaja: { value: new THREE.Vector3(80, 2.4, 80) }, uVel: { value: new THREE.Vector3(2.4, 0, .5) }, uTam: { value: new THREE.Vector2(10, 18) }, uY0: { value: .2 } });
-    u2.uColA.value.set(.82, .5, .26); u2.uColB.value.set(.7, .46, .32); u2.uAlfa.value = .26;
+    u2.uColA.value.set(.82, .5, .26); u2.uColB.value.set(.7, .46, .32); u2.uAlfa.value = .12;
     sistemas.push({ m: crearMalla(geoQuadSuelo(), Math.round(30 * escala), rng, VS_NIEBLA, FS_NIEBLA, u2), u: u2, luz: true, cant: .8 });
     return sistemas;
   },
   lluvia(rng, escala) {
     const sistemas = [];
-    const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(56, 24, 56) }, uVel: { value: new THREE.Vector3(-2.4, -19, -.9) }, uLargo: { value: 1.05 }, uGrosor: { value: .028 } });
-    u.uColA.value.set(.62, .68, .7); u.uColB.value.set(.74, .78, .74); u.uAlfa.value = .5;
-    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(4800 * escala), rng, VS_CORRIENTE, FS_CORRIENTE, u), u, luz: true, cant: 1 });
+    const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(56, 24, 56) }, uVel: { value: new THREE.Vector3(-2.4, -19, -.9) }, uLargo: { value: 1.05 }, uGrosor: { value: .022 } });
+    u.uColA.value.set(.62, .68, .7); u.uColB.value.set(.74, .78, .74); u.uAlfa.value = .3;
+    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(2600 * escala), rng, VS_CORRIENTE, FS_CORRIENTE, u), u, luz: true, cant: 1 });
     const us = mezclarUniformes({ uCaja: { value: new THREE.Vector3(46, 1, 46) }, uRitmo: { value: 2.2 }, uTam: { value: 1 } });
-    us.uColA.value.set(.78, .82, .82); us.uColB.value.set(.7, .78, .72); us.uAlfa.value = .62;
-    sistemas.push({ m: crearMalla(geoSalpicadura(), Math.round(800 * escala), rng, VS_SALPICADURA, FS_SALPICADURA, us), u: us, luz: true, cant: 1 });
+    us.uColA.value.set(.78, .82, .82); us.uColB.value.set(.7, .78, .72); us.uAlfa.value = .24;
+    sistemas.push({ m: crearMalla(geoSalpicadura(), Math.round(520 * escala), rng, VS_SALPICADURA, FS_SALPICADURA, us), u: us, luz: true, cant: 1 });
     const un = mezclarUniformes({ uCaja: { value: new THREE.Vector3(80, 3, 80) }, uVel: { value: new THREE.Vector3(.9, 0, .3) }, uTam: { value: new THREE.Vector2(9, 16) }, uY0: { value: .15 } });
-    un.uColA.value.set(.7, .68, .38); un.uColB.value.set(.58, .62, .42); un.uAlfa.value = .24;
+    un.uColA.value.set(.7, .68, .38); un.uColB.value.set(.58, .62, .42); un.uAlfa.value = .11;
     sistemas.push({ m: crearMalla(geoQuadSuelo(), Math.round(40 * escala), rng, VS_NIEBLA, FS_NIEBLA, un), u: un, luz: true, cant: .85 });
     return sistemas;
   },
   neon(rng, escala) {
     const sistemas = [];
     const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(56, 24, 56) }, uVel: { value: new THREE.Vector3(-1.4, -21, -.4) }, uLargo: { value: 1.1 }, uGrosor: { value: .03 } });
-    u.uColA.value.set(1.9, .55, 1.15); u.uColB.value.set(.45, 1.5, 1.7); u.uAlfa.value = .42; u.uEmisivo.value = .75;
-    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(2800 * escala), rng, VS_CORRIENTE, FS_CORRIENTE, u), u, luz: false, cant: 1 });
+    u.uColA.value.set(1.9, .55, 1.15); u.uColB.value.set(.45, 1.5, 1.7); u.uAlfa.value = .24; u.uEmisivo.value = .75;
+    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(1500 * escala), rng, VS_CORRIENTE, FS_CORRIENTE, u), u, luz: false, cant: 1 });
     const us = mezclarUniformes({ uCaja: { value: new THREE.Vector3(46, 1, 46) }, uRitmo: { value: 1.8 }, uTam: { value: .7 } });
-    us.uColA.value.set(1.8, .6, 1.2); us.uColB.value.set(.5, 1.5, 1.6); us.uAlfa.value = .6; us.uEmisivo.value = .8;
-    sistemas.push({ m: crearMalla(geoSalpicadura(), Math.round(650 * escala), rng, VS_SALPICADURA, FS_SALPICADURA, us), u: us, luz: false, cant: 1 });
+    us.uColA.value.set(1.8, .6, 1.2); us.uColB.value.set(.5, 1.5, 1.6); us.uAlfa.value = .22; us.uEmisivo.value = .8;
+    sistemas.push({ m: crearMalla(geoSalpicadura(), Math.round(420 * escala), rng, VS_SALPICADURA, FS_SALPICADURA, us), u: us, luz: false, cant: 1 });
     return sistemas;
   },
   ceniza(rng, escala) {
     const sistemas = [];
-    const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(60, 18, 60) }, uVel: { value: new THREE.Vector3(1.1, -1.05, .35) }, uTam: { value: new THREE.Vector2(.1, .26) }, uOscila: { value: 1.1 }, uY0: { value: 0 }, uParp: { value: 0 } });
-    u.uColA.value.set(.78, .8, .84); u.uColB.value.set(.56, .58, .62); u.uAlfa.value = .72;
-    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(2600 * escala), rng, VS_MOTA, FS_MOTA, u), u, luz: true, cant: 1 });
+    const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(60, 8, 60) }, uVel: { value: new THREE.Vector3(1.1, -1.05, .35) }, uTam: { value: new THREE.Vector2(.035, .085) }, uOscila: { value: 1.1 }, uY0: { value: 0 }, uParp: { value: 0 } });
+    u.uColA.value.set(.78, .8, .84); u.uColB.value.set(.56, .58, .62); u.uAlfa.value = .5;
+    sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(1300 * escala), rng, VS_MOTA, FS_MOTA, u), u, luz: true, cant: 1 });
     const ue = mezclarUniformes({ uCaja: { value: new THREE.Vector3(50, 12, 50) }, uVel: { value: new THREE.Vector3(.6, .55, .2) }, uTam: { value: new THREE.Vector2(.05, .11) }, uOscila: { value: .9 }, uY0: { value: .2 }, uParp: { value: .9 } });
     ue.uColA.value.set(3.2, .7, .35); ue.uColB.value.set(2.6, .45, .3); ue.uAlfa.value = .9; ue.uEmisivo.value = 1;
     sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(220 * escala), rng, VS_MOTA, FS_MOTA, ue), u: ue, luz: false, cant: .7 });
     const un = mezclarUniformes({ uCaja: { value: new THREE.Vector3(80, 3.5, 80) }, uVel: { value: new THREE.Vector3(1.2, 0, .4) }, uTam: { value: new THREE.Vector2(10, 18) }, uY0: { value: .3 } });
-    un.uColA.value.set(.34, .36, .4); un.uColB.value.set(.26, .28, .32); un.uAlfa.value = .3;
+    un.uColA.value.set(.34, .36, .4); un.uColB.value.set(.26, .28, .32); un.uAlfa.value = .14;
     sistemas.push({ m: crearMalla(geoQuadSuelo(), Math.round(26 * escala), rng, VS_NIEBLA, FS_NIEBLA, un), u: un, luz: true, cant: .8 });
     return sistemas;
   },
   luminosa(rng, escala) {
     const sistemas = [];
     const u = mezclarUniformes({ uCaja: { value: new THREE.Vector3(56, 26, 56) }, uVel: { value: new THREE.Vector3(-3.2, -24, -.8) }, uLargo: { value: 1.35 }, uGrosor: { value: .026 } });
-    u.uColA.value.set(3.4, .6, 2.2); u.uColB.value.set(.7, 2.5, 3.6); u.uAlfa.value = .5; u.uEmisivo.value = 1;
+    u.uColA.value.set(3.4, .6, 2.2); u.uColB.value.set(.7, 2.5, 3.6); u.uAlfa.value = .36; u.uEmisivo.value = 1;
     sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(1700 * escala), rng, VS_CORRIENTE, FS_CORRIENTE, u), u, luz: false, cant: 1 });
     const us = mezclarUniformes({ uCaja: { value: new THREE.Vector3(46, 1, 46) }, uRitmo: { value: 2.0 }, uTam: { value: .65 } });
-    us.uColA.value.set(3.0, .7, 2.0); us.uColB.value.set(.8, 2.2, 3.0); us.uAlfa.value = .5; us.uEmisivo.value = 1;
-    sistemas.push({ m: crearMalla(geoSalpicadura(), Math.round(650 * escala), rng, VS_SALPICADURA, FS_SALPICADURA, us), u: us, luz: false, cant: 1 });
+    us.uColA.value.set(3.0, .7, 2.0); us.uColB.value.set(.8, 2.2, 3.0); us.uAlfa.value = .2; us.uEmisivo.value = 1;
+    sistemas.push({ m: crearMalla(geoSalpicadura(), Math.round(400 * escala), rng, VS_SALPICADURA, FS_SALPICADURA, us), u: us, luz: false, cant: 1 });
     const um = mezclarUniformes({ uCaja: { value: new THREE.Vector3(50, 10, 50) }, uVel: { value: new THREE.Vector3(.15, .45, .1) }, uTam: { value: new THREE.Vector2(.04, .1) }, uOscila: { value: .7 }, uY0: { value: .2 }, uParp: { value: 1 } });
     um.uColA.value.set(.7, 2.8, 3.6); um.uColB.value.set(3.2, .8, 2.6); um.uAlfa.value = .85; um.uEmisivo.value = 1;
     sistemas.push({ m: crearMalla(geoQuadVertical(), Math.round(260 * escala), rng, VS_MOTA, FS_MOTA, um), u: um, luz: false, cant: .8 });

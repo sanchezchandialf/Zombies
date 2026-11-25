@@ -35,6 +35,20 @@ function texturas() {
 }
 
 const cache = new Map();
+/** Fuerza del borde de luz (rim) de todos los materiales de jugador: la sube el visual de noche para separarlos del fondo. */
+export const RIM = { value: 0.45 };
+function conRim(m) {
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.uRimJ = RIM;
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\n uniform float uRimJ;')
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        float rimJ = pow(1.0 - clamp(abs(dot(normalize(normal), normalize(vViewPosition))), 0.0, 1.0), 2.6);
+        totalEmissiveRadiance += (diffuseColor.rgb * 0.55 + vec3(0.05, 0.055, 0.065)) * rimJ * uRimJ;`);
+  };
+  m.customProgramCacheKey = () => 'jug-rim';
+  return m;
+}
 const DEF = {
   tela: (c) => ({ color: c, roughness: 0.93, metalness: 0, map: 'tela', bumpMap: 'tela', bumpScale: 0.7 }),
   cuero: (c) => ({ color: c, roughness: 0.52, metalness: 0.02, map: 'cuero', bumpMap: 'cuero', bumpScale: 1.4 }),
@@ -58,8 +72,32 @@ export function mat(tipo, color = 0xffffff, doble = false) {
   for (const n of ['map', 'bumpMap']) if (typeof d[n] === 'string') d[n] = t[d[n]];
   if (doble) d.side = THREE.DoubleSide;
   m = new THREE.MeshStandardMaterial(d);
+  if (tipo !== 'luz' && tipo !== 'cristal') conRim(m);
   m.userData.compartido = true;
   cache.set(k, m);
+  return m;
+}
+
+// Silueta «rayos X»: se dibuja solo donde el héroe queda tapado por el escenario (profundidad mayor), en el color del rol.
+// Va antes que el propio héroe (renderOrder 1 < 2) y sin escribir profundidad, así el cuerpo visible la cubre y no se tiñe.
+const siluetas = new Map();
+export function matSilueta(color = 0xffffff) {
+  const k = String(color);
+  let m = siluetas.get(k);
+  if (!m) {
+    // Holograma: relleno tenue y borde marcado (fresnel). Mezcla alfa propia sin pasar a la lista de transparentes
+    // (debe dibujarse entre el escenario y el héroe).
+    m = new THREE.ShaderMaterial({
+      uniforms: { uColor: { value: new THREE.Color(color) } },
+      vertexShader: `varying vec3 vN; varying vec3 vV;
+        void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }`,
+      fragmentShader: `uniform vec3 uColor; varying vec3 vN; varying vec3 vV;
+        void main() { float r = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 1.6); gl_FragColor = vec4(uColor * (0.75 + 0.6 * r), 0.2 + 0.6 * r); }`,
+      transparent: false, blending: THREE.CustomBlending, blendSrc: THREE.SrcAlphaFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+      depthWrite: false, depthFunc: THREE.GreaterDepth, toneMapped: false, fog: false,
+    });
+    siluetas.set(k, m);
+  }
   return m;
 }
 
@@ -87,6 +125,8 @@ export function matFantasma() {
 export function liberarMateriales() {
   for (const m of cache.values()) m.dispose();
   cache.clear();
+  for (const m of siluetas.values()) m.dispose();
+  siluetas.clear();
   for (const m of flash.values()) m.dispose();
   flash.clear();
   fantasma?.dispose(); fantasma = null;

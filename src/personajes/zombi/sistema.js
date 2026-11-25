@@ -7,6 +7,7 @@ import { NJ } from './matematica.js';
 import { animarVivo, construirJoints, DUR_ACCION } from './animacion.js';
 import { iniciarMuerte, actualizarMuerto, actualizarResto } from './muerte.js';
 import { crearVisualJefe } from './jefes.js';
+import { RIM_ZOMBI } from './materiales.js';
 
 const TINTE = {
   ralentizado: [0.12, 0.34, 0.8, 0.38], envenenado: [0.18, 0.62, 0.08, 0.34], furia: [0.85, 0.06, 0.04, 0.32],
@@ -80,6 +81,7 @@ export function crearVisualesZombis(juego) {
     dt = Math.min(dt, 0.1);
     sis.t += dt;
     const t = sis.t;
+    RIM_ZOMBI.value = 1 + 1.1 * (juego.render?.ambienteActual?.noche ?? 0);
     const cam = juego.render?.camara;
     let cx = 0, cz = 0;
     if (cam) { cam.updateMatrixWorld?.(); mat.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse); frustum.setFromProjectionMatrix(mat); cx = cam.position.x; cz = cam.position.z; }

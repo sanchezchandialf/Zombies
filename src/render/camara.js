@@ -2,7 +2,7 @@
 // mueven, se aleja si hay jugadores separados, sacudida con ruido suave, retroceso direccional y vuelo de menú.
 import * as THREE from 'three';
 
-export const CAMARA = { fov: 35, cabeceo: (55 * Math.PI) / 180, dist: 26, altoMirada: 0.7, near: 0.4, far: 450 };
+export const CAMARA = { fov: 35, cabeceo: (55 * Math.PI) / 180, dist: 22, altoMirada: 0.7, near: 0.4, far: 450 };
 
 const suave = (t) => t * t * (3 - 2 * t);
 const ruido = (t, s) => (Math.sin(t * 7.3 + s * 11.1) + Math.sin(t * 12.7 + s * 5.3) * 0.6 + Math.sin(t * 19.1 + s * 2.7) * 0.3) / 1.9;

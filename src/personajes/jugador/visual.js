@@ -4,7 +4,8 @@ import * as THREE from 'three';
 import { D } from './construir.js';
 import { RASGOS } from './rasgos.js';
 import { atuendo } from './atuendos.js';
-import { matFlash, matFantasma } from './mat.js';
+import { matFlash, matFantasma, matSilueta, RIM } from './mat.js';
+import { ROLES } from '../../datos/roles.js';
 import { crearAuras } from './auras.js';
 
 const V = THREE.Vector3, Q = THREE.Quaternion;
@@ -81,6 +82,11 @@ export class VisualJugador {
     this.mallas = [];
     this.auras = crearAuras(this);
     this.sombra = sis.crearSombra(); root.add(this.sombra);
+    this.anillo = sis.crearAnillo?.(ROLES[rolId]?.color ?? '#ffffff') ?? null;
+    if (this.anillo) { this.anillo.scale.setScalar(1 / R.esc); root.add(this.anillo); }
+    // Luz de héroe: pequeño foco sin sombra sobre la cabeza, blanco teñido del color del rol. De noche separa al jugador del fondo.
+    this.colLuz = new THREE.Color(ROLES[rolId]?.color ?? '#ffffff').lerp(new THREE.Color(1, 0.96, 0.9), 0.45);
+    this.luz = this.juego?.render?.luzPuntual?.({ x: 0, y: 2.6, z: 0, color: this.colLuz, intensidad: 0, distancia: 8 }) ?? null;
     sis.escena.add(root);
 
     // Estado de animación
@@ -149,17 +155,24 @@ export class VisualJugador {
     // Retirar mallas anteriores (las geometrías están cacheadas y compartidas: nada que liberar aquí)
     for (const m of this.mallas) m.removeFromParent();
     this.mallas.length = 0;
+    for (const m of this.siluetas ?? []) m.removeFromParent();
+    this.siluetas = [];
+    const colRol = ROLES[this.rolId]?.color ?? '#ffffff';
     for (const p of atuendo(this.rolId, eraIdx)) {
       const h = this.H[p.h]; if (!h) continue;
       const m = new THREE.Mesh(p.geo, p.m);
       m.castShadow = true; m.receiveShadow = true; m.userData.m0 = p.m;
+      m.renderOrder = 2;
       h.add(m); this.mallas.push(m);
+      const sl = new THREE.Mesh(p.geo, matSilueta(colRol));
+      sl.renderOrder = 1; sl.castShadow = false; sl.receiveShadow = false;
+      h.add(sl); this.siluetas.push(sl);
     }
     this._mats();
   }
   destello(color = 0xffffff) { this.flashT = 0.1; this.flashCol = color; this._mats(); }
   visible(v) { this.root.visible = v; }
-  liberar() { this.root.removeFromParent(); this.sis.quitar(this); this.auras.liberar(); }
+  liberar() { this.root.removeFromParent(); this.sis.quitar(this); this.auras.liberar(); this.luz?.quitar?.(); this.luz = null; }
 
   morir(o = {}) {
     if (this.muerto) return;
@@ -193,6 +206,7 @@ export class VisualJugador {
   _mats() {
     const f = this.flashT > 0 ? matFlash(this.flashCol) : this.invisible ? matFantasma() : null;
     for (const m of this.mallas) { m.material = f || m.userData.m0; m.castShadow = !this.invisible; }
+    for (const m of this.siluetas ?? []) m.visible = !this.invisible && !this.muerto;
     this.sombra.visible = !this.invisible;
   }
 
@@ -203,6 +217,18 @@ export class VisualJugador {
     if (dt <= 0) return;
     this.t += dt;
     this.auras.actualizar(dt, this.t);
+    const noche = this.juego?.render?.ambienteActual?.noche ?? 0;
+    RIM.value = 0.4 + 0.5 * noche;
+    if (this.luz) {
+      const p = this.root.position;
+      // por delante (hacia la cámara) y a ~2,5 m de la cabeza: modela la cara visible sin quemarla
+      this.luz.pos.set(p.x, p.y + 3.3, p.z + 2.2);
+      this.luz.intensidad = this.muerto || this.invisible || !this.root.visible ? 0 : 2 + 5 * noche;
+    }
+    if (this.anillo) {
+      this.anillo.visible = !this.muerto && !this.invisible;
+      this.anillo.material.opacity = 0.78 + 0.12 * Math.sin(this.t * 2.6);
+    }
     if (this.muerto) { this._muerte(dt); return; }
     this._gait(dt);
     this.aplicarPose(dt);

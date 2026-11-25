@@ -26,7 +26,7 @@ function materialHaz(color) {
     g.fillStyle = gr; g.fillRect(0, 0, 4, 64);
     texHaz = new THREE.CanvasTexture(c); texHaz.colorSpace = THREE.SRGBColorSpace;
   }
-  m = new THREE.MeshBasicMaterial({ map: texHaz, color, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+  m = new THREE.MeshBasicMaterial({ map: texHaz, color, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
   hazMats.set(color, m);
   return m;
 }

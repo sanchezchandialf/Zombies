@@ -10,7 +10,6 @@ function geo() {
     llama: new THREE.ConeGeometry(0.09, 0.42, 7).translate(0, 0.21, 0),
     esfera: new THREE.SphereGeometry(1, 16, 12),
     estrella: new THREE.OctahedronGeometry(0.05, 0),
-    columna: new THREE.CylinderGeometry(0.5, 0.58, 2.1, 24, 1, true).translate(0, 1.05, 0),
   };
   return G;
 }
@@ -28,7 +27,7 @@ export function crearAuras(v) {
   const g = new THREE.Group(); g.name = 'auras'; v.root.add(g);
   let activos = {};
   const obj = {};
-  const llamas = [], estrellas = [], burbujas = [];
+  const llamas = [], estrellas = [], burbujas = [], brasas = [];
   const crear = (n) => {
     const Gg = geo();
     if (n === 'ardiendo') {
@@ -41,8 +40,14 @@ export function crearAuras(v) {
       return llamas;
     }
     if (n === 'aturdido') { for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(Gg.estrella, am(COL.aturdido, 0.95)); g.add(m); estrellas.push(m); } return estrellas; }
-    if (n === 'escudo') { const m = new THREE.Mesh(Gg.esfera, am(COL.escudo, 0.16)); m.scale.set(0.85, 1.1, 0.85); m.position.y = 0.95; g.add(m); return [m]; }
-    if (n === 'furia') { const m = new THREE.Mesh(Gg.columna, am(COL.furia, 0.22)); g.add(m); const r = new THREE.Mesh(Gg.aro, am(COL.furia, 0.6)); r.position.y = 0.04; g.add(r); return [m, r]; }
+    if (n === 'escudo') { const m = new THREE.Mesh(Gg.esfera, am(COL.escudo, 0.09)); m.scale.set(0.85, 1.1, 0.85); m.position.y = 0.95; g.add(m); return [m]; }
+    if (n === 'furia') {
+      // Potenciado: aro de suelo pulsante y chispas de brasa que suben alrededor del cuerpo (sin volúmenes que tapen al héroe)
+      const r = new THREE.Mesh(Gg.aro, am(COL.furia, 0.4)); r.position.y = 0.045; g.add(r);
+      const l = [r];
+      for (let i = 0; i < 9; i++) { const b = new THREE.Mesh(Gg.estrella, am(i % 3 ? 0xff7a2a : 0xffd070, 0.95)); g.add(b); brasas.push(b); l.push(b); }
+      return l;
+    }
     const r = new THREE.Mesh(Gg.aro, am(COL[n] ?? 0xffffff, 0.55)); r.position.y = 0.04; g.add(r);
     const l = [r];
     if (n === 'envenenado') for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(Gg.esfera, am(COL.envenenado, 0.8)); b.scale.setScalar(0.035); g.add(b); burbujas.push(b); l.push(b); }
@@ -61,7 +66,17 @@ export function crearAuras(v) {
       if (activos.ardiendo) llamas.forEach((m, i) => { const f = 0.75 + 0.45 * Math.sin(t * 14 + i * 2.3) * Math.sin(t * 9 + i); m.scale.set(0.8 + 0.3 * Math.sin(t * 11 + i), f * (i % 2 ? 0.55 : 1), 0.8 + 0.3 * Math.cos(t * 12 + i)); m.rotation.y = t * 3 + i; });
       if (activos.aturdido) estrellas.forEach((m, i) => { const a = t * 3 + i * 2.09; m.position.set(Math.cos(a) * 0.22, v.altura * 0.97 - 0.08, Math.sin(a) * 0.22); m.rotation.y = a * 2; m.rotation.x = a; });
       if (activos.envenenado) burbujas.forEach((b, i) => { const k = (t * 0.6 + i * 0.27) % 1; b.position.set(Math.sin(i * 2.4 + t) * 0.3, 0.2 + k * 1.5, Math.cos(i * 2.4) * 0.3); b.scale.setScalar(0.04 * (1 - k * 0.6)); });
-      const f = obj.furia; if (f && activos.furia) { f[0].scale.set(1 + 0.05 * Math.sin(t * 8), 1, 1 + 0.05 * Math.sin(t * 8)); f[1].scale.setScalar(1 + 0.12 * Math.sin(t * 6)); }
+      const f = obj.furia;
+      if (f && activos.furia) {
+        f[0].scale.setScalar(1 + 0.1 * Math.sin(t * 6));
+        brasas.forEach((b, i) => {
+          const k = (t * 0.75 + i * 0.111) % 1, a = i * 2.4 + t * 1.3;
+          const rr = 0.36 + 0.12 * Math.sin(i * 1.7);
+          b.position.set(Math.cos(a) * rr, 0.15 + k * 1.9, Math.sin(a) * rr);
+          b.scale.set(0.7, 1.6, 0.7).multiplyScalar(1.1 * (1 - k * 0.75));
+          b.rotation.y = a;
+        });
+      }
       const e = obj.escudo; if (e && activos.escudo) e[0].scale.set(0.85 + 0.03 * Math.sin(t * 5), 1.1, 0.85 + 0.03 * Math.sin(t * 5));
     },
     liberar() { g.removeFromParent(); for (const l of llamas) l.removeFromParent(); },

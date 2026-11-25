@@ -41,6 +41,11 @@ export function crearRender(juego) {
   escena.add(cielo.malla);
   const entorno = crearEntorno(renderer, escena, cielo);
   const luces = crearLuces(escena);
+  // Luz de acción: relleno suave sin sombra que acompaña al foco de la cámara (los jugadores). Crea un charco de luz
+  // donde ocurre la acción y deja la periferia en penumbra atmosférica; crece de noche para que nada se pierda.
+  const luzAccion = new THREE.PointLight(0xffffff, 0, 48, 1.55);
+  luzAccion.name = 'luzAccion'; escena.add(luzAccion);
+  const colAccion = new THREE.Color();
   const clima = crearClima(escena, juego.rng ? () => juego.rng() : Math.random);
   const rig = crearCamaraJuego(camara);
   const post = crearPostproceso(renderer);
@@ -193,6 +198,8 @@ export function crearRender(juego) {
     get centroVista() { return centroVista; },
     get camaraJuego() { return rig; },
     get transicionActiva() { return !!trans; },
+    /** Luz de relleno que sigue a la acción (multiplicador de intensidad; 0 la apaga). */
+    luzAccion, luzAccionFactor: 1,
 
     actualizar() {
       const dtR = Math.min(juego.tiempo?.dtReal ?? 0.016, 0.1);
@@ -227,6 +234,13 @@ export function crearRender(juego) {
       luces.actualizarPuntuales(dtR, centroVista);
       const noche = luces.info.noche;
       ambienteActual.noche = noche;
+      // penumbra (sol bajo o ausente): la luz de acción toma el relevo con el tono del cielo y un punto cálido
+      const penumbra = Math.max(noche, 1 - Math.min(1, luces.info.f * 2.2));
+      colAccion.copy(act.hemiC).lerp(BLANCO, 0.55).lerp(act.sol, 0.15 * (1 - noche));
+      luzAccion.color.copy(colAccion);
+      luzAccion.intensity = (30 + 150 * penumbra) * (api.luzAccionFactor ?? 1);
+      // alta y del lado de la cámara: ilumina las caras que vemos y su reflejo especular cae fuera de cuadro
+      luzAccion.position.set(rig.foco.x, 16, rig.foco.z + 9);
       escena.fog.color.copy(act.niebla); escena.fog.density = act.nieblaD;
       escena.environmentIntensity = act.envI * (1 + flash * 0.6);
       cielo.actualizar(act, luces.solDir, luces.lunaDir, noche, tReal, flash);
