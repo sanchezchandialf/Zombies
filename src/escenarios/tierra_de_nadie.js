@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { ERAS } from '../datos/eras.js';
 import { crearPiezas } from './tierra_de_nadie/piezas.js';
+import { detalleTrincheras } from './tierra_de_nadie/suelo.js';
 
 const CRATERES = [
   { x: -6, z: -14, r: 5.8, d: 0.2 }, { x: 12, z: -6, r: 4.2, d: 0.17 }, { x: -14, z: 10, r: 4.6, d: 0.19 }, { x: 5, z: 14, r: 3.4, d: 0.15 },
@@ -215,31 +216,34 @@ export async function construir(juego, kit) {
 
   // ───────────── 6. DETALLES: escombros, terrones, tablones, charcos y gas ─────────────
   const evitarDet = [...evitarMasas.slice(0, 5)];
-  const ladrilloR = M('ladrillo_rojo', { desgaste: 1 }), barroM = M('barro', { desgaste: 0.7 }), tab = M('tablas_viejas', { desgaste: 1 });
+  // Materiales lisos para las piezas instanciadas: con color por instancia sobre un material con textura oscura salían negras.
+  const liso = (n) => { const m = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.92, metalness: 0 }); m.name = n; kit._propios.push(m); return m; };
+  const ladrilloR = liso('escombros'), barroM = liso('terrones'), tab = liso('tablas_sueltas');
   const trozos = [];
   for (const [cx, cz, rx, rz, n] of [[-27, -23, 9, 7, 26], [-33, 12, 7, 5.5, 22], [-34, 31, 6, 4.5, 16], [36, 22, 5, 4.5, 14], [26, -24, 9, 6.5, 10]]) {
-    for (let i = 0; i < n; i++) trozos.push({ x: cx + rng.rango(-rx, rx), z: cz + rng.rango(-rz, rz), y: 0, rot: rng() * 6.28, rotZ: rng.rango(-0.3, 0.3), esc: [rng.rango(0.6, 1.4), rng.rango(0.5, 1.2), rng.rango(0.6, 1.3)], color: [0x8a6a58, 0x6e6a5c, 0x9a8d7a][i % 3] });
+    for (let i = 0; i < n; i++) trozos.push({ x: cx + rng.rango(-rx, rx), z: cz + rng.rango(-rz, rz), y: 0, rot: rng() * 6.28, rotZ: rng.rango(-0.3, 0.3), esc: [rng.rango(0.6, 1.4), rng.rango(0.5, 1.2), rng.rango(0.6, 1.3)], color: [0xa8705a, 0x8e8878, 0xb59a7c][i % 3] });
   }
   kit.instancias(kit.cajaRedondeada(0.34, 0.2, 0.24, 0.05, 1), ladrilloR, trozos.filter((t) => kit.libre(t.x, t.z, 0.2)), { nombre: 'escombros' });
+  // terrones de tierra removida: anillo continuo y desigual en el labio de cada cráter (no radial)
   const terrones = [];
-  for (const c of CRATERES) for (let i = 0; i < 9; i++) { const a = rng() * 6.28, r = c.r * rng.rango(0.95, 1.35); terrones.push({ x: c.x + Math.cos(a) * r, z: c.z + Math.sin(a) * r, y: -0.02, rot: rng() * 6.28, esc: [rng.rango(0.8, 2), rng.rango(0.6, 1.4), rng.rango(0.8, 1.8)], color: [0x3a3226, 0x4a4030, 0x2f2a20][i % 3] }); }
-  kit.instancias(kit.cajaRedondeada(0.4, 0.2, 0.34, 0.08, 1), barroM, terrones, { nombre: 'terrones' });
+  for (const c of CRATERES) for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * 6.2832 + rng.rango(-0.12, 0.12), r = c.r * rng.rango(1.02, 1.3);
+    terrones.push({ x: c.x + Math.cos(a) * r, z: c.z + Math.sin(a) * r, y: -0.02, rot: a + rng.rango(-0.5, 0.5), esc: [rng.rango(0.8, 1.9), rng.rango(0.5, 1.2), rng.rango(0.7, 1.4)], color: [0x6e5d40, 0x7d6a48, 0x574830][i % 3] });
+  }
+  kit.instancias(kit.cajaRedondeada(0.4, 0.2, 0.34, 0.08, 1), barroM, terrones.filter((t) => kit.libre(t.x, t.z, 0.2)), { nombre: 'terrones' });
   const maderas = kit.dispersar({ area: { x0: -42, z0: -34, x1: 42, z1: 40 }, cantidad: 40, distMin: 3, libre: 0.3, semilla: 12, evitar: [...evitarMasas, { x: 0, z: 0, r: 5 }] });
-  kit.instancias(kit.cajaRedondeada(1.2, 0.07, 0.16, 0.015, 1), tab, maderas.map((p) => ({ x: p.x, z: p.z, y: 0.01, rot: p.rot, esc: [p.esc, 1, 1] })), { nombre: 'tablas_sueltas', sombras: false });
+  kit.instancias(kit.cajaRedondeada(1.2, 0.07, 0.16, 0.015, 1), tab, maderas.map((p) => ({ x: p.x, z: p.z, y: 0.01, rot: p.rot, esc: [p.esc, 1, 1], color: [0x8a6c48, 0x6a5238, 0x9a7c58][Math.floor(p.u * 3) % 3] })), { nombre: 'tablas_sueltas', sombras: false });
 
+  // Capa de detalle del suelo: barro variado, bordes de cráter, oruga del tanque, huellas, charcos, hierba seca y casquillos
+  detalleTrincheras(kit, kit.rng(97), { crateres: CRATERES, tanque: { x: 17, z: 4, rot: 0.55 } });
   const evitarParche = evitarMasas.slice(0, 5).map((e) => ({ ...e, margen: 0.5 }));
-  // charcos de agua turbia en el fondo de los cráteres
-  CRATERES.forEach((c, i) => kit.parche({ tipo: 'charco', x: c.x + rng.rango(-0.4, 0.4), z: c.z + rng.rango(-0.4, 0.4), radio: c.r * rng.rango(0.42, 0.62), rot: rng() * 6, color: 0x2b3a30, semilla: i }));
-  kit.parches({ tipo: 'charco', area: { x0: -42, z0: -34, x1: 42, z1: 42 }, cantidad: 16, radio: [0.8, 2.2], evitar: [...evitarParche, { x: 0, z: 0, r: 6 }], color: 0x27322d, semilla: 7 });
-  // manchas de barro oscuro y quemaduras
-  kit.parches({ tipo: 'mancha', area: { x0: -44, z0: -40, x1: 44, z1: 42 }, cantidad: 10, radio: [2.5, 5.5], evitar: evitarParche, color: 0x2e281d, opacidad: 0.25, semilla: 31 });
-  kit.parches({ tipo: 'mancha', area: { x0: -42, z0: -38, x1: 42, z1: 40 }, cantidad: 7, radio: [0.7, 1.4], evitar: evitarParche, color: 0x1d1a15, opacidad: 0.4, semilla: 8 });
+  // charcos de agua turbia (reflejo suave) en el fondo de los cráteres mayores
+  CRATERES.forEach((c, i) => { if (c.r > 3.3) kit.parche({ tipo: 'charco', x: c.x + rng.rango(-0.3, 0.3), z: c.z + rng.rango(-0.3, 0.3), radio: c.r * rng.rango(0.4, 0.55), rot: rng() * 6, color: 0x55655a, metal: 0.2, rugosidad: 0.1, reflejo: 0.9, semilla: i }); });
   // gas amarillento a ras de suelo en las zonas bajas
   for (const [i, c] of CRATERES.slice(0, 9).entries()) kit.parche({ tipo: 'mancha', x: c.x, z: c.z, radio: c.r * 1.35, rot: i, color: 0xa7a24a, opacidad: 0.2, capa: 3, semilla: i });
   kit.parche({ tipo: 'mancha', x: 0, z: -36.5, radio: 10, alargado: 3, color: 0xa7a24a, opacidad: 0.16, capa: 3 });
   kit.parche({ tipo: 'mancha', x: 2, z: 24, radio: 9, alargado: 2.6, color: 0x9a9848, opacidad: 0.14, capa: 3 });
-  // restos de hierba seca y paja (en vez de hojas)
-  for (let i = 0; i < 8; i++) kit.parche({ tipo: 'hojas', x: rng.rango(-40, 40), z: rng.rango(-34, 40), radio: rng.rango(2, 4), cantidad: 22, semilla: i, paleta: [0x4a4a2a, 0x5b5a34, 0x3d3a26, 0x6a5c3a, 0x55512f] });
+  void evitarParche;
 
   // ───────────── 7. LUCES (≤ 10) y bengala ─────────────
   const lampara = (x, y, z) => { const g = kit.cajaRedondeada(0.18, 0.26, 0.18, 0.04, 1); L.anadir(g, kit.emisivo(0xffb25a, 2.6), mat4(x, y, z), { uv: false }); L.anadir(kit.cajaRedondeada(0.04, 0.5, 0.04, 0.01, 1), M('hierro_forjado'), mat4(x, y + 0.35, z), { uv: false }); };
