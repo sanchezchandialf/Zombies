@@ -4,6 +4,7 @@ import { crearBuses } from './ayudas.js';
 import { EFECTOS, NOMBRES_EFECTOS } from './sintesis.js';
 import { BUCLES, nombreAmbiente } from './bucles.js';
 import { Secuenciador } from './musica.js';
+import { conectarVoces } from './voces.js';
 
 const CLAVE = 'eraz.audio.v1';
 const MAX_VOCES = 40, ALCANCE = 58;
@@ -358,5 +359,6 @@ export function crearAudio(juego) {
       ctx = null;
     },
   };
+  conectarVoces(juego, api, en); // voces reales en español (public/voces); opcional
   return api;
 }
