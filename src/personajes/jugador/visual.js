@@ -17,7 +17,7 @@ const damp = (a, b, k, dt) => lerp(a, b, 1 - Math.exp(-k * dt));
 const TAU = Math.PI * 2;
 /** Escala heroica: a 22 m de cámara el héroe debe dominar el encuadre frente a la horda (ARTE §8). */
 const ESC_HEROE = 1.12;
-const DUR_TINTE = 0.16;
+const DUR_TINTE = 0.13;
 
 // Posición del puño derecho (empuñadura) en el marco del pecho y parámetros de retroceso por pose de arma
 const POSES = {
@@ -88,7 +88,7 @@ export class VisualJugador {
     this.anillo = sis.crearAnillo?.(ROLES[rolId]?.color ?? '#ffffff') ?? null;
     if (this.anillo) { this.anillo.scale.setScalar(1 / (R.esc * ESC_HEROE)); root.add(this.anillo); }
     // Luz de héroe: pequeño foco sin sombra sobre la cabeza, blanco teñido del color del rol. De noche separa al jugador del fondo.
-    this.colLuz = new THREE.Color(ROLES[rolId]?.color ?? '#ffffff').lerp(new THREE.Color(1, 0.96, 0.9), 0.45);
+    this.colLuz = new THREE.Color(ROLES[rolId]?.color ?? '#ffffff').lerp(new THREE.Color(1, 0.96, 0.9), 0.7);   // casi blanca: modela al héroe sin teñir el arma
     this.luz = this.juego?.render?.luzPuntual?.({ x: 0, y: 2.6, z: 0, color: this.colLuz, intensidad: 0, distancia: 8 }) ?? null;
     sis.escena.add(root);
 
@@ -173,7 +173,11 @@ export class VisualJugador {
     }
     this._mats();
   }
-  destello(color = 0xffffff) { this.flashT = DUR_TINTE; this.flashCol = color === 0xffffff ? 0xff3424 : color; this.flashNivel = 2; this._mats(); }
+  destello(color = 0xffffff) {
+    // bajo golpes seguidos el tinte no se queda clavado al máximo: solo el primero del racimo llega al nivel fuerte
+    this.flashNivel = this.t - (this.tGolpe ?? -9) < 0.45 ? 1 : 2; this.tGolpe = this.t;
+    this.flashT = DUR_TINTE; this.flashCol = color === 0xffffff ? 0xff3424 : color; this._mats();
+  }
   visible(v) { this.root.visible = v; }
   liberar() { this.root.removeFromParent(); this.sis.quitar(this); this.auras.liberar(); this.luz?.quitar?.(); this.luz = null; }
 

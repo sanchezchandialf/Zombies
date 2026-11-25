@@ -113,9 +113,9 @@ export function matTinte(m0, color = 0xff3a2a, nivel = 1) {
     m = m0.clone();
     m.onBeforeCompile = m0.onBeforeCompile; m.customProgramCacheKey = m0.customProgramCacheKey;
     _ct.set(color);
-    const f = nivel > 1 ? 0.6 : 0.32;
+    const f = nivel > 1 ? 0.3 : 0.12;
     m.color = m0.color.clone().lerp(_ct, f);
-    m.emissive = _ct.clone(); m.emissiveIntensity = nivel > 1 ? 0.5 : 0.22;
+    m.emissive = _ct.clone(); m.emissiveIntensity = nivel > 1 ? 0.1 : 0.04;
     m.emissiveMap = null;
     m.userData.compartido = true;
     tintes.set(k, m);

@@ -269,7 +269,7 @@ function sangre(idx, buf, o) {
     const base = abanicos[i % nAb];
     const a = base + (rnd() - 0.5) * (sesgo ? 0.9 : 1.5);
     const L = largoMin + (largoMax - largoMin) * Math.pow(rnd(), 1.6);
-    const gr = 0.03 + rnd() * rnd() * 0.11;
+    const gr = sesgo ? 0.018 + rnd() * rnd() * 0.05 : 0.03 + rnd() * rnd() * 0.11;
     const ax = Math.cos(a) * masa * 0.5, ay = Math.sin(a) * masa * 0.5;
     const curva = (rnd() - 0.5) * 0.25;
     const mx = Math.cos(a + curva) * (L * 0.55), my = Math.sin(a + curva) * (L * 0.55);
@@ -430,8 +430,9 @@ export function atlasCalcos() {
   sangre(1, buf, { semilla: 29, masa: 0.46, nRayos: 12, largoMin: 0.4, largoMax: 0.88, motas: 26, rocio: 1, ang0: 0.5 });
   sangre(2, buf, { semilla: 41, masa: 0.44, nRayos: 10, largoMin: 0.3, largoMax: 0.6, motas: 18, rocio: 0.85 });
   sangre(3, buf, { semilla: 53, masa: 0.4, nRayos: 13, largoMin: 0.3, largoMax: 0.66, motas: 20, rocio: 0.9, ang0: 1.2 });
-  sangre(4, buf, { semilla: 67, masa: 0.3, nRayos: 11, largoMin: 0.5, largoMax: 0.95, sesgo: 0.85, motas: 9, rocio: 0.85, centro: true, ang0: 0 });
-  sangre(5, buf, { semilla: 83, masa: 0.26, nRayos: 9, largoMin: 0.55, largoMax: 0.97, sesgo: 0.9, motas: 10, rocio: 0.9, centro: true, ang0: 0.05 });
+  // direccional: abanico estrecho de regueros finos y gotas alargadas, con poca masa en el origen (nada de «renacuajos»)
+  sangre(4, buf, { semilla: 67, masa: 0.16, nRayos: 18, largoMin: 0.45, largoMax: 0.95, sesgo: 0.85, motas: 16, rocio: 0.9, ang0: 0 });
+  sangre(5, buf, { semilla: 83, masa: 0.14, nRayos: 16, largoMin: 0.5, largoMax: 0.97, sesgo: 0.9, motas: 18, rocio: 0.9, ang0: 0.05 });
   charco(6, buf, 97);
   gotero(7, buf, 101);
   quemadura(8, buf, 113); quemadura(9, buf, 127); quemadura(10, buf, 139);

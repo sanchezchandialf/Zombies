@@ -319,7 +319,7 @@ export function crearEfectos(ctx) {
       const tl = lanzar(H, p.x, py, p.z, vx, vy, vz, 1.4, t, t * 0.8, ESFERA, SANG0, SANG1, SANG2);
       if (programarSuelo && tl < 1.3 && i % programarSuelo === 0) {
         const k = 0.25, ee = (1 - Math.exp(-k * tl)) / k;
-        calcos.programar(tl, 'sangre', p.x + vx * ee, p.z + vz * ee, rr(0.3, 0.62) * e * (0.7 + t * 2.5), vx, vz);
+        calcos.programar(tl, 'sangre', p.x + vx * ee, p.z + vz * ee, rr(0.16, 0.34) * e * (0.8 + t * 1.5), vx, vz);   // gotas: manchas pequeñas
       }
     }
   }
@@ -335,26 +335,26 @@ export function crearEfectos(ctx) {
     const e = op.escala ?? 1, tiene = dirDe(op);
     const n = cnt(op.cantidad ?? 8);
     const y = Y(p, 1);
-    gotasSangre(p, n, 5.5 * e, 0.17 * e, tiene, e, 2);
+    gotasSangre(p, n, 5.5 * e, 0.17 * e, tiene, e, 3);
     brumaSangre(p, Math.max(1, Math.round(n / 4)), 2.8 * e, 0.8 * e, tiene);
     if (!op.sinCalco && (op.calco !== false)) {
       const k = Math.min(1, y);
-      calcos.calco('sangre', p.x + (tiene ? DX * 0.45 : 0), p.z + (tiene ? DZ * 0.45 : 0), rr(0.8, 1.35) * e * (0.7 + 0.3 * Math.min(1, n / 8)), tiene ? { dirX: DX, dirZ: DZ } : undefined);
+      calcos.calco('sangre', p.x + (tiene ? DX * 0.45 : 0), p.z + (tiene ? DZ * 0.45 : 0), rr(0.55, 0.95) * e * (0.7 + 0.3 * Math.min(1, n / 8)), tiene ? { dirX: DX, dirZ: DZ } : undefined);
     }
   }
 
   function sangreGrande(p, op = {}) {
     const e = op.escala ?? 1, tiene = dirDe(op);
     const n = cnt(op.cantidad ?? 26);
-    gotasSangre(p, n, 8.5 * e, 0.22 * e, tiene, e, 2);
-    gotasSangre(p, Math.round(n * 0.35), 3.2 * e, 0.3 * e, false, e, 3);
+    gotasSangre(p, n, 8.5 * e, 0.22 * e, tiene, e, 3);
+    gotasSangre(p, Math.round(n * 0.35), 3.2 * e, 0.3 * e, false, e, 4);
     brumaSangre(p, cnt(7), 4 * e, 1.4 * e, tiene);
     estallido(p, e);
     if (op.calco !== false) {
-      calcos.calco('sangre', p.x + (tiene ? DX * 0.4 : 0), p.z + (tiene ? DZ * 0.4 : 0), rr(2.4, 3.4) * e, { charco: false });
-      for (let i = 0; i < cnt(4); i++) {
-        const a = rng() * TAU, d = rr(0.8, 2.4) * e;
-        calcos.programar(rr(0.05, 0.4), 'sangre', p.x + Math.cos(a) * d, p.z + Math.sin(a) * d, rr(0.9, 1.9) * e, tiene ? DX : 0, tiene ? DZ : 0);
+      calcos.calco('sangre', p.x + (tiene ? DX * 0.4 : 0), p.z + (tiene ? DZ * 0.4 : 0), rr(1.6, 2.2) * e, { charco: false });
+      for (let i = 0; i < cnt(3); i++) {
+        const a = rng() * TAU, d = rr(0.7, 1.9) * e;
+        calcos.programar(rr(0.05, 0.4), 'sangre', p.x + Math.cos(a) * d, p.z + Math.sin(a) * d, rr(0.5, 1.1) * e, tiene ? DX : 0, tiene ? DZ : 0);
       }
     }
     if (op.trozos) escombros.lanzar({ x: p.x, y: Y(p, 0.8), z: p.z, cantidad: cnt(op.trozos), material: 'carne', fuerza: 6.5 * e, dirX: tiene ? DX : 0, dirZ: tiene ? DZ : 0 });
