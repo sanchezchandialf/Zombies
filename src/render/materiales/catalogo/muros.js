@@ -233,12 +233,13 @@ const troncos = {
 
 const chapa_ondulada = {
   nombre: 'chapa_ondulada', grupo: 'muros', tam: 512, escala: 1.6,
-  descripcion: 'Chapa ondulada galvanizada o pintada (admite color), con óxido, golpes, tornillos y churretes de suciedad.',
-  material: { macro: [0.16, 0.04, 0.12], desgaste: 0.5, props: { envMapIntensity: 1.1 } },
+  descripcion: 'Chapa ondulada galvanizada o pintada (admite color), con óxido escaso en manchas menudas junto a tornillos y valles, golpes y churretes de suciedad. El óxido de gran escala lo aporta la macro-variación (tono) del material.',
+  // macro: más variación de valor y de tono (cálido/frío) a gran escala, para que cada faldón de tejado tenga su propio matiz sin repetir el mosaico de 1,6 m.
+  material: { macro: [0.24, 0.1, 0.14], desgaste: 0.5, props: { envMapIntensity: 1.1 } },
   generar(c) {
     const N = c.N, n = c.n, px = (v) => c.px(v);
     const ond = 8;
-    const bl = blanco(N, 19), ox = c.fbm(5, 6, { warp: { amp: 0.6, freq: 3 } }), ox2 = c.fbm(18, 4), hol = goteos(c, { cols: 36, largo: 2 }), gol = c.fbm(3, 4), fino = c.fbm(80, 2), pel = c.fbm(6, 5, { warp: { amp: 0.6, freq: 3 } });
+    const bl = blanco(N, 19), ox = c.fbm(3, 3, { warp: { amp: 0.6, freq: 3 } }), ox2 = c.fbm(23, 4), ox3 = c.fbm(61, 3), lav = c.fbm([5, 70], 3, { exacto: true }), hol = goteos(c, { cols: 36, largo: 2 }), gol = c.fbm(3, 4), fino = c.fbm(80, 2), pel = c.fbm(6, 5, { warp: { amp: 0.6, freq: 3 } });
     const rem = remaches(c, { cols: ond, filas: 5, radio: 5, desfaseX: 0.0, desfaseY: 0.5 });
     const pintura = col(0xcdd0cf), metal = col(0x9fa3a5), orin = [col(0x5a2a10), col(0x9a4a1c), col(0xb8672a)];
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
@@ -246,10 +247,15 @@ const chapa_ondulada = {
       const fase = (x / N) * ond * Math.PI * 2;
       const o = Math.sin(fase) * 0.5 + 0.5;
       const dent = (gol[i] - 0.5) * 0.35;
-      const pe = suave(0.55, 0.64, pel[i] + (1 - o) * 0.04 - hol[i] * 0.05);
-      const oxm = suave(0.58, 0.72, ox[i] * 0.7 + ox2[i] * 0.3 + (pe) * 0.15) * pe + suave(0.8, 0.9, ox2[i]) * 0.5;
+      // desconchado de pintura: poco y suelto, deja ver el galvanizado
+      const pe = suave(0.76, 0.88, pel[i] * 0.55 + ox3[i] * 0.45 + o * 0.05 - hol[i] * 0.04) * 0.85;
+      // Óxido: solo motas menudas (ruido de 23-61 ciclos por mosaico) y churretes bajo los tornillos; la densidad varía muy poco
+      // con un ruido de 3 ciclos para que no haya ningún manchón grande ni motivo reconocible al repetir.
+      const dens = 0.9 + (ox[i] - 0.5) * 0.5;
+      const motas = suave(0.72, 0.86, (ox2[i] * 0.6 + ox3[i] * 0.4) * dens + (1 - pe) * 0.06);
+      const oxm = Math.min(1, motas * 0.8 + rem.mask[i] * 0.35 * suave(0.55, 0.75, ox3[i]) + hol[i] * 0.12 * suave(0.6, 0.8, ox2[i]));
       const pm = 1 - pe;
-      const lum = 0.55 + o * 0.5 + dent * 0.3 + (fino[i] - 0.5) * 0.1;
+      const lum = (0.55 + o * 0.5 + dent * 0.3 + (fino[i] - 0.5) * 0.1) * (0.9 + lav[i] * 0.2);
       const tr = pintura[0] * lum * (0.92 - hol[i] * 0.3), tg = pintura[1] * lum * (0.92 - hol[i] * 0.3), tb = pintura[2] * lum * (0.92 - hol[i] * 0.3);
       let r = mezcla(metal[0] * lum, tr, pm), g = mezcla(metal[1] * lum, tg, pm), b = mezcla(metal[2] * lum, tb, pm);
       const t = clamp(ox2[i] * 1.2);
