@@ -112,18 +112,26 @@ export function crearHudMundo(ctx, { paneles }) {
 
   // ══ Etiquetas sobre el personaje ═══════════════════════════════════════════════════════════════════════════════
   const etqs = new Map();
+  const T_ETQ = 1.5; // la etiqueta del arma solo aparece al cambiar/recoger arma o al recargar
+  const mostrarEtq = (j) => { if (!j) return; let e = etqs.get(j.indice); if (!e) { e = crearEtq(); etqs.set(j.indice, e); } e.t = T_ETQ; };
+  ctx.en('jugador:arma', (d) => mostrarEtq(d.jugador));
+  ctx.en('arma:recarga', (d) => mostrarEtq(d.portador));
   function crearEtq() {
     const n = html(`<div class="etq"><div class="etq-aviso"></div><div class="etq-fila"><span class="etq-nom"></span><span class="etq-mun num"></span></div><div class="barra fina etq-barra"><i></i></div></div>`);
     capaEtq.appendChild(n);
-    return { el: n, nom: n.querySelector('.etq-nom'), mun: n.querySelector('.etq-mun'), barra: n.querySelector('.etq-barra i'), barraEl: n.querySelector('.etq-barra'), aviso: n.querySelector('.etq-aviso') };
+    return { t: 0, el: n, nom: n.querySelector('.etq-nom'), mun: n.querySelector('.etq-mun'), barra: n.querySelector('.etq-barra i'), barraEl: n.querySelector('.etq-barra'), aviso: n.querySelector('.etq-aviso') };
   }
-  function actualizarEtq(j) {
+  function actualizarEtq(j, dt) {
     let e = etqs.get(j.indice);
     if (!e) { e = crearEtq(); etqs.set(j.indice, e); }
     const inst = j.arma;
     const o = (j.vivo !== false && inst) ? proy(j.pos.x, (j.visual?.altura ?? 1.8) + 0.55, j.pos.z) : null;
     if (!o || !o.visible) { visible(e.el, false); return; }
-    visible(e.el, true);
+    e.t = Math.max(-0.4, e.t - dt);
+    const on = e.t > 0 || !!inst.recargando;
+    clase(e.el, 'on', on);
+    visible(e.el, on || e.t > -0.4);
+    if (!on && e.t <= -0.4) return;
     estilo(e.el, 'transform', `translate3d(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px, 0) translate(-50%, -100%)`);
     estilo(e.el, '--rol', ROLES[j.rol?.id]?.color ?? '#fff');
     const def = inst.def, cargador = Math.max(1, def?.cargador ?? 1);
@@ -135,7 +143,7 @@ export function crearHudMundo(ctx, { paneles }) {
     const vacio = !rec && (inst.municion ?? 0) <= 0, bajo = !rec && cargador > 2 && (inst.municion ?? 0) <= Math.floor(cargador * 0.2);
     const sinRes = inst.reserva === 0 && def?.reserva !== -1 && !j.mods?.municionInfinita;
     const msg = rec ? '' : vacio && sinRes ? 'SIN MUNICIÓN' : (vacio || bajo) ? '¡RECARGA!' : '';
-    texto(e.aviso, msg); visible(e.aviso, !!msg);
+    texto(e.aviso, ''); visible(e.aviso, false);
     clase(e.barraEl, 'bajo', !!msg);
   }
 
@@ -321,7 +329,7 @@ export function crearHudMundo(ctx, { paneles }) {
       if (!jugando) { juego.contenedor.classList.remove('ez-cursor-oculto'); cursorOculto = false; return; }
       actualizarFlotantes(dt);
       actualizarDirs(dt);
-      for (const j of juego.jugadores) { actualizarEtq(j); actualizarInter(j); }
+      for (const j of juego.jugadores) { actualizarEtq(j, dt); actualizarInter(j); }
       for (const [i, e] of etqs) if (!juego.jugadores.some((j) => j.indice === i)) visible(e.el, false);
       for (const [i, e] of inters) if (!juego.jugadores.some((j) => j.indice === i)) visible(e.el, false);
       actualizarMarcadores();

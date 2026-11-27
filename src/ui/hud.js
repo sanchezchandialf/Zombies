@@ -13,14 +13,10 @@ import { crearMinimapa } from './minimapa.js';
 const HAB_ICONO = { supresion: 'hab_supresion', suero: 'hab_suero', torreta: 'hab_torreta', acecho: 'hab_acecho', terremoto: 'hab_terremoto' };
 const FIN = ' '; // espacio fino
 
-/** 1 234 567 → { ceros, cifras } con 9 dígitos y ceros iniciales atenuados. */
+/** 1234567 → "1 234 567" (sin ceros de relleno, separador de miles fino). */
 function formatoPuntos(n) {
-  const s = String(Math.max(0, Math.round(n))).padStart(9, '0');
-  const g = s.replace(/(\d{3})(?=\d)/g, '$1' + FIN);
-  const m = g.match(/^[0 ]*/)[0];
-  const sinCeros = m.length >= g.length ? g.slice(-1) : g.slice(m.length);
-  const ceros = g.slice(0, g.length - sinCeros.length);
-  return { ceros, cifras: sinCeros };
+  const t = String(Math.max(0, Math.round(n)));
+  return { ceros: '', cifras: t.replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') };
 }
 
 function periodoDelDia(h) {
@@ -33,26 +29,25 @@ function periodoDelDia(h) {
 
 const PLANTILLA_JUG = `
 <div class="jug panel orn">
-  <div class="jug-retr"></div>
-  <div class="jug-cuerpo">
-    <div class="jug-cab"><span class="jug-tag num"></span><span class="jug-rol titulo"></span><span class="jug-est"></span></div>
-    <div class="vida">
-      <span class="vida-ico">${icono('vida')}</span>
-      <div class="barra vida-pista"><i class="vida-perdida"></i><i class="vida-actual"></i><b class="vida-cura"></b></div>
-      <span class="vida-txt num"></span>
+  <i class="jug-fondo"></i>
+  <div class="jug-flota"><span class="jug-est"></span><span class="mun-aviso"></span></div>
+  <div class="jug-retr"></div><span class="jug-tag num"></span><span class="jug-rol"></span>
+  <div class="vida">
+    <span class="vida-ico">${icono('vida')}</span>
+    <div class="barra vida-pista"><i class="vida-perdida"></i><i class="vida-actual"></i><b class="vida-cura"></b></div>
+    <span class="vida-txt num"></span>
+  </div>
+  <div class="arma-nombre"></div>
+  <div class="arma-fila">
+    <div class="arma-ico"></div>
+    <div class="arma-datos">
+      <div class="mun-fila"><span class="mun-act num"></span><span class="mun-res num"></span></div>
+      <div class="barra fina mun-barra"><i></i></div>
     </div>
-    <div class="arma-fila">
-      <div class="arma-ico"></div>
-      <div class="arma-datos">
-        <div class="arma-nombre"></div>
-        <div class="mun-fila"><span class="mun-act num"></span><span class="mun-res num"></span><span class="mun-aviso"></span></div>
-        <div class="barra fina mun-barra"><i></i></div>
-      </div>
-    </div>
-    <div class="jug-pie">
-      <div class="sec"><span class="tecla sec-tecla">2</span><span class="sec-ico"></span><span class="sec-mun num"></span></div>
-      <div class="arroj"><span class="tecla arroj-tecla">G</span>${icono('granada')}<span class="arroj-pips"></span></div>
-    </div>
+  </div>
+  <div class="jug-pie">
+    <div class="sec"><span class="tecla sec-tecla">2</span><span class="sec-ico"></span><span class="sec-mun num"></span></div>
+    <div class="arroj"><span class="tecla arroj-tecla">G</span>${icono('granada')}<span class="arroj-pips"></span></div>
   </div>
   <div class="hab">
     <svg class="hab-anillo" viewBox="0 0 44 44"><circle class="hab-pista" cx="22" cy="22" r="19"/><circle class="hab-prog" cx="22" cy="22" r="19" transform="rotate(-90 22 22)"/></svg>
@@ -77,11 +72,11 @@ export function crearHud(ctx) {
     </div>
   </div>
   <div class="hud-centro">
-    <div class="puntos-fila">
+    <div class="puntos-fila placa">
       <div class="puntos num" aria-label="Puntuación"><span class="ceros"></span><span class="cifras">0</span></div>
       <div class="racha">
         <svg viewBox="0 0 60 60"><circle class="racha-pista" cx="30" cy="30" r="25"/><circle class="racha-prog" cx="30" cy="30" r="25" transform="rotate(-90 30 30)"/></svg>
-        <span class="racha-mult num">×1</span>
+        <span class="racha-mult num" title="Multiplicador de racha">×1</span>
         <span class="racha-txt rotulo" title="Racha"><b class="num">0</b></span>
       </div>
     </div>
@@ -225,7 +220,7 @@ export function crearHud(ctx) {
     else p.perdida = Math.max(f, p.perdida - dt * 0.5);
     if (f > p.perdida) p.perdida = f;
     estilo(R.vidaPer, '--v', p.perdida.toFixed(3));
-    contenido(R.vidaTxt, `<b>${Math.ceil(vida)}</b>/${Math.round(vmax)}`);
+    contenido(R.vidaTxt, `<b>${Math.ceil(vida)}</b>`);
     clase(R.vida, 'critica', f < 0.3 && j.vivo !== false);
     estilo(R.vidaAct, '--c', f < 0.3 ? 'var(--vida)' : f < 0.6 ? 'var(--vida-2)' : 'var(--vida-ok)');
     const abatido = j.caido || j.vivo === false;

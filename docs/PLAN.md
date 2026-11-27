@@ -23,3 +23,11 @@
 | Pulido de cada mapa | Sonnet | high | Contenido acotado y guiado por la crítica del revisor |
 | Revisor visual a ciegas (comparativa con el original) | Opus | medium | Juicio visual exigente, sin escribir código |
 | Arreglos de lógica o integración puntuales | Sonnet | medium | Errores concretos con pruebas existentes |
+
+## Pendiente para la próxima tanda (tras la beta, modo ahorro)
+- FX ronda 2: sangre granate variada que se seca y con tope; fogonazo con luz, trazadoras, impactos y explosiones visibles en combate.
+- Vehículos legibles desde arriba (locomóvil 1850 casi negro); revisar los seis.
+- Luz: sombra de contacto de la horda, anillo del demoledor distinto del rojo sangre, charcos de luz de farolas, menos lluvia en primer plano.
+- Verificar en foto: ambiente 1850 nuevo, hueco de tejados ampliado, barra de jefe y tira de avisos de la interfaz.
+- Ronda ciega 2 con el bot disparando (no pasivo) y, si es posible, capturas nativas de Boxhead.
+- 13 voces de ElevenLabs pendientes de autorización.
