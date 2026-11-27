@@ -2,14 +2,16 @@
 // mueven, se aleja si hay jugadores separados, sacudida con ruido suave, retroceso direccional y vuelo de menú.
 import * as THREE from 'three';
 
-export const CAMARA = { fov: 35, cabeceo: (55 * Math.PI) / 180, dist: 22, altoMirada: 0.7, near: 0.4, far: 450 };
+// dist/fov: el héroe mide ~95–110 px de alto a 720p (antes 22 m / 35º ≈ 55–70 px); el encuadre se adelanta hacia donde
+// apunta y hacia donde corre para que el espacio útil quede delante del jugador y no detrás.
+export const CAMARA = { fov: 33, cabeceo: (55 * Math.PI) / 180, dist: 17, altoMirada: 0.8, near: 0.4, far: 450, mira: 3.4, sepMax: 2.6 };
 
 const suave = (t) => t * t * (3 - 2 * t);
 const ruido = (t, s) => (Math.sin(t * 7.3 + s * 11.1) + Math.sin(t * 12.7 + s * 5.3) * 0.6 + Math.sin(t * 19.1 + s * 2.7) * 0.3) / 1.9;
 
 export function crearCamaraJuego(camara) {
   const foco = new THREE.Vector3(), focoObj = new THREE.Vector3(), centroPrev = new THREE.Vector3(), vel = new THREE.Vector3();
-  const spring = new THREE.Vector3(), springV = new THREE.Vector3();
+  const spring = new THREE.Vector3(), springV = new THREE.Vector3(), mira = new THREE.Vector3();
   const posJuego = new THREE.Vector3(), mirJuego = new THREE.Vector3(), posMenu = new THREE.Vector3(), mirMenu = new THREE.Vector3();
   const tmp = new THREE.Vector3(), derecha = new THREE.Vector3(), arriba = new THREE.Vector3();
   let objetivos = [], iniciado = false, dist = CAMARA.dist, zoomVal = 1, zoomObj = 1, zoomT = 0;
@@ -50,9 +52,22 @@ export function crearCamaraJuego(camara) {
         const m = Math.hypot(vel.x, vel.z); if (m > 14) { vel.x *= 14 / m; vel.z *= 14 / m; }
         centroPrev.set(cx, 0, cz);
       } else if (n === 0) { vel.multiplyScalar(Math.exp(-4 * dt)); }
-      const lead = 0.42;
-      let lx = vel.x * lead, lz = vel.z * lead; const lm = Math.hypot(lx, lz);
-      if (lm > 4.5) { lx *= 4.5 / lm; lz *= 4.5 / lm; }
+      // anticipación de la mira: media de las direcciones de apuntado de los objetivos con `rot` (los jugadores vivos)
+      let ax = 0, az = 0, na = 0;
+      for (const o of objetivos) {
+        if (!o?.pos || !isFinite(o.rot) || o.vivo === false || o.caido) continue;
+        ax += Math.sin(o.rot); az += Math.cos(o.rot); na++;
+      }
+      if (na > 0 && dt > 0) {
+        // la pantalla es apaisada: más adelanto en horizontal que en profundidad; con varios jugadores, menos
+        const f = CAMARA.mira / na / (n > 1 ? 1.8 : 1);
+        ax *= f * 1.15; az *= f * 0.8;
+        const km = 1 - Math.exp(-2.4 * dt);
+        mira.x += (ax - mira.x) * km; mira.z += (az - mira.z) * km;
+      } else if (n === 0) mira.multiplyScalar(Math.exp(-3 * dt));
+      const lead = 0.36;
+      let lx = vel.x * lead + mira.x, lz = vel.z * lead + mira.z; const lm = Math.hypot(lx, lz);
+      if (lm > 5.2) { lx *= 5.2 / lm; lz *= 5.2 / lm; }
       focoObj.set(cx + (n > 0 ? lx : 0), 0, cz + (n > 0 ? lz : 0));
       if (Math.hypot(focoObj.x - foco.x, focoObj.z - foco.z) > 45) foco.copy(focoObj); // teletransporte / cambio de escenario
       else { const kf = 1 - Math.exp(-5.2 * dt); foco.x += (focoObj.x - foco.x) * kf; foco.z += (focoObj.z - foco.z) * kf; }
@@ -61,7 +76,7 @@ export function crearCamaraJuego(camara) {
       const asp = camara.aspect || 16 / 9;
       const altoVis = 2 * CAMARA.dist * Math.tan((CAMARA.fov * Math.PI) / 360);
       const kx = (ancho + 11) / (altoVis * asp), kz = (fondo + 10) / (altoVis / Math.sin(CAMARA.cabeceo));
-      const sep = Math.min(2.1, Math.max(1, kx, kz));
+      const sep = Math.min(CAMARA.sepMax, Math.max(1, kx, kz));
       if (zoomT > 0) zoomT -= dt;
       const zObj = zoomT > 0 ? zoomObj : 1;
       zoomVal += (zObj - zoomVal) * (1 - Math.exp(-(zoomT > 0 ? 9 : 2.6) * dt));

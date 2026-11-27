@@ -264,6 +264,8 @@ export function crearKit(juego, eraIdx = 0) {
     kit.cerrado = true;
     for (const { lote, nombre } of kit._lotes) if (lote.piezas > 0) grupo.add(lote.construir({ nombre }));
     if (kit._parches.size) grupo.add(construirParches(kit));
+    // tejados, plantas altas y copas que queden entre la cámara y un jugador se abren solos (ver src/render/recorte.js)
+    juego.render?.prepararRecorte?.(grupo);
     if (juego.opciones.depurar === 'colision' || juego.opciones.depurar === true) kit.depurarColision();
   };
 

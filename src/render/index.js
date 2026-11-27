@@ -9,6 +9,7 @@ import { crearLuces, MAX_PUNTUALES } from './luces.js';
 import { crearClima } from './clima.js';
 import { crearCamaraJuego } from './camara.js';
 import { crearPostproceso } from './postproceso.js';
+import { prepararRecorte, actualizarRecorte, RECORTE } from './recorte.js';
 
 const CALIDADES = {
   baja:  { pr: 1,    sombra: 1024, ao: false, aoN: 8,  bloom: 3, msaa: 0, fxaa: true,  puntuales: 4,  clima: 0.4 },
@@ -65,6 +66,7 @@ export function crearRender(juego) {
   let calidadNivel = 'alta', cfg = CALIDADES.alta;
   let cssW = juego.contenedor.clientWidth || innerWidth, cssH = juego.contenedor.clientHeight || innerHeight;
   let hecho = false;
+  let seguidos = [];
 
   // ── transición de era
   let trans = null; // { fase:'entrada'|'medio'|'salida', t, alMedio, resolver }
@@ -146,7 +148,7 @@ export function crearRender(juego) {
       if (inmediato || !hecho) { hora = horaObj; copiar = true; }
     },
 
-    seguir(objetivos) { rig.seguir(objetivos); },
+    seguir(objetivos) { seguidos = objetivos || []; rig.seguir(objetivos); },
     sacudir(fuerza, duracion) { rig.sacudir(fuerza, duracion); },
     retroceso(dx, dz, fuerza) { rig.retroceso(dx, dz, fuerza); },
     /** factor < 1 acerca, > 1 aleja (multiplica la distancia) durante `duracion` s y vuelve solo. */
@@ -198,6 +200,10 @@ export function crearRender(juego) {
     get centroVista() { return centroVista; },
     get camaraJuego() { return rig; },
     get transicionActiva() { return !!trans; },
+    /** Hace recortables (agujero sobre el jugador) los materiales de las mallas de `obj` (lo llama el kit al cerrar el mapa). */
+    prepararRecorte(obj) { prepararRecorte(obj); },
+    /** Uniformes del recorte de oclusores (uRecR radio en m, uRecAlt altura mínima, uRecFuerza 0..1). */
+    recorte: RECORTE,
     /** Luz de relleno que sigue a la acción (multiplicador de intensidad; 0 la apaga). */
     luzAccion, luzAccionFactor: 1,
 
@@ -228,6 +234,7 @@ export function crearRender(juego) {
       rig.actualizar(dtR, !api.camaraExterna);
       camara.updateMatrixWorld();
       actualizarCentroVista();
+      actualizarRecorte(camara, rig.menuActivo || api.camaraExterna ? null : seguidos);
 
       // niebla, luces, cielo
       luces.actualizarAstros(act, hora, centroVista, flash);
